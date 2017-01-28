@@ -1,0 +1,63 @@
+main#ui article.terminal section.output .spacer {
+	flex-grow: 1;
+}
+
+main#ui article.terminal section.output > .items > li {
+	padding-bottom: 5px;
+	overflow-x: hidden;
+}
+
+main#ui article.terminal section.output > .items .hello {
+	color: #608b4e;
+	font-size: 11px;
+	padding-bottom: 10px;
+}
+
+main#ui article.terminal section.output > .items .separator {
+	height: 1px;
+	padding: 0px;
+	margin: 3px 0px;
+	background-color: #252526;
+}
+
+main#ui article.terminal section.output > .items > .message {}
+
+main#ui article.terminal section.output > .items > .execution {
+	color: #7b7b7b;
+	padding: 7px 0px;
+}
+
+main#ui article.terminal section.output > .items > .execution:hover {
+	background-color: #222222;
+}
+
+main#ui article.terminal section.output > .items > .execution .command {
+	color: #dcdcdc;
+	padding-bottom: 2px;
+}
+
+main#ui article.terminal section.output > .items > .execution .command .fa {
+	margin-top: 3px;
+	margin-right: 5px;
+}
+
+main#ui article.terminal section.output > .items > .execution .result {
+	padding-top: 2px;
+}
+
+main#ui article.terminal section.output > .items > .execution .result > * {
+	float: left;
+}
+
+main#ui article.terminal section.output > .items > .execution .result .fa-square {
+	margin-top: 2px;
+	margin-right: 5px;
+}
+
+main#ui article.terminal section.output > .items > .execution .result.success .fa-square {
+	color: #608b4e;
+}
+
+main#ui article.terminal section.output > .items > .execution .result.error .fa-square {
+	color: #9e2927;
+}

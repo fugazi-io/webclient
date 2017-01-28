@@ -1,0 +1,6 @@
+{
+	"name": "io.fugazi.numbers",
+	"title": "Numbers",
+	"description": "common utils to deal with numbers",
+	"constraints": "../scripts/bin/base/numbers.js"
+}

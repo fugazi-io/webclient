@@ -1,0 +1,61 @@
+.result .typedValue.primitive > .type {
+	display: none;
+}
+
+.result .typedValue.any > .type {
+	display: none;
+}
+
+.result .typedValue.collection .bracket {
+	font-weight: bold;
+	color: #aeaeae;
+}
+
+.result .typedValue.collection .header .icon.fold {
+	padding-right: 3px;
+	color: #aeaeae;
+	cursor: pointer;
+}
+
+.result .typedValue.collection .header .type_size {
+	margin-left: 5px;
+	font-size: 11px;
+	color: #aeaeae;
+}
+
+.result .typedValue.collection .header .bracket {
+	margin-left: 5px;
+}
+
+.result .typedValue.collection > .value {
+	margin: 3px 0px 0px 15px;
+}
+
+.result .typedValue.collection.collapsed > * > .bracket {
+	display: none;
+}
+
+.result .typedValue.collection.collapsed > .value {
+	display: none;
+}
+
+
+.result .typedValue.collection.expanded > * > .type_size {
+	display: none;
+}
+
+.result .typedValue.collection.expanded > .value {
+	display: block;
+}
+
+.result .typedValue.collection .value .item {
+	margin: 3px 0px 0px 10px;
+}
+
+.result .typedValue.collection .value .item > * {
+	float: left;
+}
+
+.result .typedValue.collection .item .colon {
+	margin-right: 5px;
+}

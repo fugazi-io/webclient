@@ -1,0 +1,104 @@
+main#ui article.terminal section.inputs .input {
+	position: relative;
+	display: flex;
+}
+
+main#ui article.terminal section.inputs .input aside.prompt {
+	padding-right: 5px;
+	color: #007acc;
+}
+
+main#ui article.terminal section.inputs .input > .container {
+	flex-grow: 1;
+	position: relative;
+	background-color: #252526;
+}
+
+main#ui article.terminal section.inputs .input input {
+	outline: 0;
+	padding: 0;
+	width: 100%;
+	border: 0px;
+	font-size: 12px;
+	color: #ADADAD;
+	background-color: transparent;
+}
+
+main#ui article.terminal section.inputs .suggestible.input .suggestionPanel {
+	position: absolute;
+	padding: 7px 10px;
+	margin-bottom: 5px;
+	color: #ffffff;
+	background-color: rgba(51, 51, 51, 0.8);
+	bottom: 100%;
+	width: 100%;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
+main#ui article.terminal section.inputs .bgtext.input .inputbox {
+	position: relative;
+	z-index: 10;
+	width: 100%;
+}
+
+main#ui article.terminal section.inputs .bgtext.input .bgtextbox {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	width: 100%;
+}
+
+main#ui article.terminal section.inputs .bgtext.input .bgtextbox input {
+	color: rgba(173, 173, 173, 0.4);
+}
+
+main#ui article.terminal section.inputs .input.historySearcher aside.prompt {
+	color: #ADADAD;
+}
+
+main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel {
+	color: rgb(255, 255, 255);
+}
+
+main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel li > span {
+	padding: 0px 7px;
+}
+
+main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel .path {
+	font-size: 11px;
+	color: rgba(255, 255, 255, 0.8);
+}
+
+main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel .keyword {
+	color: #cc6b2f;
+}
+
+main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel .parameter {
+
+}
+
+main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel .parameter.any {
+	color: #e5c66d;
+}
+
+main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel .parameter.boolean {
+	color: #5e8759;
+}
+
+main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel .parameter.number {
+	color: #5b5b9a;
+}
+
+main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel .parameter.string {
+	color: #6297bb;
+}
+
+main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel .parameter.list {
+	color: #968aa7;
+}
+
+main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel .parameter.map {
+	color: #c01b67;
+}

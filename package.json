@@ -1,0 +1,23 @@
+{
+  "name": "webclient",
+  "version": "1.0.0",
+  "description": "### Protocol ### [Types](protocol/types.md)   [Commands](protocol/command.md)   [Packages](protocol/package.md)",
+  "main": "index.js",
+  "dependencies": {
+    "typescript": "^2.1.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nitzantomer/fugazi.io.git"
+  },
+  "author": "Nitzan Tomer <nitzan.tomer@gmail.com> (https://github.com/nitzantomer)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nitzantomer/fugazi.io/issues"
+  },
+  "homepage": "https://github.com/nitzantomer/fugazi.io#readme"
+}

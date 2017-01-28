@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"target": "ES6",
+		"jsx": "react",
+		"removeComments": true,
+		"outDir": "bin",
+		"rootDir": "src",
+		"sourceMap": true,
+		"declaration": true,
+		"skipLibCheck": true,
+		"skipDefaultLibCheck": true
+	}
+}

@@ -1,0 +1,30 @@
+{
+	"name": "io.fugazi.components",
+	"title": "Components",
+	"description": "Commands for components management",
+	"types": {
+		"path": {
+			"title": "Component Path",
+			"type": "string[strings.regex '^([a-z0-9]+\\.?)+[^\\.]$' i]"
+		},
+		"component": {
+			"title": "Component",
+			"type": {
+				"name": "string",
+				"title": "string",
+				"description": "string"
+			}
+		},
+		"module": {
+			"title": "Module",
+			"base": "component",
+			"type": {
+				"types": "list<component>",
+				"constraints": "list<component>",
+				"commands": "list<component>",
+				"modules": "list<module>"
+			}
+		}
+	},
+	"commands": "../scripts/bin/base/components.js"
+}

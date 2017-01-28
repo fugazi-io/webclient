@@ -1,0 +1,44 @@
+{
+	"name": "io.fugazi",
+	"modules": {
+		"strings": {
+			"title": "Strings",
+			"description": "common utils to deal with strings",
+			"constraints": "../scripts/bin/base/strings.js"
+		},
+		"numbers": {
+			"title": "Numbers",
+			"description": "common utils to deal with numbers",
+			"constraints": "../scripts/bin/base/numbers.js",
+			"types": {
+				"integer": {
+					"title": "Integer type",
+					"type": "number[integer]"
+				},
+				"float": {
+					"title": "Float type",
+					"type": "number[float]"
+				}
+			}
+		},
+		"collections": {
+			"title": "Collections",
+			"description": "common utils to deal with collections",
+			"constraints": "../scripts/bin/base/collections.js"
+		},
+		"ui": {
+			"title": "UI",
+			"description": "ui types",
+			"types": {
+				"message": {
+					"title": "Message type",
+					"type": "string"
+				}
+			}
+		},
+		"net": "net.json",
+		"components": "components.json"
+	},
+	"commands": "../scripts/bin/base/commands.js",
+	"converters": "../scripts/bin/base/converters.js"
+}
