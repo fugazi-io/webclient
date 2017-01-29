@@ -4,7 +4,9 @@ A web based terminal application for executing local and remote commands.
 The latest version of the terminal can be found here: http://fugazi.io
 
 Unfortunately there's no form of documentation, we're aware of the problem and are working on it.  
-For now here are a few usage examples for the terminal:
+For now a few usage examples for the terminal are documented below.
+
+While using the terminal you can get command suggestions which are based on your input by pressing the `tab` key. To exit this mode click `tab` again or `esc`.
 
 ## Builtin commands
 Fugazi comes with a few builtin commands
@@ -36,4 +38,31 @@ With variables:
 ```
 set a = [1, "str", { key: value }]
 echo $a
+```
+
+#### List
+Outputs the list of different component types in different modules  
+Syntax:
+```
+list modules
+list modules in MODULE_PATH
+list types in MODULE_PATH
+list commands in MODULE_PATH
+list converters in MODULE_PATH
+list constraints in MODULE_PATH
+```
+Examples:
+```
+list modules
+list modules in "io.fugazi"
+list types in "io.fugazi.core"
+```
+
+#### Load
+Loads a module from a url.  
+Urls must end with either `.json` or `.js`.  
+Syntax: `load module from URL`  
+Examples:
+```
+load module from "http://fugazi.io/modules/scripts/bin/math.js"
 ```
