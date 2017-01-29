@@ -13,14 +13,19 @@ Fugazi comes with a few builtin commands
 
 #### Set
 Stores a value into a variable  
-Syntax: `set VAR_NAME = VALUE`  
+Syntax: 
+```
+VAR_NAME = VALUE
+set VAR_NAME = VALUE
+```
+
 Examples:
 ```
-set a = 4
+a = 4
 set a = true
-set b = string
+b = string
 set c = "string"
-set a = { str: "a string", arr: [1, 3] }
+a = { str: "a string", arr: [1, 3] }
 ```
 
 #### Echo
