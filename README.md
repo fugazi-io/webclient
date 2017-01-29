@@ -11,6 +11,14 @@ While using the terminal you can get command suggestions which are based on your
 ## Builtin commands
 Fugazi comes with a few builtin commands
 
+#### Version
+Outputs the version of the client  
+Syntax: `version`  
+Examples:
+```
+version
+```
+
 #### Set
 Stores a value into a variable  
 Syntax: 
