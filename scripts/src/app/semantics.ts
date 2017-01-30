@@ -30,7 +30,6 @@ module fugazi.app.semantics {
 		roots: [],
 	};
 
-
 	export interface MatchResult {
 		command: components.commands.Command;
 		rule: components.commands.syntax.SyntaxRule;
@@ -147,26 +146,22 @@ module fugazi.app.semantics {
 
 				if (firstExpression instanceof input.Parameter) {
 					collector(firstExpression, currentInterpretation, currentInterpretationScore);
-
 				} else if (firstExpression instanceof input.Word) {
 					CONVERTERS.some(converter => {
 						try {
 							let convertedExpression = converter(firstExpression as input.Word);
 							if (this.getScore(convertedExpression) === 0) {
 								return false;
-
 							} else {
 								collector(convertedExpression,
 									currentInterpretation,
 									currentInterpretationScore);
 								return true;
 							}
-
 						} catch (e) {
 							return false;
 						}
 					});
-
 				} else {
 					throw new Exception("can only deal with Word or Parameter");
 				}
@@ -176,12 +171,15 @@ module fugazi.app.semantics {
 		private getScore(expression: input.Expression<any>): number {
 			if ((this.token.getTokenType() === components.commands.syntax.TokenType.Keyword) && expression instanceof input.Keyword ||
 				(this.token.getTokenType() === components.commands.syntax.TokenType.Parameter) && (expression instanceof input.Parameter)) {
+				const value = expression instanceof input.ListParameter || expression instanceof input.MapParameter ?
+					expression.getParameterValues() :
+					expression.value;
+
 				return Scoreboard.score(
-					this.token.tolerates(expression.value),
-					this.token.validates(expression.value),
+					this.token.tolerates(value),
+					this.token.validates(value),
 					expression.state);
-            // KW <-> Parameter is forbidden, thus score is 0
-			} else {
+			} else { // KW <-> Parameter is forbidden, thus score is 0
 				return 0;
 			}
 		}
@@ -190,6 +188,10 @@ module fugazi.app.semantics {
 		                       expression: input.Expression<any>, interpretationExpression: input.Expression<any>[],
 			                   currentInterpretationScore: number): void {
 			if (this.shouldCollect(currentInterpretationScore)) {
+				if (expression instanceof input.WordsListParameter || expression instanceof input.WordsMapParameter) {
+					expression = expression.normalize();
+				}
+
 				let score = this.getScore(expression);
 
 				if (this.shouldCollect(score)) {
@@ -232,7 +234,6 @@ module fugazi.app.semantics {
 		}
 	}
 
-
 	// TODO: FOR DEBUGGING PURPOSES
 	export function instance(): any {
 		return forest;
@@ -243,7 +244,7 @@ module fugazi.app.semantics {
 
 		forest.roots.forEach(root => root.fuzzyMatch(commandExpression.getExpressions(), [], result, Scoreboard.perfectScore()));
 		result.forEach(interpretation => interpretation.interpretedCommand = commandExpression);
-		result = result.sort((item1, item2) =>  item2.score - item1.score);
+		result = result.sort((item1, item2) => item2.score - item1.score);
 
 		return result;
 	}
