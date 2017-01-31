@@ -12,7 +12,7 @@
 		data: any;
 	}
 
-	function httpRequest(context: fugazi.app.Context, params: fugazi.collections.Map<any>): Promise<HttpResponse> {
+	function httpRequest(context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>): Promise<HttpResponse> {
 		let future = new fugazi.Future<HttpResponse>(),
 			data: string | fugazi.collections.Map<any> = params.get("data"),
 			props: fugazi.net.RequestProperties = {
@@ -44,7 +44,7 @@
 		return future.asPromise();
 	}
 
-	function httpRequestByMethod(context: fugazi.app.Context, method: fugazi.net.HttpMethod, params: fugazi.collections.Map<any>) {
+	function httpRequestByMethod(method: fugazi.net.HttpMethod, context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>) {
 		params.set("method", fugazi.net.httpMethodToString(method));
 		return httpRequest(context, params);
 	}
@@ -129,7 +129,7 @@
 				async: true,
 				returns: "response",
 				parametersForm: "map",
-				handler: httpRequestByMethod.bind(null, fugazi.net.HttpMethod.Post),
+				handler: httpRequestByMethod.bind(null, fugazi.net.HttpMethod.Get),
 				syntax: httpRequestByMethodSyntax("get")
 			},
 			"delete": {
@@ -137,7 +137,7 @@
 				async: true,
 				returns: "response",
 				parametersForm: "map",
-				handler: httpRequestByMethod.bind(null, fugazi.net.HttpMethod.Post),
+				handler: httpRequestByMethod.bind(null, fugazi.net.HttpMethod.Delete),
 				syntax: httpRequestByMethodSyntax("delete")
 			}
 		}
