@@ -6,7 +6,8 @@ The latest version of the terminal can be found here: http://fugazi.io
 Unfortunately there's no form of documentation, we're aware of the problem and are working on it.  
 For now a few usage examples for the terminal are documented below.
 
-While using the terminal you can get command suggestions which are based on your input by pressing the `tab` key. To exit this mode click `tab` again or `esc`.
+While using the terminal you can get command suggestions which are based on your input by pressing the `tab` key. To exit this mode click `TAB` again or `ESC`.  
+You can also search for previous used commands using `CTRL+R` and then start typing the command you're looking for. Here also, click `ESC` to exit this mode.
 
 ## Builtin commands
 Fugazi comes with a few builtin commands
