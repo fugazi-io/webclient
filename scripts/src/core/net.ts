@@ -301,6 +301,7 @@ module fugazi.net {
 		isContentType(contentType: string): boolean;
 		getContentType(): string;
 		getData(): string;
+		guessData(): any;
 		getDataAsJson(): any;
 		getDataAsJson<T>(): T;
 		getDataAsMap(): collections.Map<any>;
@@ -571,6 +572,8 @@ module fugazi.net {
 				});
 			} else if (this.getContentType() === ContentTypes.Form.UrlEncoded) {
 				processed = mapToQueryString(<collections.Map<any>> data);
+			} else {
+				processed = data.toString();
 			}
 
 			this.xhr.send(processed);
@@ -599,6 +602,16 @@ module fugazi.net {
 
 		public getData(): string {
 			return this.data;
+		}
+
+		public guessData(): any {
+			const contentType = ContentTypes.fromString(this.contentType);
+
+			if (contentType === ContentTypes.Json) {
+				return this.getDataAsJson();
+			} else {
+				return this.getData();
+			}
 		}
 
 		/**

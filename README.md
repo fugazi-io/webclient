@@ -81,6 +81,84 @@ Examples:
 load module from "http://fugazi.io/modules/scripts/bin/math.js"
 ```
 
+## Net (http) module
+Provides commands for executing http requests.
+
+#### Http
+Make an http request  
+Syntax:
+```
+http URL METHOD
+http URL METHOD DATA
+http URL METHOD DATA HEADERS
+http URL METHOD DATA TIMEOUT
+http URL METHOD DATA CONTENT_TYPE
+http URL METHOD DATA HEADERS TIMEOUT
+http URL METHOD DATA CONTENT_TYPE HEADERS
+http URL METHOD DATA CONTENT_TYPE TIMEOUT
+http URL METHOD DATA CONTENT_TYPE HEADERS TIMEOUT
+```
+Examples:
+```
+```
+
+#### Get
+Make an http GET request.  
+Same as calling: `http URL get`.  
+Syntax:
+```
+get URL
+get URL DATA
+get URL DATA HEADERS
+get URL DATA TIMEOUT
+get URL DATA CONTENT_TYPE
+get URL DATA HEADERS TIMEOUT
+get URL DATA CONTENT_TYPE HEADERS
+get URL DATA CONTENT_TYPE TIMEOUT
+get URL DATA CONTENT_TYPE HEADERS TIMEOUT
+```
+Examples:
+```
+```
+
+#### Post
+Make an http POST request.  
+Same as calling: `http URL post`.  
+Syntax:
+```
+post URL
+post URL DATA
+post URL DATA HEADERS
+post URL DATA TIMEOUT
+post URL DATA CONTENT_TYPE
+post URL DATA HEADERS TIMEOUT
+post URL DATA CONTENT_TYPE HEADERS
+post URL DATA CONTENT_TYPE TIMEOUT
+post URL DATA CONTENT_TYPE HEADERS TIMEOUT
+```
+Examples:
+```
+```
+
+#### Delete
+Make an http DELETE request.  
+Same as calling: `http URL delete`.  
+Syntax:
+```
+delete URL
+delete URL DATA
+delete URL DATA HEADERS
+delete URL DATA TIMEOUT
+delete URL DATA CONTENT_TYPE
+delete URL DATA HEADERS TIMEOUT
+delete URL DATA CONTENT_TYPE HEADERS
+delete URL DATA CONTENT_TYPE TIMEOUT
+delete URL DATA CONTENT_TYPE HEADERS TIMEOUT
+```
+Examples:
+```
+```
+
 ## Math example module
 You can load a sample module for simple math operations using the `load` command example:
 ```

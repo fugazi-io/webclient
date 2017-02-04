@@ -313,7 +313,8 @@ module fugazi.view.renderers {
 			componentClass = VoidComponent;
 		} else if (type.is(components.registry.getType("any"))) {
 			componentClass = AnyComponent;
-		} else if (type.is(components.registry.getType("boolean")) || type === components.registry.get(components.ComponentType.Type, "number")) {
+		//} else if (type.is(components.registry.getType("boolean")) || type === components.registry.get(components.ComponentType.Type, "number")) {
+		} else if (type.is(components.registry.getType("boolean")) || type.is(components.registry.getType("number"))) {
 			componentClass = PrimitiveComponent;
 		} else if (type.is(components.registry.getType("ui.message"))) {
 			componentClass = UiMessageComponent;
