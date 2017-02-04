@@ -280,7 +280,7 @@ module fugazi.app.input {
 					value = entry.value;
 				}
 
-				map.set(key, value);
+				map.setEntry(key, value);
 			});
 
 			return new MapParameter(this.input, this.state, this.range, map);

@@ -171,9 +171,11 @@ module fugazi.app.semantics {
 		private getScore(expression: input.Expression<any>): number {
 			if ((this.token.getTokenType() === components.commands.syntax.TokenType.Keyword) && expression instanceof input.Keyword ||
 				(this.token.getTokenType() === components.commands.syntax.TokenType.Parameter) && (expression instanceof input.Parameter)) {
-				const value = expression instanceof input.ListParameter || expression instanceof input.MapParameter ?
+
+				const value = expression instanceof input.CompoundParameter ?
 					expression.getParameterValues() :
 					expression.value;
+
 
 				return Scoreboard.score(
 					this.token.tolerates(value),
