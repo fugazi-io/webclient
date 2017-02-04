@@ -344,14 +344,12 @@ module fugazi.app.statements {
 					}
 
 					newExpressions.push(new VariableExpression(expression, this.context.terminal().retrieveVariable(expression.value)));
-
 				} else if (expression instanceof input.CommandExpression) {
 					if (matchedReturnTypesCount >= innerStatements.length) {
 						throw new Exception(`Could not find return type of expression "${ expression.input }"`);
 					}
 
 					newExpressions.push(new InnerCommandExpression(expression, innerStatements[matchedReturnTypesCount++].getReturnType()));
-
 				} else {
 					newExpressions.push(expression);
 				}

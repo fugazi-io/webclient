@@ -52,8 +52,16 @@ module fugazi.app.input {
 		public input: string;
 		public state: ExpressionState;
 
+		public canBeBoolean(): boolean {
+			return this.input.test(/^true|false$/i);
+		}
+
 		public asBooleanParameter(): BooleanParameter {
 			return new BooleanParameter(this.input, this.state, this.range);
+		}
+
+		public canBeNumber(): boolean {
+			return !Number.isNaN(parseFloat(this.input));
 		}
 
 		public asNumberParameter(): NumberParameter {
@@ -62,6 +70,16 @@ module fugazi.app.input {
 
 		public asStringParameter(): StringParameter {
 			return new StringParameter(this.input, this.state, this.range);
+		}
+
+		public guess(): Parameter<any> {
+			if (this.canBeBoolean()) {
+				return this.asBooleanParameter();
+			} else if (this.canBeNumber()) {
+				return this.asNumberParameter();
+			}
+
+			return this.asStringParameter();
 		}
 	}
 	
@@ -115,9 +133,12 @@ module fugazi.app.input {
 			return new WordParameter<string>(this.input, this.state, this.range);
 		}
 
-		public asBooleanParameter: () => BooleanParameter;
+		public guess: () =>Parameter<any>;
+		public canBeNumber: () => boolean;
+		public canBeBoolean: () => boolean;
 		public asNumberParameter: () => NumberParameter;
 		public asStringParameter: () => StringParameter;
+		public asBooleanParameter: () => BooleanParameter;
 	}
 	utils.applyMixins(Word, [WordTransformer]);
 
@@ -137,9 +158,12 @@ module fugazi.app.input {
 			super(input, state, range, value || input);
 		}
 
-		public asBooleanParameter: () => BooleanParameter;
+		public guess: () =>Parameter<any>;
+		public canBeNumber: () => boolean;
+		public canBeBoolean: () => boolean;
 		public asNumberParameter: () => NumberParameter;
 		public asStringParameter: () => StringParameter;
+		public asBooleanParameter: () => BooleanParameter;
 	}
 	utils.applyMixins(WordParameter, [WordTransformer]);
 
@@ -204,6 +228,22 @@ module fugazi.app.input {
 			});
 		}
 	}
+
+	export class WordsListParameter extends ListParameter {
+		public normalize(): ListParameter {
+			const items = [] as any[];
+
+			this.value.forEach(item => {
+				if (item instanceof WordParameter) {
+					items.push(item.guess());
+				} else {
+					items.push(item);
+				}
+			});
+
+			return new ListParameter(this.input, this.state, this.range, items);
+		}
+	}
 	
 	export class MapParameter extends CompoundParameter<collections.EntryMap<Parameter<any>, Parameter<any>>, collections.Map<any>> {
 		public getParameterValues(): collections.Map<any> {
@@ -218,6 +258,32 @@ module fugazi.app.input {
 			});
 
 			return values;
+		}
+	}
+
+	export class WordsMapParameter extends MapParameter {
+		public normalize(): MapParameter {
+			let map = new collections.EntryMap<Parameter<any>, Parameter<any>>();
+
+			this.value.forEach(entry => {
+				let key, value;
+
+				if (entry.key instanceof WordParameter) {
+					key = entry.key.guess();
+				} else {
+					key = entry.key;
+				}
+
+				if (entry.value instanceof WordParameter) {
+					value = entry.value.guess();
+				} else {
+					value = entry.value;
+				}
+
+				map.set(key, value);
+			});
+
+			return new MapParameter(this.input, this.state, this.range, map);
 		}
 	}
 
@@ -586,11 +652,14 @@ module fugazi.app.input {
 		}
 
 		class CompoundParameterState<T extends Parameter<any>> extends CompoundState<T> {
+			protected isWordsCollection: boolean;
+
 			/**
 			 * @override
 			 */
 			addExpression(expression: Expression<any>): Expression<any> {
 				if (expression instanceof Word) {
+					this.isWordsCollection = true;
 					expression = CompoundParameterState.wordToParameter(expression as Word)
 				}
 
@@ -642,7 +711,9 @@ module fugazi.app.input {
 					}
 	
 					used = input.use(this.start);
-					this.expression = new ListParameter(used.value, expressionState, used.range, this.items);
+					this.expression = this.isWordsCollection ?
+						new WordsListParameter(used.value, expressionState, used.range, this.items) :
+						new ListParameter(used.value, expressionState, used.range, this.items);
 				} else if(this.expecting === "item" || this.expecting === "item | end") {
 					this.parseInnerState(", ]");
 				} else if(this.expecting === "comma | end") {
@@ -671,6 +742,7 @@ module fugazi.app.input {
 
 				expression = super.addExpression(expression);
 				this.items.push(<Parameter<any>> expression);
+
 				return expression;
 			}
 	
@@ -714,7 +786,9 @@ module fugazi.app.input {
 					}
 
 					used = input.use(this.start);
-					this.expression = new MapParameter(used.value, expressionState, used.range, this.map);
+					this.expression = this.isWordsCollection ?
+						new WordsMapParameter(used.value, expressionState, used.range, this.map) :
+						new MapParameter(used.value, expressionState, used.range, this.map);
 				} else if (this.expecting === "key" || this.expecting === "key | end") {
 					this.parseInnerState(":");
 				} else if (this.expecting === "colon") {
