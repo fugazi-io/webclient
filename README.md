@@ -45,6 +45,7 @@ Here's how to run it locally:
 #### Builtin Components
 1. [Types](./docs/builtins/types.md)
 2. [Commands](./docs/builtins/commands.md)
+3. [Constraints](./docs/builtins/constraints.md)
 
 #### Examples
 1. Simple Math Module
