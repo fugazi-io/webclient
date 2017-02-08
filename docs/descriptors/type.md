@@ -1,15 +1,18 @@
 # Type Descriptor
 
 ## Interfaces
-	interface TypeDefinition {}
+```typescript
+interface TypeDefinition {}
+
+interface StringTypeDefinition extends TypeDefinition, String {}
+
+interface StructTypeDefinition extends TypeDefinition, Object<TypeDefinition> {}
+
+interface TypeDescriptor extends ComponentDescriptor {
+	type: TypeDefinition;
+}
+```
 	
-	interface StringTypeDefinition extends TypeDefinition, String {}
-	
-	interface StructTypeDefinition extends TypeDefinition, Object<TypeDefinition> {}
-	
-	interface TypeDescriptor extends ComponentDescriptor {
-		type: TypeDefinition;
-	}
 
 ## Properties
 * type

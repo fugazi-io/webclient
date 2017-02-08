@@ -6,34 +6,38 @@ enum ResultStatus {
 	Success,
 	Failure
 }
-
+  
 interface CommandResult {
 	status: ResultStatus;
 	value?: any;
 	error?: string;
 }
-
+  
 interface CommandHandler extends Function {}
-
+  
 interface SyncedCommandHandler extends CommandHandler {
-	(context: Context, ...params: any[]): CommandResult;
+	(context: app.modules.ModuleContext, ...params: any[]): CommandResult;
 }
-
+  
 interface AsyncedCommandHandler extends CommandHandler {
-	(context: app.Context, ...params: any[]): Promise<Result, Exception>;
+	(context: app.modules.ModuleContext, ...params: any[]): Promise<CommandResult>;
 }
-
+  
 interface CommandDescriptor extends ComponentDescriptor {
-	returns: StringTypeDefinition;
-	syntax: string[];
+	returns: types.TypeDefinition;
+	convert?: {
+		from: string;
+		converter?: string;
+	};
+	syntax: string | string[];
 	async?: boolean;
 }
-
+  
 interface LocalCommandDescriptor extends CommandDescriptor {
 	handler: CommandHandler;
 	parametersForm?: "list" | "arguments" | "map" | "struct";
 }
-
+  
 interface RemoteCommandDescriptor extends CommandDescriptor {
 	handler: {
 		endpoint: string;
@@ -68,6 +72,13 @@ interface RemoteCommandDescriptor extends CommandDescriptor {
 	* `StringTypeDefinition`
 	
 	The type definition of the value of successful executions.
+	
+* convert
+	* `optionl`
+	
+	If the command execution (locally or remotely) needs to be converted specify the type of the result (`from`) 
+	and the name of the converter to use.  
+	The converter is optional, if not included a converter that is suited will be looked up.
 
 * syntax
 	* `required`
