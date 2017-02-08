@@ -2,20 +2,30 @@
 Fugazi comes with a few builtin constraints
 
 ### `io.fugazi.core`
-The core constraints are used by the system and should not be used explicitly.
-
 #### Enum
 Checks that a value is included in a list of predetermined values  
 Path: `io.fugazi.core`  
-Applies to: [string](./types.md#string)
+Syntax: 
+```
+enum ...VALUES
+enum ignoreCase ...VALUES
+```  
+Applies to: [string](./types.md#string)  
+Examples:
+```
+string[enum A B C]
+string[enum ignoreCase A B C]
+```
 
 #### Struct
-Checks that a value has the exact keys and values types based on a predetermined structure  
+Checks that a value has the exact keys and values types based on a predetermined structure.  
+**Should not be used explicitly**, this constraint is used internally.  
 Path: `io.fugazi.core`  
 Applies to: [map](./types.md#map)
 
 #### Generics
-Checks that the values in a collection has a specific type  
+Checks that the values in a collection has a specific type.  
+**Should not be used explicitly**, this constraint is used internally.  
 Path: `io.fugazi.core`  
 Applies to: [list](./types.md#list), [map](./types.md#map)
 
@@ -27,7 +37,7 @@ Syntax: `integer`
 Applies to: [number](./types.md#number)  
 Examples:
 ```
-number[integer]
+number[numbers.integer]
 ```
 
 #### Float
@@ -37,7 +47,7 @@ Syntax: `float`
 Applies to: [number](./types.md#number)  
 Examples:
 ```
-number[float]
+number[numbers.float]
 ```
 
 #### Min
@@ -47,7 +57,7 @@ Syntax: `min (num number)`
 Applies to: [number](./types.md#number)  
 Examples:
 ```
-number[min 3]
+number[numbers.min 3]
 ```
 
 #### Max
@@ -57,7 +67,7 @@ Syntax: `max (num number)`
 Applies to: [number](./types.md#number)  
 Examples:
 ```
-number[max 10]
+number[numbers.max 10]
 ```
 
 #### Between
@@ -67,7 +77,7 @@ Syntax: `between (min number) (max number)`
 Applies to: [number](./types.md#number)  
 Examples:
 ```
-number[between 3 10]
+number[numbers.between 3 10]
 ```
 
 #### Positive
@@ -77,7 +87,7 @@ Syntax: `positive`
 Applies to: [number](./types.md#number)  
 Examples:
 ```
-number[positive]
+number[numbers.positive]
 ```
 
 #### Negative
@@ -87,7 +97,7 @@ Syntax: `negative`
 Applies to: [number](./types.md#number)  
 Examples:
 ```
-number[negative]
+number[numbers.negative]
 ```
 
 #### Even
@@ -97,7 +107,7 @@ Syntax: `even`
 Applies to: [number](./types.md#number)  
 Examples:
 ```
-number[even]
+number[numbers.even]
 ```
 
 #### Odd
@@ -107,7 +117,7 @@ Syntax: `odd`
 Applies to: [number](./types.md#number)  
 Examples:
 ```
-number[odd]
+number[numbers.odd]
 ```
 
 #### Divided By
@@ -117,7 +127,7 @@ Syntax: `dividedBy (divisor number)`
 Applies to: [number](./types.md#number)  
 Examples:
 ```
-number[dividedBy 10]
+number[numbers.dividedBy 10]
 ```
 
 ### `io.fugazi.strings`
@@ -128,7 +138,7 @@ Syntax: `exactLength (num number)`
 Applies to: [string](./types.md#string)  
 Examples:
 ```
-string[exactLength 216]
+string[strings.exactLength 216]
 ```
 
 #### Minimum Length
@@ -138,7 +148,7 @@ Syntax: `minLength (num number)`
 Applies to: [string](./types.md#string)  
 Examples:
 ```
-string[minLength 3]
+string[strings.minLength 3]
 ```
 
 #### Maximum Length
@@ -148,7 +158,7 @@ Syntax: `maxLength (num number)`
 Applies to: [string](./types.md#string)  
 Examples:
 ```
-string[maxLength 10]
+string[strings.maxLength 10]
 ```
 
 #### Between
@@ -158,7 +168,7 @@ Syntax: `between (min number) (max number)`
 Applies to: [string](./types.md#string)  
 Examples:
 ```
-string[between 3 10]
+string[strings.between 3 10]
 ```
 
 #### Pattern/RegEx
@@ -172,8 +182,8 @@ regex (pattern string) (flags string)
 Applies to: [string](./types.md#string)  
 Examples:
 ```
-string[regex '^[a-b]+$']
-string[regex '^[a-b]+$' i]
+string[strings.regex '^[a-b]+$']
+string[strings.regex '^[a-b]+$' i]
 ```
 
 ### `io.fugazi.collections`
@@ -184,8 +194,8 @@ Syntax: `exactSize (size number)`
 Applies to: [list](./types.md#list), [map](./types.md#map)  
 Examples:
 ```
-list[exactSize 4]
-map[exactSize 10]
+list[collections.exactSize 4]
+map[collections.exactSize 10]
 ```
 
 #### Minimum Size
@@ -195,8 +205,8 @@ Syntax: `minSize (size number)`
 Applies to: [list](./types.md#list), [map](./types.md#map)  
 Examples:
 ```
-list[minSize 4]
-map[minSize 10]
+list[collections.minSize 4]
+map[collections.minSize 10]
 ```
 
 #### Maximum Size
@@ -206,6 +216,6 @@ Syntax: `maxSize (size number)`
 Applies to: [list](./types.md#list), [map](./types.md#map)  
 Examples:
 ```
-list[maxSize 4]
-map[maxSize 10]
+list[collections.maxSize 4]
+map[collections.maxSize 10]
 ```

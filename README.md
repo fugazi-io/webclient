@@ -35,12 +35,12 @@ Here's how to run it locally:
 6. Commands
 
 #### Descriptors
-1. Descriptors basics
-2. Module Descriptors
-3. Type Descriptors
-4. Constraint Descriptors
-5. Converter Descriptors
-6. Command Descriptors
+1. [Descriptors basics](docs/descriptors/component.md)
+2. [Module Descriptors](docs/descriptors/module.md)
+3. [Type Descriptors](docs/descriptors/type.md)
+4. [Constraint Descriptors](docs/descriptors/constraint.md)
+5. [Converter Descriptors](docs/descriptors/converter.md)
+6. [Command Descriptors](docs/descriptors/command.md)
 
 #### Builtin Components
 1. [Types](./docs/builtins/types.md)
@@ -48,10 +48,10 @@ Here's how to run it locally:
 3. [Constraints](./docs/builtins/constraints.md)
 
 #### Examples
-1. Simple Math Module
+1. [Simple Math Module](./docs/examples/math.md)
 
 #### Getting help
-Use the issues for any bug, request, question
+Use the [issues](//github.com/fugazi-io/webclient/issues) for any bug, request, question
 
 ### Contribution
 We're looking for more help, if you're interested find us in this `gmail.com` address: `terminal.fugazi.io`

@@ -3,6 +3,7 @@ You can load a sample module for simple math operations using the `load` command
 ```
 load module from "http://fugazi.io/modules/scripts/bin/math.js"
 ```
+[The source for the module](https://github.com/fugazi-io/webclient/blob/master/modules/scripts/src/math.ts)
 
 ### Commands
 #### Add
