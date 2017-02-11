@@ -27,12 +27,12 @@ Here's how to run it locally:
 ### More documentation
 
 #### Components
-1. Components basics
-2. Modules
-3. Types
-4. Constraints
-5. Converters
-6. Commands
+1. [Components basics](docs/components/components.md)
+2. [Modules](docs/components/modules.md)
+3. [Types](docs/components/types.md)
+4. [Constraints](docs/components/constraints.md)
+5. [Converters](docs/components/converters.md)
+6. [Commands](docs/components/commands.md)
 
 #### Descriptors
 1. [Descriptors basics](docs/descriptors/component.md)
