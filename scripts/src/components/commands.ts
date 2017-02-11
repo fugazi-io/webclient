@@ -657,7 +657,6 @@ namespace fugazi.components.commands {
 					match = ENDPOINT_ARGUMENTS_REGEX.exec(endpoint);
 				}
 
-				console.log(matches);
 				return matches;
 			}
 		}

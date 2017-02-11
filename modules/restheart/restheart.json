@@ -100,6 +100,7 @@
 				"RawCollections": {
 					"title": "RESTHeart collections response",
 					"type": {
+						"_id": "string",
 						"_embedded": "list<RawIdObject>",
 						"_size": "numbers.integer",
 						"_returned": "numbers.integer",
