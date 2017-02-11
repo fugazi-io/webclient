@@ -288,69 +288,54 @@ namespace fugazi.components.commands {
 		}
 
 		protected invokeHandler(context: app.modules.ModuleContext, params: ExecutionParameters): Promise<handler.Result> {
-			if ((this.parent as modules.Module).isRemote()) {
-				const remoteSourceId = context.getParent().getRemoteSource(this.parent.getPath());
-				const remote: modules.Remote = (this.parent as modules.Module).getRemote();
+			if (!this.authenticator.authenticated()) {
+				this.future.reject(new Exception("not authenticated"));
+			}
+			else {
+				if ((this.parent as modules.Module).isRemote()) {
+					const remoteSourceId = context.getParent().getRemoteSource(this.parent.getPath());
+					const remote: modules.Remote = (this.parent as modules.Module).getRemote();
 
-				try {
-					const preparedEndpointParams = this.expandEndpointArguments(context, params);
+					try {
+						const preparedEndpointParams = this.expandEndpointArguments(context, params);
+						this.executeVia(remote, remoteSourceId, preparedEndpointParams);
 
-					if (remote.proxied()) {
-						this.executeViaProxy(remote, remoteSourceId, preparedEndpointParams);
-					} else {
-						this.executeViaHttp(remote, remoteSourceId, preparedEndpointParams);
+					} catch (e) {
+						this.future.reject(e);
 					}
-				} catch (e) {
-					this.future.reject(e);
-				}
-			} else {
-				this.future.reject(new fugazi.Exception(
-					`cannot execute remote command '${this.getName()}' without 
+				} else {
+					this.future.reject(new fugazi.Exception(
+						`cannot execute remote command '${this.getName()}' without 
 					remote definition on its enclosing modules`));
+				}
 			}
 
 			return this.future.asPromise();
 		}
 
-		private executeViaProxy(remote: modules.Remote, remoteSourceId: string, endpointParams: PreparedEndpointParams) {
-			remote.frame(remoteSourceId).execute(
-				this.method,
-				new net.Url(endpointParams.endpoint, remote.base(remoteSourceId)),
-				endpointParams.params
-			)
-			.then(response => {
-				this.success(response);
-			})
-			.catch(response => {
-					this.failure(response);
-				}) ;
+		protected get authenticator(): fugazi.components.modules.Authenticator {
+			return (this.getParent() as modules.Module).getRemote().authenticator();
 		}
 
-		private executeViaHttp(remote: modules.Remote, remoteSourceId: string, endpointParams: PreparedEndpointParams) {
-			const authenticator = (this.getParent() as modules.Module).getRemote().authenticator();
-
-			if (!authenticator.authenticated()) {
-				this.future.reject(new Exception("not authenticated"));
-				return;
-			}
-
+		private executeVia(remote: modules.Remote, remoteSourceId: string, endpointParams: PreparedEndpointParams): void {
 			const data = endpointParams.params;
 			const props = {
 				cors: true,
 				method: this.method,
 				url: new net.Url(endpointParams.endpoint, remote.base(remoteSourceId))
 			} as net.RequestProperties;
-			authenticator.interceptRequest(props, data);
+			this.authenticator.interceptRequest(props, data);
 
-			net.http(props).success(response => {
-				authenticator.interceptResponse(response);
-				this.success(response.getData());
-			})
-			.fail(response => {
-				authenticator.interceptResponse(response);
-				this.failure(response.getData());
-			})
-			.send(data);
+			if (remote.proxied()) {
+				remote.frame(remoteSourceId).execute(props, data)
+					.then(this.success.bind(this))
+					.catch(this.failure.bind(this));
+			} else {
+				net.http(props)
+					.success(this.success.bind(this))
+					.fail(this.failure.bind(this))
+					.send(data);
+			}
 		}
 
 		private expandEndpointArguments(context: app.modules.ModuleContext, params: ExecutionParameters): PreparedEndpointParams {
@@ -383,19 +368,21 @@ namespace fugazi.components.commands {
 			return prepared;
 		}
 
-		private success(response: string): void {
+		private success(response: net.HttpResponse): void {
+			this.authenticator.interceptResponse(response);
 			let data;
 			try {
-				data = JSON.parse(response)
+				data = JSON.parse(response.getData());
 			} catch (e) {
-				data = response;
+				data = response.getData();
 			}
 
 			this.future.resolve(data);
 		}
 
-		private failure(response: string): void {
-			this.future.reject(new fugazi.Exception(response));
+		private failure(response: net.HttpResponse): void {
+			this.authenticator.interceptResponse(response);
+			this.future.reject(new fugazi.Exception(response.getData()));
 		}
 	}
 
@@ -657,7 +644,6 @@ namespace fugazi.components.commands {
 					match = ENDPOINT_ARGUMENTS_REGEX.exec(endpoint);
 				}
 
-				console.log(matches);
 				return matches;
 			}
 		}

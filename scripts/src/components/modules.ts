@@ -253,7 +253,7 @@ namespace fugazi.components.modules {
 		}
 
 		public descriptor() {
-			return {} as commands.descriptor.LocalCommandDescriptor;
+			return null;
 		}
 
 		public authenticate(): commands.handler.Result {
@@ -1155,7 +1155,10 @@ namespace fugazi.components.modules {
 
 				this.remote = new RemoteSource(source);
 				const loginCommandDescriptor = (this.remote as RemoteSource).loginCommandDescriptor();
-				this.innerCommandsBuilders.set(loginCommandDescriptor.name, commands.builder.create(loginCommandDescriptor, this));
+
+				if (loginCommandDescriptor) {
+					this.innerCommandsBuilders.set(loginCommandDescriptor.name, commands.builder.create(loginCommandDescriptor, this));
+				}
 			}
 		}
 	}

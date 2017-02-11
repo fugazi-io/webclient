@@ -26,14 +26,19 @@ namespace fugazi.proxyframe {
 	export interface RemoteProxyExecuteCommandRequest {
 		method: net.HttpMethod;
 		url: string;
+		headers: collections.Map<string> | fugazi.PlainObject<string>;
 		data?: string | fugazi.PlainObject<any>;
 	}
 
 	export interface RemoteProxyExecuteCommandResponse {
 		requestId: string;
+		statusCode: number;
+		headers: collections.Map<string> | fugazi.PlainObject<string>;
+		contentType: string,
+		httpStatus: number,
+		httpStatusText: string,
 		status: "ok" | "error";
-		error: string;
-		result: string;
+		data: string;
 	}
 
 	export function baseMessageHandler(message: MessageEvent, origin?: string): any {
