@@ -31,6 +31,19 @@ set a = [1, "str", { key: value }]
 echo $a
 ```
 
+#### Extract
+Returns an inner value inside a compound value  
+Syntax: `echo INDEX from VALUE`
+Examples:
+```
+arr = [11, 22, 33]
+extract 1 from $arr
+
+map = { str: string, arr: [1, 2, 3], obj: { num: 45, bool: true } }
+extract arr from $map
+extract "obj.num" from $map
+```
+
 ### `io.fugazi.terminal` commands
 Commands regarding a specific terminal instance.
 
