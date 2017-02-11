@@ -3,7 +3,7 @@
 A web based terminal application for executing local and remote commands.  
 The latest version of the terminal can be found here: http://fugazi.io
 
-Unfortunately there's no form of documentation, we're aware of the problem and are working on it.  
+Unfortunately there's no form of documentation, we're aware of the problem and are working on it in a [different branch](https://github.com/fugazi-io/webclient/tree/nitzan/10/docs).
 For now a few usage examples for the terminal are documented below.
 
 While using the terminal you can get command suggestions which are based on your input by pressing the `tab` key. To exit this mode click `TAB` again or `ESC`.  
