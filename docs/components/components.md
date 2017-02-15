@@ -10,6 +10,8 @@ There are different types of components, currently:
 
 All components share the same [basic descriptor](../descriptors/component.md).
 
+----
+
 ## Components name and path
 Each component has a path which identifies it. 
 This path is simply a concatenation of all the component names of the ancestors.  

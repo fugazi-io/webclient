@@ -6,6 +6,8 @@ Examples of existing modules:
 * [The simple math module](../../modules/scripts/src/math.ts)
 * [The base fugazi module](../../modules/jsons/base.json)
 
+----
+
 ## Characteristics
 and can have one or more 
 of the following characteristics:
@@ -77,6 +79,8 @@ Which is the same as:
 }
 ```
 
+----
+
 ## Loading
 A module can be loaded in one of two ways:
 * [Http](#json-format) 
@@ -121,6 +125,8 @@ The code shouldn't rely on any 3rd party library, and has to have the following 
 	});
 })();
 ```
+
+----
 
 ## Referencing other descriptors
 A module can reference other modules or "partial modules".  
