@@ -60,7 +60,8 @@
 						return value >= min;
 					}
 				}
-			},{
+			},
+			{
 				name: "between",
 				title: "Between Values",
 				types: ["number"],
