@@ -1155,7 +1155,9 @@ namespace fugazi.components.modules {
 
 				this.remote = new RemoteSource(source);
 				const loginCommandDescriptor = (this.remote as RemoteSource).loginCommandDescriptor();
-				this.innerCommandsBuilders.set(loginCommandDescriptor.name, commands.builder.create(loginCommandDescriptor, this));
+				if (loginCommandDescriptor != null && Object.keys(loginCommandDescriptor).length > 0) {
+					this.innerCommandsBuilders.set(loginCommandDescriptor.name, commands.builder.create(loginCommandDescriptor, this));
+				}
 			}
 		}
 	}
