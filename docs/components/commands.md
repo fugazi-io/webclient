@@ -90,7 +90,8 @@ Examples:
 ----
 
 ## Local Commands
-Local commands are javascript functions which are executed in the browser.  
+Local commands are javascript functions which are executed in the browser, and can be loaded only as part of 
+javascript descriptors.
 
 ### Local Handler
 The local command handler is a function that is invoked when the user inputs a line matching the command's 
@@ -170,7 +171,8 @@ Asynced command with `parametersForm = "map"`
 
 ## Remote Commands
 Remote commands do not need a local implementation like the local commands, they have a builtin implementation 
-which issues an http request and processes the response based on the `endpoint` and `method`:
+which issues an http request and processes the response based on the `endpoint` and `method`.  
+All remote commands are asynced.
 
 ### Endpoint
 This definition needs to be the relative path for this command. 
