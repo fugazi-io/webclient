@@ -206,7 +206,6 @@ module fugazi.app.terminal {
 		}
 		
 		private queryForStatements(command: string, position: number): Promise<app.statements.Statement[]> {
-			input.parse(command);
 			let future = new Future<app.statements.Statement[]>(),
 				session: statements.StatementSession = statements.createStatementsSession(command, this.contextProvider),
 				suggestedStatements: statements.Statement[] = session.getSuggestions(position);
