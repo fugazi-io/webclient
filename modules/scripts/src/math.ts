@@ -29,7 +29,7 @@
 					"add (a number) (b number)",
 					"add (numbers list<number>)"
 				],
-				handler: function(context: fugazi.app.Context, params: fugazi.collections.Map<any>): number {
+				handler: function(context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>): number {
 					if (params.has("a") && params.has("b")) {
 						return params.get("a") + params.get("b");
 					}
@@ -48,7 +48,7 @@
 					"sub (a number) (b number)",
 					"sub (numbers list<number>)"
 				],
-				handler: function(context: fugazi.app.Context, params: fugazi.collections.Map<any>): number {
+				handler: function(context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>): number {
 					if (params.has("a") && params.has("b")) {
 						return params.get("a") - params.get("b");
 					}
@@ -67,7 +67,7 @@
 					"mul (a number) (b number)",
 					"mul (numbers list<number>)"
 				],
-				handler: function(context: fugazi.app.Context, params: fugazi.collections.Map<any>): number {
+				handler: function(context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>): number {
 					if (params.has("a") && params.has("b")) {
 						return params.get("a") * params.get("b");
 					}
@@ -86,7 +86,7 @@
 					"div (a number) (b number)",
 					"div (numbers list<number>)"
 				],
-				handler: function(context: fugazi.app.Context, params: fugazi.collections.Map<any>): number {
+				handler: function(context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>): number {
 					if (params.has("a") && params.has("b")) {
 						return params.get("a") / params.get("b");
 					}
@@ -104,7 +104,7 @@
 					"(a integer)!",
 					"factorial of (a integer)"
 				],
-				handler: function(context: fugazi.app.Context, a: number): number {
+				handler: function(context: fugazi.app.modules.ModuleContext, a: number): number {
 					let i = 1,
 						result = 1;
 
@@ -122,7 +122,7 @@
 				syntax: [
 					"fib (a integer)"
 				],
-				handler: function(context: fugazi.app.Context, a: number): number {
+				handler: function(context: fugazi.app.modules.ModuleContext, a: number): number {
 					var result: number,
 						cache: number[] = [],
 						fn = index => {

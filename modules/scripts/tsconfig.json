@@ -1,8 +1,6 @@
 {
+	"extends": "../../tsconfig.common.json",
 	"compilerOptions": {
-		"target": "ES6",
-		"removeComments": true,
-		"sourceMap": true,
 		"outDir": "bin",
 		"rootDir": "src"
 	}

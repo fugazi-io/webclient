@@ -88,13 +88,15 @@ namespace fugazi.view.input {
 		}
 
 		protected onEnterPressed(): boolean {
-			this.history.mark();
-			this.props.onExecute(this.inputbox.value);
-			this.inputbox.value = "";
-			this.setState({
-				value: "",
-				showing: false
-			});
+			if (!this.inputbox.value.empty()) {
+				this.history.mark();
+				this.props.onExecute(this.inputbox.value);
+				this.inputbox.value = "";
+				this.setState({
+					value: "",
+					showing: false
+				});
+			}
 
 			return false;
 		}

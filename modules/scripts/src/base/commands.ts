@@ -25,6 +25,45 @@
 				handler: function(context: fugazi.app.modules.ModuleContext) {
 					return fugazi.app.version.toString();
 				}
+			},
+			extract: {
+				title: "returns an item inside a compound type",
+				syntax: [
+					"extract (index string) from (value map)",
+					"extract (index number[numbers.integer]) from (value list)",
+				],
+				returns: "any",
+				parametersForm: "arguments",
+				handler: function(context: fugazi.app.modules.ModuleContext, index: string | number, value: any[] | fugazi.collections.Map<any>) {
+					if (typeof index === "string" && value instanceof fugazi.collections.Map) {
+						if (value.has(index)) {
+							return value.get(index);
+						}
+
+						const path = index.split(".");
+						if (path.length > 1) {
+							let result: any = value;
+
+							while (result instanceof fugazi.collections.Map && !path.empty() && result.has(path.first())) {
+								result = result.get(path.remove(0));
+							}
+
+							if (path.empty() && result !== undefined) {
+								return result;
+							}
+						}
+
+						throw new fugazi.Exception("index not found");
+					} else if (typeof index === "number" && value instanceof Array) {
+						if (index < 0 || index >= value.length) {
+							throw new fugazi.Exception("index out of bound");
+						}
+
+						return value[index];
+					}
+
+					throw new fugazi.Exception("params must be string|map or number|list");
+				}
 			}
 		}
 	});
