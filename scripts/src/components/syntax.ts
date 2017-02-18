@@ -58,7 +58,7 @@ module fugazi.components.commands.syntax {
 			} else {
 				let distance = this.computeDistance(input, this.value);
 
-				return distance / this.value.length <= 0.5;
+				return distance / this.value.length < 0.5;
 			}
 		}
 
