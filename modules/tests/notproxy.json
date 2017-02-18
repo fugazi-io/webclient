@@ -1,0 +1,19 @@
+{
+	"name": "tests.notproxy",
+	"title": "Remote command via proxy test",
+	"remote": {
+		"origin": "http://127.0.0.1:8080/",
+		"base": "cors/"
+	},
+	"commands": {
+		"proxytest": {
+			"title": "not proxy test",
+			"syntax": "test not proxy",
+			"returns": "ui.message",
+			"handler": {
+				"endpoint": "mycommand.txt",
+				"method": "get"
+			}
+		}
+	}
+}

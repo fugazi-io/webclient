@@ -9,7 +9,7 @@
 namespace fugazi.app.frames {
 	let remoteProxies = collections.map() as collections.Map<Frame>,
 		pendingLoaders = collections.map() as collections.Map<Loader>,
-		pendingRequests = collections.map() as collections.Map<Future<string>>,
+		pendingRequests = collections.map() as collections.Map<Future<ProxyHttpResponse>>,
 		framesContainer: HTMLDivElement;
 
 	window.addEventListener("message", envelope => {
@@ -55,10 +55,11 @@ namespace fugazi.app.frames {
 		}
 
 		const future = pendingRequests.get(message.requestId);
+		const proxyResponse = new ProxyHttpResponse(message);
 		if (message.status == "ok") {
-			future.resolve(message.result);
+			future.resolve(proxyResponse);
 		} else {
-			future.reject(message.error);
+			future.reject(proxyResponse);
 		}
 	}
 
@@ -145,6 +146,91 @@ namespace fugazi.app.frames {
 		}
 	}
 
+	class ProxyHttpResponse implements net.HttpResponse {
+		private contentType: string;
+		private statusCode: number;
+		private httpStatus: number;
+		private httpStatusText: string;
+		private data: string;
+
+		constructor (responseProperties: proxyframe.RemoteProxyExecuteCommandResponse) {
+			this.contentType = responseProperties.contentType;
+			this.statusCode = responseProperties.statusCode;
+			this.httpStatus = responseProperties.httpStatus;
+			this.httpStatusText = responseProperties.httpStatusText;
+			this.data = responseProperties.data;
+		}
+
+		public getXHR(): XMLHttpRequest {
+			return null;
+		}
+
+		public getStatusCode(): number {
+			return this.statusCode;
+		}
+
+		public getStatus(): net.Status {
+			switch (this.statusCode) {
+				case 0:
+					return net.Status.None;
+
+				case 200:
+					return net.Status.Success;
+
+				case 304:
+					return net.Status.NotModified;
+
+				case 408:
+					return net.Status.Timeout;
+
+				default:
+					return net.Status.Error;
+			}
+		}
+
+		public getHttpStatus(): number {
+			return this.httpStatus;
+		}
+
+		public getHttpStatusText(): string {
+			return this.httpStatusText;
+		}
+
+		public isContentType(contentType: string): boolean {
+			return this.getContentType().toLowerCase().startsWith(contentType.toLowerCase());
+		}
+
+		public getContentType(): string {
+			return this.contentType;
+		}
+
+		public getData(): string {
+			return this.data;
+		}
+
+		public guessData(): any {
+			const contentType = net.ContentTypes.fromString(this.contentType);
+
+			if (contentType === net.ContentTypes.Json) {
+				return this.getDataAsJson();
+			} else {
+				return this.getData();
+			}
+		}
+
+		public getDataAsJson<T>(): any | T {
+			try {
+				return JSON.parse(this.data);
+			} catch (exception) {
+				throw new fugazi.Exception("unable to parse response data");
+			}
+		}
+
+		public getDataAsMap<T>(): collections.Map<T> {
+			return collections.map<T>(this.getDataAsJson());
+		}
+	}
+
 	export class BaseFrame implements Frame {
 		private id: string;
 		private element: HTMLIFrameElement;
@@ -187,22 +273,18 @@ namespace fugazi.app.frames {
 	}
 
 	export class ProxyFrame extends BaseFrame {
-		execute(method: net.HttpMethod, url: net.Url, data?: string | fugazi.PlainObject<any> | collections.Map<any>): Promise<string> {
-			let future = new Future<string>(),
+		execute(properties: net.RequestProperties, data?: string | net.RequestData): Promise<net.HttpResponse> {
+			let future = new Future<ProxyHttpResponse>(),
 				message: proxyframe.RemoteProxyExecuteCommandRequest = {
-					method: method,
-					url: url.toString()
+					method: properties.method,
+					url: properties.url.toString(),
+					headers: properties.headers,
+					data: data instanceof collections.Map ? data.asObject() : data
 				};
-			
-			if (data instanceof collections.Map) {
-				message.data = data.asObject();
-			} else {
-				message.data = data;
-			}
 
 			const messageId = this.message(proxyframe.MessageTypes.ProxyFrameExecuteCommandRequest, message);
 			pendingRequests.set(messageId, future);
-			
+
 			return future.asPromise();
 		}
 	}

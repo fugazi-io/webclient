@@ -253,7 +253,7 @@ namespace fugazi.components.modules {
 		}
 
 		public descriptor() {
-			return {} as commands.descriptor.LocalCommandDescriptor;
+			return null;
 		}
 
 		public authenticate(): commands.handler.Result {
