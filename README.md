@@ -3,15 +3,14 @@
 A web based terminal application for executing local and remote commands.  
 The latest version of the terminal can be found here: http://fugazi.io
 
-### Installation
+### Development
 The client requires no servers, other than hosting the static files (scripts, styles, etc).  
 Here's how to run it locally:
 
-1. Clone the repo  
-2. Install the dependencies: `/FUGAZI_PATH/npm install`  
-3. Compile the typescript files: `/FUGAZI_PATH/node_modules/typescript/bin/tsc -p /FUGAZI_PATH/scripts`  
-4. Serve `/FUGAZI_PATH` from a local webserver or IDE  
-5. Open the `/FUGAZI_PATH/index.html` in the browser (based on how you serve it)  
+1. Clone the repo and change into the directory
+1. Install the dependencies: `$ npm install`
+1. Run `$ npm run dev` (read the `dev` npm script in `package.json` for more information)
+1. Open the provided URL in the browser.
 
 ### Features
 1. Executing of local (js) commands and remote (HTTP) commands

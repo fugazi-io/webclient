@@ -13,37 +13,41 @@ interface Window {
 }
 
 namespace fugazi.proxyframe {
-	function respond(requestId: string, result: string, error: string) {
-		const data = {
-			requestId: requestId
-		} as RemoteProxyExecuteCommandResponse;
-
+	function respond(requestId: string, result: net.HttpResponse, error: net.HttpResponse) {
+		let chosenResponse, status;
 		if (error) {
-			data.status = "error";
-			data.error = error;
+			status = "error";
+			chosenResponse = error;
 		} else {
-			data.status = "ok";
-			data.result = result;
+			status = "ok";
+			chosenResponse = result;
 		}
 
 		postMessage({
 			id: utils.generateId({ min: 5, max: 10 }),
 			type: MessageTypes.ProxyFrameExecuteCommandResponse,
-			data: data
+			data: {
+				requestId: requestId,
+				status: status,
+				statusCode: chosenResponse.getStatusCode(),
+				contentType: chosenResponse.getContentType(),
+				httpStatus: chosenResponse.getHttpStatus(),
+				httpStatusText: chosenResponse.getHttpStatus(),
+				data: chosenResponse.getData()
+			} as RemoteProxyExecuteCommandResponse
 		});
 	}
 
 	function request(requestId: string, message: RemoteProxyExecuteCommandRequest): void {
-		//let future = new Future<components.commands.handler.Result, Exception>();
-
 		net.http({
+			headers: message.headers,
 			method: message.method,
 			url: message.url
 		}).success(response => {
-				respond(requestId, response.getData(), null);
+			respond(requestId, response, null);
 		})
 		.fail(response => {
-			respond(requestId, null, response.getData());
+			respond(requestId, null, response);
 		})
 		.send(message.data);
 	}

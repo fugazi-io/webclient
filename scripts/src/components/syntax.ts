@@ -42,6 +42,7 @@ module fugazi.components.commands.syntax {
 	
 	export class Keyword implements RuleToken  {
 		private value: string;
+		private distanceCache: Map<string, number>;
 
 		public constructor(word: string) {
 			if (word.test(/^[0-9]|[\"'\(\)\[\]\{\},:]/)) {
@@ -49,6 +50,7 @@ module fugazi.components.commands.syntax {
 			}
 	
 			this.value = word;
+			this.distanceCache = new Map<string, number>();
 		}
 
 		public tolerates(input: string): boolean {
@@ -58,7 +60,7 @@ module fugazi.components.commands.syntax {
 			} else {
 				let distance = this.computeDistance(input, this.value);
 
-				return distance / this.value.length <= 0.5;
+				return distance / this.value.length < 0.5;
 			}
 		}
 
@@ -83,10 +85,14 @@ module fugazi.components.commands.syntax {
 		}
 
 		private computeDistance(challenge: string, target: string): number {
-			let distance = 0;
+			let key = `${challenge}:${target}]`;
+			if (this.distanceCache.has(key)) {
+				return this.distanceCache.get(key);
+			}
 
+			let distance = 0;
 			if (challenge.empty() || target.empty()) { // do not charge for tail typos
-				return Math.abs(challenge.length - target.length);
+				distance = Math.abs(challenge.length - target.length);
 
 			} else if (challenge.charAt(0) === target.charAt(0)) { // keep with 0 charge
 				distance = this.computeDistance(challenge.substring(1), target.substring(1));
@@ -98,6 +104,8 @@ module fugazi.components.commands.syntax {
 						this.computeDistance(challenge.substring(1), target) // case added char
 					);
 			}
+			
+			this.distanceCache.set(key, distance);
 
 			return distance;
 		}

@@ -74,7 +74,7 @@ module fugazi.app.terminal {
         }
     }
 
-    export class RestrictedTerminalContext extends BaseTerminalContext { }
+    export class RestrictedTerminalContext extends BaseTerminalContext {}
 
     export class TerminalCommand extends components.commands.LocalCommand {
         constructor() {
@@ -176,7 +176,7 @@ module fugazi.app.terminal {
 
         public retrieveVariable(name: string): Variable {
             return this.variables.get(extractVariableName(name));
-        }
+        }        
 
         public executeCommand(command: string): components.commands.ExecutionResult {
             storage.local.store(this.properties.name, this.properties);
@@ -204,15 +204,14 @@ module fugazi.app.terminal {
         private setView(view: view.TerminalView): void {
             this.view = view;
         }
-
+        
         private queryForStatements(command: string, position: number): Promise<app.statements.Statement[]> {
-            input.parse(command);
             let future = new Future<app.statements.Statement[]>(),
                 session: statements.StatementSession = statements.createStatementsSession(command, this.contextProvider),
                 suggestedStatements: statements.Statement[] = session.getSuggestions(position);
 
             future.resolve(suggestedStatements);
-
+            
             return future.asPromise();
         }
     }
@@ -222,7 +221,7 @@ module fugazi.app.terminal {
     }
 
     // init
-    app.bus.register(app.Events.Ready, function (): void {
+    app.bus.register(app.Events.Ready, function(): void {
         let coreCommands = {
             name: "io.fugazi.terminal",
             title: "Terminal Module",
@@ -232,7 +231,7 @@ module fugazi.app.terminal {
                     types: ["string"],
                     params: [],
                     validator: () => {
-                        return function (value: string): boolean {
+                        return function(value: string): boolean {
                             return /^\$[^"':\[]\(\)\{}]+$/.test(value);
                         }
                     }
@@ -255,7 +254,7 @@ module fugazi.app.terminal {
                     returns: "void",
                     parametersForm: "arguments",
                     componentConstructor: TerminalCommand,
-                    handler: function (context: modules.PrivilegedModuleContext, name: string, value: any): components.commands.handler.Result {
+                    handler: function(context: modules.PrivilegedModuleContext, name: string, value: any): components.commands.handler.Result {
                         let type = context.guessType(value);
                         if (type == null) {
                             return {
@@ -268,6 +267,35 @@ module fugazi.app.terminal {
                         return {
                             status: components.commands.handler.ResultStatus.Success
                         };
+                    }
+                },
+                moduleWorkWith: {
+                    title: "Specific module remote source setup",
+                    syntax: [
+                        "module (moduleName string) works with (source string)",
+                    ],
+                    returns: "ui.message",
+                    parametersForm: "arguments",
+                    componentConstructor: TerminalCommand,
+                    handler: function (context: modules.ModuleContext, moduleName: string, source: string): components.commands.handler.Result {
+                        let theModule: components.modules.Module = components.registry.getModule(moduleName);
+                        if (isNothing(theModule)) {
+                            return {
+                                status: components.commands.handler.ResultStatus.Failure,
+                                error: `No such module '${moduleName}'`
+                            }
+                        } else if (isNothing(theModule.getRemote().base(source))) {
+                            return {
+                                status: components.commands.handler.ResultStatus.Failure,
+                                error: `Module '${moduleName}' has no remote description for '${ source}'`
+                            }
+                        } else {
+                            context.getParent().setRemoteSource(theModule.getPath(), source);
+                            return {
+                                status: components.commands.handler.ResultStatus.Success,
+                                value: `set '${moduleName}' to work with remote source '${source}'`
+                            }
+                        }
                     }
                 },
                 run: {
@@ -340,35 +368,6 @@ module fugazi.app.terminal {
                         }
 
                         return future.asPromise();
-                    }
-                },
-                moduleWorkWith: {
-                    title: "Specific module remote source setup",
-                    syntax: [
-                        "module (moduleName string) works with (source string)",
-                    ],
-                    returns: "ui.message",
-                    parametersForm: "arguments",
-                    componentConstructor: TerminalCommand,
-                    handler: function (context: modules.ModuleContext, moduleName: string, source: string): components.commands.handler.Result {
-                        let theModule: components.modules.Module = components.registry.getModule(moduleName);
-                        if (isNothing(theModule)) {
-                            return {
-                                status: components.commands.handler.ResultStatus.Failure,
-                                error: `No such module '${moduleName}'`
-                            }
-                        } else if (isNothing(theModule.getRemote().base(source))) {
-                            return {
-                                status: components.commands.handler.ResultStatus.Failure,
-                                error: `Module '${moduleName}' has no remote description for '${source}'`
-                            }
-                        } else {
-                            context.getParent().setRemoteSource(theModule.getPath(), source);
-                            return {
-                                status: components.commands.handler.ResultStatus.Success,
-                                value: `set '${moduleName}' to work with remote source '${source}'`
-                            }
-                        }
                     }
                 }
             }
