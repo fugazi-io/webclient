@@ -273,9 +273,10 @@ namespace fugazi.view.input {
 		}
 
 		protected onEscapePressed(): boolean {
-			this.setState({
-				showing: false
-			} as S);
+			this.setState({ showing: false } as S, () => {
+					this.inputbox.focus();
+					this.setCaretPosition(this.getValue().length)
+			});
 
 			return false;
 		}
@@ -290,7 +291,8 @@ namespace fugazi.view.input {
 				items={ this.state.suggestions || [] }
 				itemRenderer={ this.getItemRenderer() }
 				ref={ element => this.suggestionPanel = element }
-				onTabPressed={ () => this.onTabPressed() } />);
+				onTabPressed={ () => this.onTabPressed() }
+				onEscapePressed={ () => this.onEscapePressed() }/>);
 
 			return elements;
 		}
@@ -304,6 +306,7 @@ namespace fugazi.view.input {
 		message?: string;
 		items?: any[];
 		onTabPressed: () => void;
+		onEscapePressed: () => void;
 	}
 
 	export interface SuggestionPanelState extends ViewState {
@@ -359,11 +362,14 @@ namespace fugazi.view.input {
 					this.props.onTabPressed();
 					break;
 
+				case "Escape":
+					event.stopPropagation();
+					event.preventDefault();
+					this.props.onEscapePressed();
+					break;
+
 				case "ArrowUp":
 					this.setState({
-						// remain in place
-						//selected: this.state.selected + 1 >= this.props.items.length ? this.state.selected : this.state.selected + 1
-						// cyclic
 						selected: (this.props.items.length + this.state.selected - 1) % this.props.items.length
 					}, () => {
 						this.element.focus();
@@ -372,9 +378,6 @@ namespace fugazi.view.input {
 
 				case "ArrowDown":
 					this.setState({
-						// remain in place
-						//selected: this.state.selected + 1 >= this.props.items.length ? this.state.selected : this.state.selected + 1
-						// cyclic
 						selected: (this.state.selected + 1) % this.props.items.length
 					}, () => {
 						this.element.focus();
