@@ -102,7 +102,7 @@ namespace fugazi.view.input {
 		protected getContainerElements(): JSX.Element[] {
 			return [
 				<div key="inputbox" className="inputbox">
-					<input key="input" type="text" ref="inputbox" value={ this.state.value }
+					<input tabIndex={ - 1 } key="input" type="text" ref="inputbox" value={ this.state.value }
 						onFocus={ this.onFocus.bind(this) }
 						onBlur={ this.onBlur.bind(this) }
 						onChange={ this.onChange.bind(this) }
@@ -228,27 +228,46 @@ namespace fugazi.view.input {
 		suggestions?: T[];
 	}
 
+	export type FocusType = "input" | "suggestions";
+
 	export interface SuggestibleInputState<T> extends InputState {
 		showing: boolean;
 		message?: string;
 		suggestions?: T[];
+		focus: FocusType;
 	}
 
-	export type ItemRenderer<T> = (item: T, index: number) => JSX.Element;
+	export type ItemRenderer<T> = (item: T, index: number, selected: boolean) => JSX.Element;
 
 	export abstract class SuggestibleInputView<P extends SuggestibleInputProperties<T>, S extends SuggestibleInputState<T>, T> extends InputView<P, S> {
+		private suggestionPanel: SuggestionPanel;
+
 		public constructor(props: P, className: string, prompt?: string) {
 			super(props, "suggestible " + className, prompt);
 
 			this.state.showing = false;
 			this.state.message = null;
 			this.state.suggestions = this.props.suggestions;
+			this.state.focus = "input";
 		}
 
 		protected onTabPressed(): boolean {
-			this.setState({
-				showing: !this.state.showing
-			} as S);
+			let newState = !this.state.showing ?
+				{
+					showing: true
+				} :
+				{
+					focus: this.state.focus === "input" ? "suggestions" : "input"
+				};
+
+			this.setState(newState as S, () => {
+				if (this.state.focus === "input") {
+					this.inputbox.focus();
+					this.setCaretPosition(this.getValue().length);
+				} else {
+					this.suggestionPanel.focus();
+				}
+			});
 
 			return true;
 		}
@@ -264,13 +283,15 @@ namespace fugazi.view.input {
 		protected getInnerElements(): JSX.Element[] {
 			let elements = super.getInnerElements();
 
-			elements.unshift(React.createElement(SuggestionPanel, {
-				key: "suggestions",
-				showing: this.state.showing,
-				message: this.state.message,
-				items: this.state.suggestions || [],
-				itemRenderer: this.getItemRenderer()
-			}));
+			elements.push(<SuggestionPanel
+				key="suggestions"
+				showing={ this.state.showing }
+				message={ this.state.message }
+				items={ this.state.suggestions || [] }
+				itemRenderer={ this.getItemRenderer() }
+				ref={ element => this.suggestionPanel = element }
+				onTabPressed={ () => this.onTabPressed() } />);
+
 			return elements;
 		}
 
@@ -282,14 +303,22 @@ namespace fugazi.view.input {
 		showing: boolean;
 		message?: string;
 		items?: any[];
+		onTabPressed: () => void;
 	}
 
-	class SuggestionPanel extends View<SuggestionPanelProperties, ViewState> {
+	export interface SuggestionPanelState extends ViewState {
+		selected: number;
+	}
+
+	class SuggestionPanel extends View<SuggestionPanelProperties, SuggestionPanelState> {
 		private key: string;
+		private element: HTMLElement;
 
 		constructor(props: SuggestionPanelProperties) {
 			super(props);
+
 			this.key = utils.generateId();
+			this.state.selected = -1;
 		}
 
 		public render(): JSX.Element {
@@ -304,14 +333,54 @@ namespace fugazi.view.input {
 					item = <span key={ "span2" + this.key } className="message empty">no matches found</span>
 				} else {
 					item = <ul key={ "ul" + this.key }>{ this.props.items.map(item => {
-						return this.props.itemRenderer(item, counter++);
+						return this.props.itemRenderer(item, counter, this.state.selected === counter++);
 					}) } </ul>;
 				}
 			} else {
 				throw new Exception("SuggestionPanel.render: both props.message and props.items are missing");
 			}
 
-			return <div key={ "div" + this.key } className={ className }>{ item }</div>;
+			return <div tabIndex={ -1 } key={ "div" + this.key } onKeyDown={ this.onKeyDown.bind(this) } className={ className } ref={ el => this.element = el }>{ item }</div>;
+		}
+
+		public focus() {
+			this.setState({
+				selected: 0
+			}, () => {
+				this.element.focus();
+			});
+		}
+
+		private onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+			switch (event.key) {
+				case "Tab":
+					event.stopPropagation();
+					event.preventDefault();
+					this.props.onTabPressed();
+					break;
+
+				case "ArrowUp":
+					this.setState({
+						// remain in place
+						//selected: this.state.selected + 1 >= this.props.items.length ? this.state.selected : this.state.selected + 1
+						// cyclic
+						selected: (this.props.items.length + this.state.selected - 1) % this.props.items.length
+					}, () => {
+						this.element.focus();
+					});
+					break;
+
+				case "ArrowDown":
+					this.setState({
+						// remain in place
+						//selected: this.state.selected + 1 >= this.props.items.length ? this.state.selected : this.state.selected + 1
+						// cyclic
+						selected: (this.state.selected + 1) % this.props.items.length
+					}, () => {
+						this.element.focus();
+					});
+					break;
+			}
 		}
 	}
 

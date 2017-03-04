@@ -32,8 +32,15 @@ main#ui article.terminal section.inputs .suggestible.input .suggestionPanel {
 	background-color: rgba(51, 51, 51, 0.8);
 	bottom: 100%;
 	width: 100%;
+	outline: none;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
+}
+
+main#ui article.terminal section.inputs .suggestible.input .suggestionPanel:focus li.selected {
+	border: 1px solid #608b4e;
+	border-radius: 5px;
+	padding: 2px;
 }
 
 main#ui article.terminal section.inputs .bgtext.input .inputbox {
