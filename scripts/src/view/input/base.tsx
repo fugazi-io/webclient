@@ -274,8 +274,8 @@ namespace fugazi.view.input {
 
 		protected onEscapePressed(): boolean {
 			this.setState({ showing: false } as S, () => {
-					this.inputbox.focus();
-					this.setCaretPosition(this.getValue().length)
+				this.inputbox.focus();
+				this.setCaretPosition(this.getValue().length)
 			});
 
 			return false;
