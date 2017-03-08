@@ -313,7 +313,7 @@ module fugazi {
 			 * @Override
 			 */
 			public toString(): string {
-				return JSON.stringify(this.items);
+				return JSON.stringify(this.asObject());
 			}
 
 			public asObject(): { [key: string]: T } {
