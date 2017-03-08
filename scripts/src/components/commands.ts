@@ -324,6 +324,11 @@ namespace fugazi.components.commands {
 				method: this.method,
 				url: new net.Url(endpointParams.endpoint, remote.base(remoteSourceId))
 			} as net.RequestProperties;
+
+			if (isPlainObject(data) || is(data, collections.Map)) {
+				props.contentType = net.ContentTypes.Json;
+			}
+
 			this.authenticator.interceptRequest(props, data);
 
 			if (remote.proxied()) {
