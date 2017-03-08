@@ -620,13 +620,6 @@ namespace fugazi.components.commands {
 							`required by endpoint "${ (this.component as any).endpoint }"`
 						);
 					}
-
-					if (!endpointParams.includesAll(syntaxParamsNames)) {
-						console.warn(
-							`syntax rule "${ rule.raw }" of command ${ this.component.getPath().toString() } ` +
-							`contains unused parameters`
-						);
-					}
 				});
 			}
 
