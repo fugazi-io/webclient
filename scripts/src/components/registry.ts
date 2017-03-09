@@ -136,7 +136,7 @@ module fugazi.components.registry {
 			return components.registry.getType("list");
 		}
 
-		if (value instanceof collections.Map) {
+		if (isPlainObject(value) || value instanceof collections.Map) {
 			return components.registry.getType("map");
 		}
 
@@ -148,7 +148,7 @@ module fugazi.components.registry {
 			return components.registry.getType("boolean");
 		}
 
-		return typeof value === "string" ? components.registry.getType("string") : null;
+		return typeof value === "string" ? components.registry.getType("string") : components.registry.getType("any");
 	}
 
 	export function guessTypeFromString(value: string): components.types.Type {
