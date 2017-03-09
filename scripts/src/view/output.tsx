@@ -178,11 +178,18 @@ module fugazi.view {
 		 * @Override
 		 */
 		public render(): JSX.Element {
-			let element: JSX.Element,
+			let error: string,
+				element: JSX.Element,
+				status = this.state.status,
 				renderer: renderers.Renderer,
 				className = "result clearfix ";
 
-			switch (this.state.status) {
+			if (status === "success" && !this.props.result.getType()) {
+				status = "fail";
+				error = "error: result contains no type";
+			}
+
+			switch (status) {
 				case "pending":
 					className += "pending";
 					element = <span className="message">pending</span>;
@@ -196,7 +203,7 @@ module fugazi.view {
 
 				case "fail":
 					className += "error";
-					element = <span className="message">{ this.createErrorMessage() }</span>;
+					element = <span className="message">{ error || this.createErrorMessage() }</span>;
 					break;
 			}
 
