@@ -147,7 +147,7 @@ namespace fugazi.components.commands {
 		}
 
 		public executeLater(context: app.modules.ModuleContext): Executer {
-			let executionResult: ExecutionResult = this.returnType.is("any") ? new ExecutionResultAny(this.returnType, this.asynced) : new ExecutionResult(this.returnType, this.asynced),
+			let executionResult = this.returnType.is("any") ? new ExecutionResultAny(this.returnType, this.asynced) : new ExecutionResult(this.returnType, this.asynced),
 				executer = new Executer(executionResult, params => {
 					this.invokeHandler(context, params).then(this.handleHandlerResult.bind(this, executionResult), executionResult.reject.bind(executionResult));
 				});
@@ -156,7 +156,7 @@ namespace fugazi.components.commands {
 		}
 
 		public executeNow(context: app.modules.ModuleContext, params: ExecutionParameters): ExecutionResult {
-			let executer: Executer = this.executeLater(context);
+			let executer = this.executeLater(context);
 			executer.execute(params);
 			return executer.result;
 		}

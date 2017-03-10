@@ -192,7 +192,6 @@ module fugazi.app.terminal {
 
 				if (!isNull(executableStatement)) {
 					result = executableStatement.execute();
-
 				} else {
 					throw new Exception("None of the statements are executable");
 				}
