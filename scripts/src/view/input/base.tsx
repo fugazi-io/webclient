@@ -292,12 +292,15 @@ namespace fugazi.view.input {
 				itemRenderer={ this.getItemRenderer() }
 				ref={ element => this.suggestionPanel = element }
 				onTabPressed={ () => this.onTabPressed() }
-				onEscapePressed={ () => this.onEscapePressed() }/>);
+				onEscapePressed={ () => this.onEscapePressed() }
+				onSuggestionItemPressed={ (item: any) => this.onSuggestionItemPressed(item) } />);
 
 			return elements;
 		}
 
 		protected abstract getItemRenderer(): ItemRenderer<T>;
+
+		protected abstract onSuggestionItemPressed(item: T): void;
 	}
 
 	interface SuggestionPanelProperties extends ViewProperties {
@@ -307,6 +310,7 @@ namespace fugazi.view.input {
 		items?: any[];
 		onTabPressed: () => void;
 		onEscapePressed: () => void;
+		onSuggestionItemPressed: (item: any) => void;
 	}
 
 	export interface SuggestionPanelState extends ViewState {
@@ -356,6 +360,12 @@ namespace fugazi.view.input {
 
 		private onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
 			switch (event.key) {
+				case "Enter":
+					event.stopPropagation();
+					event.preventDefault();
+					this.props.onSuggestionItemPressed(this.props.items[this.state.selected]);
+					break;
+
 				case "Tab":
 					event.stopPropagation();
 					event.preventDefault();

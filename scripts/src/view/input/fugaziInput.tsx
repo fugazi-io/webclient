@@ -106,6 +106,21 @@ namespace fugazi.view.input {
 			return false;
 		}
 
+		protected onSuggestionItemPressed(item: app.statements.Statement): void {
+			let newValue: string = "",
+				iterator = item.getRule().getTokens().getIterator();
+			while (iterator.hasNext()) {
+				let token: components.commands.syntax.RuleToken = iterator.next();
+				if (token.getTokenType() == components.commands.syntax.TokenType.Keyword) {
+					newValue += ` ${(token as components.commands.syntax.Keyword).getWord()}`;
+				} else {
+					break;
+				}
+			}
+
+			this.inputbox.value = newValue;
+		}
+
 		private onShowSearch(): void {
 			this.history.mark();
 			this.history.update();
