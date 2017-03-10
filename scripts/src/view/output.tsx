@@ -127,7 +127,10 @@ module fugazi.view {
 			});
 
 			if (this.props.sayhello) {
-				blocks.unshift(<li key="hello" className="hello">fugazi version { app.version.code }</li>);
+				blocks.unshift(
+					<li key="hello" className="hello">fugazi version { app.version.code }</li>,
+					<li key="repoLink" className="repoLink">check out the <a target="_blank" href="https://github.com/fugazi-io/webclient">GitHub repo</a> for more info</li>
+				);
 			}
 			
 			return <section className="output">

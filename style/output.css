@@ -10,7 +10,22 @@ main#ui article.terminal section.output > .items > li {
 main#ui article.terminal section.output > .items .hello {
 	color: #608b4e;
 	font-size: 11px;
+	padding-bottom: 3px;
+}
+
+main#ui article.terminal section.output > .items .repoLink {
+	color: #7b7b7b;
+	font-size: 11px;
 	padding-bottom: 10px;
+}
+
+main#ui article.terminal section.output > .items .repoLink a {
+	color: #7b7b7b;
+}
+
+main#ui article.terminal section.output > .items .repoLink a:hover {
+	color: #608b4e;
+	text-decoration: none;
 }
 
 main#ui article.terminal section.output > .items .separator {
