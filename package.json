@@ -1,8 +1,7 @@
 {
-  "name": "webclient",
-  "version": "1.0.0",
-  "description": "### Protocol ### [Types](protocol/types.md)   [Commands](protocol/command.md)   [Packages](protocol/package.md)",
-  "main": "index.js",
+  "name": "@fugazi/webclient",
+  "version": "1.0.9",
+  "description": "web based terminal application for executing local and remote commands",
   "dependencies": {
     "typescript": "^2.1.4"
   },
@@ -10,25 +9,26 @@
     "http-server": "^0.9.0",
     "npm-run-all": "^4.0.1"
   },
+  "types": "./scripts/bin/",
   "scripts": {
-    "transpile-core": "tsc -p scripts",
+    "transpile-core": "node_modules/typescript/bin/tsc -p scripts",
     "transpile-modules": "tsc -p modules/scripts",
     "transpile": "run-p transpile-core transpile-modules",
     "transpile-core-watch": "npm run transpile-core -- --watch",
     "transpile-modules-watch": "npm run transpile-modules -- --watch",
     "transpile-watch": "run-p transpile-core-watch transpile-modules-watch",
-    "serve": "http-server",
+    "serve": "http-server -p 3330",
     "dev": "npm-run-all transpile -p transpile-watch serve",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nitzantomer/fugazi.io.git"
+    "url": "git+https://github.com/fugazi-io/webclient"
   },
   "author": "Nitzan Tomer <nitzan.tomer@gmail.com> (https://github.com/nitzantomer)",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/nitzantomer/fugazi.io/issues"
+    "url": "https://github.com/fugazi-io/webclient/issues"
   },
-  "homepage": "https://github.com/nitzantomer/fugazi.io#readme"
+  "homepage": "http://fugazi.io"
 }

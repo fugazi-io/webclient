@@ -3,8 +3,27 @@
 A web based terminal application for executing local and remote commands.  
 The latest version of the terminal can be found here: http://fugazi.io
 
-### Development
+### Installation
 The client requires no servers, other than hosting the static files (scripts, styles, etc).  
+To run locally install the [npm package](https://www.npmjs.com/package/@fugazi/webclient):
+```bash
+npm install @fugazi/webclient
+```
+
+Then build the scripts:
+```bash
+npm run transpile
+```
+
+After the compilation ended, serve the files:
+```bash
+npm run serve
+```
+
+That's it, you have fugazi locally served, open [http://localhost:3330/index.hml](http://localhost:3330/index.hml) in your browser.
+
+### Development
+If you want to develop with/for fugazi then you better clone this repo.  
 Here's how to run it locally:
 
 1. Clone the repo and change into the directory
