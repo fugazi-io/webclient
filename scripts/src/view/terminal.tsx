@@ -44,6 +44,10 @@ module fugazi.view {
 			};
 		}
 
+		public clearOutput(): void {
+			this.getOutput().clear();
+		}
+
 		public render(): JSX.Element {
 			let inputView: JSX.Element;
 

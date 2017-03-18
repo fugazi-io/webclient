@@ -39,6 +39,7 @@ module fugazi.view {
 	}
 	
 	export interface OutputState extends ViewState {
+		sayhello: boolean;
 		output: Array<OutputItemInfo>;
 	}
 
@@ -56,6 +57,7 @@ module fugazi.view {
 
 			this.shouldScrollBottom = false;
 			this.state = {
+				sayhello: props.sayhello,
 				output: history
 			};
 		}
@@ -79,7 +81,20 @@ module fugazi.view {
 			Ps.update(node);
 		}
 
+		public clear(): void {
+			history = [];
+
+			this.setState({
+				sayhello: false,
+				output: history
+			} as OutputState);
+		}
+
 		public addExecutionResult(statement: string, result: components.commands.ExecutionResult): void {
+			if (statement === "clear") {
+				return;
+			}
+			
 			history.push({
 				result: result,
 				statement: statement
@@ -87,7 +102,7 @@ module fugazi.view {
 
 			this.setState({
 				output: history
-			});
+			} as OutputState);
 		}
 		
 		public render(): JSX.Element {
@@ -126,7 +141,7 @@ module fugazi.view {
 				}
 			});
 
-			if (this.props.sayhello) {
+			if (this.state.sayhello) {
 				blocks.unshift(
 					<li key="hello" className="hello">fugazi version { app.version.code }</li>,
 					<li key="repoLink" className="repoLink">check out the <a target="_blank" href="https://github.com/fugazi-io/webclient">GitHub repo</a> for more info</li>

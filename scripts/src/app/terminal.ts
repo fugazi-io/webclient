@@ -72,6 +72,10 @@ module fugazi.app.terminal {
 		public retrieveVariable(name: string): Variable {
 			return this.terminal.retrieveVariable(name);
 		}
+
+		public clearOutput(): void {
+			this.terminal.clearOutput();
+		}
 	}
 
 	export class RestrictedTerminalContext extends BaseTerminalContext {}
@@ -147,6 +151,10 @@ module fugazi.app.terminal {
 				querier: this.queryForStatements.bind(this),
 				executer: this.executeCommand.bind(this)
 			}).then(this.setView.bind(this));
+		}
+
+		public clearOutput(): void {
+			this.view.clearOutput();
 		}
 
 		public moduleLoaded(module: components.modules.Module) {
@@ -243,6 +251,18 @@ module fugazi.app.terminal {
 				}
 			},
 			commands: {
+				clear: {
+					title: "Clears the output panel",
+					syntax: "clear",
+					returns: "void",
+					componentConstructor: TerminalCommand,
+					handler: function(context: modules.PrivilegedModuleContext): components.commands.handler.Result {
+						context.getParent().clearOutput();
+						return {
+							status: components.commands.handler.ResultStatus.Success
+						}
+					}
+				},
 				assign: {
 					title: "Variable assignment command",
 					syntax: [
