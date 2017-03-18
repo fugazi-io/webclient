@@ -49,28 +49,32 @@ Here's how to run it locally:
 ### More documentation
 
 #### Components
-1. [Components basics](docs/components/components.md)
-2. [Modules](docs/components/modules.md)
-3. [Types](docs/components/types.md)
-4. [Constraints](docs/components/constraints.md)
-5. [Converters](docs/components/converters.md)
-6. [Commands](docs/components/commands.md)
+* [Components basics](docs/components/components.md)
+* [Modules](docs/components/modules.md)
+* [Types](docs/components/types.md)
+* [Constraints](docs/components/constraints.md)
+* [Converters](docs/components/converters.md)
+* [Commands](docs/components/commands.md)
 
 #### Descriptors
-1. [Descriptors basics](docs/descriptors/component.md)
-2. [Module Descriptors](docs/descriptors/module.md)
-3. [Type Descriptors](docs/descriptors/type.md)
-4. [Constraint Descriptors](docs/descriptors/constraint.md)
-5. [Converter Descriptors](docs/descriptors/converter.md)
-6. [Command Descriptors](docs/descriptors/command.md)
+* [Descriptors basics](docs/descriptors/component.md)
+* [Module Descriptors](docs/descriptors/module.md)
+* [Type Descriptors](docs/descriptors/type.md)
+* [Constraint Descriptors](docs/descriptors/constraint.md)
+* [Converter Descriptors](docs/descriptors/converter.md)
+* [Command Descriptors](docs/descriptors/command.md)
 
 #### Builtin Components
-1. [Types](./docs/builtins/types.md)
-2. [Commands](./docs/builtins/commands.md)
-3. [Constraints](./docs/builtins/constraints.md)
+* [Types](./docs/builtins/types.md)
+* [Commands](./docs/builtins/commands.md)
+* [Constraints](./docs/builtins/constraints.md)
+
+### Connectors
+* [Connectors](./docs/connectors/connectors.md)
+* [Expose an existing http based api](./docs/connectors/existing-service.md)
 
 #### Examples
-1. [Simple Math Module](./docs/examples/math.md)
+* [Simple Math Module](./docs/examples/math.md)
 
 #### Getting help
 Use the [issues](//github.com/fugazi-io/webclient/issues) for any bug, request, question
