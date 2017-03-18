@@ -309,7 +309,7 @@ module fugazi.net {
 	}
 
 	export function http(properties: RequestProperties): HttpRequest {
-		if (!properties.method) {
+		if (properties.method == null) {
 			properties.method = DEFAULT_METHOD;
 		}
 
@@ -411,7 +411,7 @@ module fugazi.net {
 
 			this.url = fugazi.is(properties.url, Url) ? <Url> properties.url : new Url(<string> properties.url);
 			this.timeout = properties.timeout;
-			this.method = properties.method || DEFAULT_METHOD;
+			this.method = properties.method != null ? properties.method : DEFAULT_METHOD;
 			this.headers = collections.map<string>(properties.headers);
 
 			if (properties.contentType) {
