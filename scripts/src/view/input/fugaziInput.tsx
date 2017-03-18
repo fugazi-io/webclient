@@ -53,15 +53,18 @@ namespace fugazi.view.input {
 
 		protected onArrowUpPressed(): boolean {
 			this.history.previous();
-			this.updateSuggestions(this.getValue(), this.getValue().length);
-			setTimeout(() => { this.setCaretPosition(this.getValue().length); }, 5);
+			this.updateSuggestions(this.getValue(), this.getValue().length).then(() => {
+				setTimeout(() => { this.setCaretPosition(this.getValue().length); }, 5);
+			});
 			return false;
 		}
 
 		protected onArrowDownPressed(): boolean {
 			this.history.next();
-			this.updateSuggestions(this.getValue(), this.getValue().length);
-			setTimeout(() => { this.setCaretPosition(this.getValue().length); }, 5);
+			this.updateSuggestions(this.getValue(), this.getValue().length).then(() => {
+				setTimeout(() => { this.setCaretPosition(this.getValue().length); }, 5);
+			});
+
 			return false;
 		}
 
@@ -79,14 +82,18 @@ namespace fugazi.view.input {
 			return false;
 		}
 
-		private updateSuggestions(value: string, position: number): void {
-			let promise = this.props.onQuery(value, position);
-			promise.then(statements => {
-				this.setState({
-					suggestions: statements,
-					value: this.inputbox.value
-				} as any);
+		private updateSuggestions(value: string, position: number) {
+			let onResult = this.props.onQuery(value, position);
+
+			return new Promise((resolve, reject) => {
+				onResult.then(statements => {
+					this.setState({
+						suggestions: statements,
+						value: this.inputbox.value
+					} as any, () => resolve());
+				}).catch(reject);
 			});
+
 		}
 
 		protected onEnterPressed(): boolean {
