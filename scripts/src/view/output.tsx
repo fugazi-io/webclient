@@ -94,7 +94,7 @@ module fugazi.view {
 			if (statement === "clear") {
 				return;
 			}
-			
+
 			history.push({
 				result: result,
 				statement: statement

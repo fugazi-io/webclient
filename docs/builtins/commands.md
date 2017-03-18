@@ -47,6 +47,15 @@ extract "obj.num" from $map
 ### `io.fugazi.terminal` commands
 Commands regarding a specific terminal instance.
 
+#### Clear
+Clears the output panel  
+Path: `io.fugazi.terminal`  
+Syntax: `clear`  
+Examples:
+```
+clear
+```
+
 #### Set
 Stores a value into a variable  
 Path: `io.fugazi.terminal`  
