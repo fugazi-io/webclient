@@ -153,7 +153,7 @@ namespace fugazi.view.input {
 			let elements: JSX.Element[] = [];
 			let className = this.props.selected ? "selected" : undefined;
 			
-			elements.push(<span key="path" className="path">{ this.props.statement.getCommand().getPath().parent().toString() }</span>);
+			elements.push(<span key="__command-path__" className="path">{ this.props.statement.getCommand().getPath().parent().toString() }</span>);
 			this.props.statement.getRule().getTokens().forEach(token => {
 				elements.push(StatementSuggestionItem.getElementFor(token));
 			});
@@ -183,11 +183,12 @@ namespace fugazi.view.input {
 					typeClassName += "map";
 				}
 
-				let name = (token as components.commands.syntax.Parameter).getName();
+				let name = (token as components.commands.syntax.Parameter).getName(),
+					typeName = (token as components.commands.syntax.Parameter).getType().toString();
 				return <span key={ name } className={ typeClassName }>
 					<span className="name">{ name }</span>
 					<span className="separator">|</span>
-					<span className="type">{ (token as components.commands.syntax.Parameter).getType().toString() }</span>
+					<span className="type">{ typeName }</span>
 				</span>;
 			} else {
 				return null;
