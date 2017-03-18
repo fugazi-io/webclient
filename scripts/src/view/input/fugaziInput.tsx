@@ -108,17 +108,27 @@ namespace fugazi.view.input {
 
 		protected onSuggestionItemPressed(item: app.statements.Statement): void {
 			let newValue: string = "",
+				haveStoppedForParameter = false,
 				iterator = item.getRule().getTokens().getIterator();
 			while (iterator.hasNext()) {
 				let token: components.commands.syntax.RuleToken = iterator.next();
 				if (token.getTokenType() == components.commands.syntax.TokenType.Keyword) {
-					newValue += ` ${(token as components.commands.syntax.Keyword).getWord()}`;
+					newValue += `${(token as components.commands.syntax.Keyword).getWord()} `;
 				} else {
+					haveStoppedForParameter = true;
 					break;
 				}
 			}
 
-			this.inputbox.value = newValue;
+			this.setState({
+					value: haveStoppedForParameter ? newValue : newValue.trimRight(),
+					focus: "input"
+				} as any,
+				() => {
+					this.updateSuggestions(this.getValue(), this.getValue().length);
+					this.inputbox.focus();
+					this.setCaretPosition(this.getValue().length);
+				});
 		}
 
 		private onShowSearch(): void {

@@ -39,8 +39,6 @@ main#ui article.terminal section.inputs .suggestible.input .suggestionPanel {
 
 main#ui article.terminal section.inputs .suggestible.input .suggestionPanel:focus li.selected {
 	border: 1px solid #608b4e;
-	border-radius: 5px;
-	padding: 2px;
 }
 
 main#ui article.terminal section.inputs .bgtext.input .inputbox {
@@ -67,6 +65,12 @@ main#ui article.terminal section.inputs .input.historySearcher aside.prompt {
 
 main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel {
 	color: rgb(255, 255, 255);
+}
+
+main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel li {
+	border: 1px solid transparent;
+	border-radius: 5px;
+	padding: 2px;
 }
 
 main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel li > span {
