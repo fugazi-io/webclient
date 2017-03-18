@@ -46,8 +46,8 @@ namespace fugazi.view.input {
 		}
 
 		protected getItemRenderer(): ItemRenderer<app.statements.Statement> {
-			return (statement, index) => {
-				return <StatementSuggestionItem key={ index.toString() } statement={ statement } />;
+			return (statement, index, selected) => {
+				return <StatementSuggestionItem key={ index.toString() } statement={ statement } selected={ selected }/>;
 			}
 		}
 
@@ -98,11 +98,37 @@ namespace fugazi.view.input {
 				this.inputbox.value = "";
 				this.setState({
 					value: "",
-					showing: false
+					showing: false,
+					focus: "input"
 				});
 			}
 
 			return false;
+		}
+
+		protected onSuggestionItemPressed(item: app.statements.Statement): void {
+			let newValue: string = "",
+				haveStoppedForParameter = false,
+				iterator = item.getRule().getTokens().getIterator();
+			while (iterator.hasNext()) {
+				let token: components.commands.syntax.RuleToken = iterator.next();
+				if (token.getTokenType() == components.commands.syntax.TokenType.Keyword) {
+					newValue += `${(token as components.commands.syntax.Keyword).getWord()} `;
+				} else {
+					haveStoppedForParameter = true;
+					break;
+				}
+			}
+
+			this.setState({
+					value: haveStoppedForParameter ? newValue : newValue.trimRight(),
+					focus: "input"
+				} as any,
+				() => {
+					this.updateSuggestions(this.getValue(), this.getValue().length);
+					this.inputbox.focus();
+					this.setCaretPosition(this.getValue().length);
+				});
 		}
 
 		private onShowSearch(): void {
@@ -113,19 +139,21 @@ namespace fugazi.view.input {
 	}
 
 	interface StatementSuggestionItemProperties extends ViewProperties {
+		selected: boolean;
 		statement: app.statements.Statement;
 	}
 
 	class StatementSuggestionItem extends View<StatementSuggestionItemProperties, ViewState> {
 		render(): JSX.Element {
 			let elements: JSX.Element[] = [];
+			let className = this.props.selected ? "selected" : undefined;
 			
 			elements.push(<span key="path" className="path">{ this.props.statement.getCommand().getPath().parent().toString() }</span>);
 			this.props.statement.getRule().getTokens().forEach(token => {
 				elements.push(StatementSuggestionItem.getElementFor(token));
 			});
 
-			return <li key={ this.props.key }>{ elements }</li>;
+			return <li key={ this.props.key } className={ className }>{ elements }</li>;
 		}
 
 		private static getElementFor(token: components.commands.syntax.RuleToken): JSX.Element {

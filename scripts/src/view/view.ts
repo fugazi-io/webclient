@@ -7,7 +7,7 @@
 
 module fugazi.view {
 	export interface ViewProperties {
-		ref?: string;
+		ref?: (<T>(el: T) => void) | string;
 		key?: string;
 	}
 
