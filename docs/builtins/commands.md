@@ -105,6 +105,14 @@ Examples:
 ```
 load module from "http://fugazi.io/modules/scripts/bin/math.js"
 ```
+#### Run
+Runs a script of other fugazi commands from a url.
+Path: `io.fugazi.components` 
+Syntax: `run URL`
+Examples:
+```
+run "https://gist.githubusercontent.com/oferh/5e59f93b3b38a2c669e94e04bb5b0ead/raw"
+```
 
 ### `io.fugazi.net` commands
 Network (HTTP) commands

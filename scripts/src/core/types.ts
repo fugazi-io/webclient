@@ -36,6 +36,13 @@ module fugazi {
 	
 		return false;
 	}
+
+	export function isEmpty(value: any): boolean {
+		if (is(value, Array) || typeof(value) === "string") {
+			return value.length === 0;
+		}
+		return false;
+	}
 	
 	export function isNull(value: any): boolean {
 		return value === null;

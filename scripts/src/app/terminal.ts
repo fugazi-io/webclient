@@ -184,13 +184,9 @@ module fugazi.app.terminal {
 
 		public retrieveVariable(name: string): Variable {
 			return this.variables.get(extractVariableName(name));
-		}
+		}		
 
-		private setView(view: view.TerminalView): void {
-			this.view = view;
-		}
-
-		private executeCommand(command: string): components.commands.ExecutionResult {
+		public executeCommand(command: string): components.commands.ExecutionResult {
 			storage.local.store(this.properties.name, this.properties);
 
 			let result: components.commands.ExecutionResult = null;
@@ -210,6 +206,10 @@ module fugazi.app.terminal {
 			}
 
 			return result;
+		}
+
+		private setView(view: view.TerminalView): void {
+			this.view = view;
 		}
 		
 		private queryForStatements(command: string, position: number): Promise<app.statements.Statement[]> {
@@ -315,6 +315,78 @@ module fugazi.app.terminal {
 								value: `set '${moduleName}' to work with remote source '${source}'`
 							}
 						}
+					}
+				},
+				run: {
+					title: "run url",
+					syntax: "run (url net.url)",
+					returns: "any",
+					async: true,
+					parametersForm: "arguments",
+					componentConstructor: fugazi.app.terminal.TerminalCommand,
+					handler: function (context: modules.PrivilegedModuleContext, url: string): Promise<components.commands.handler.Result> {
+						let future = new Future<components.commands.handler.Result>();
+						let lineExecutor = async function (commands: string[], execResult: any[] = [], lineNumber = 0) {
+							let future = new Future<string[]>();							
+							if (commands.length === lineNumber) {
+								future.resolve(execResult);
+								return future.asPromise();
+							}							
+							if (!isNothing(commands[lineNumber]) && !isEmpty(commands[lineNumber])) {
+								let v = context.getParent().getTerminal().executeCommand(commands[lineNumber]);
+								v.then(val => {
+									if (!isNothing(val)) {
+										execResult.push(val);
+									}
+									future.resolve(lineExecutor(commands, execResult, lineNumber + 1));
+								})
+								.catch(err => {
+									future.reject(`Error in line ${lineNumber}: ${err}`);
+								})
+							} else {
+								future.resolve(lineExecutor(commands, execResult, lineNumber + 1));
+							}
+							return future.asPromise();
+						};
+
+						try {
+							let request = fugazi.net.get({ url });
+							request.complete(response => {
+								const data = response.getData();
+								if (data) {
+									let execResult: string[] = [];
+									let commands = data.split(/\n/);
+
+									let scriptRun = lineExecutor(commands);
+									scriptRun.then(val => {
+										future.resolve({
+											status: components.commands.handler.ResultStatus.Success,
+											value: val
+										});
+									})
+										.catch(err => {
+											future.resolve({
+												status: components.commands.handler.ResultStatus.Failure,
+												error: `Error in script ${err}`
+											});
+										});
+								}
+							});
+							request.fail(response => {
+								future.resolve({
+									status: components.commands.handler.ResultStatus.Failure,
+									error: `Error loading script ${response.getStatusCode()} ${response.getStatus()}`
+								});
+							});
+							request.send();
+						} catch (err) {
+							future.resolve({
+								status: components.commands.handler.ResultStatus.Failure,
+								error: `Error loading script ${err}`
+							});
+						}
+
+						return future.asPromise();
 					}
 				}
 			}
