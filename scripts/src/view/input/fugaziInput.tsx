@@ -83,11 +83,7 @@ namespace fugazi.view.input {
 				this.setState({
 					suggestions: statements,
 					value: this.inputbox.value
-				} as any, () => {
-					setTimeout(() => {
-						this.setCaretPosition(this.getValue().length);
-					}, 5);
-				});
+				} as any);
 			});
 		}
 
