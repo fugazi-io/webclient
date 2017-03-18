@@ -19,7 +19,11 @@ Here's how to run it locally:
 4. Commands syntax is determined by the command author
 5. Type validation
 6. Composing of new types
-7. Commands suggestions (press `TAB` to see suggestions and then `TAB` again or `ESC` to close)
+7. Commands suggestions
+    1. Press `TAB` to open the suggestions box
+    2. Press `ESC` to close the suggestion box
+    3. While open, `TAB` can be used to switch to _selection mode_ and back to _input mode_
+    4. While in _selection mode_, press `ENTER` to select a suggestion
 8. Move in the command history (by pressing the up & down arrows)
 9. Search for command in history (press `CTRL + R` then start typing and `ENTER` to select, `ESC` to close)
 
