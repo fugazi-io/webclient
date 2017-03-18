@@ -54,12 +54,14 @@ namespace fugazi.view.input {
 		protected onArrowUpPressed(): boolean {
 			this.history.previous();
 			this.updateSuggestions(this.getValue(), this.getValue().length);
+			setTimeout(() => { this.setCaretPosition(this.getValue().length); }, 5);
 			return false;
 		}
 
 		protected onArrowDownPressed(): boolean {
 			this.history.next();
 			this.updateSuggestions(this.getValue(), this.getValue().length);
+			setTimeout(() => { this.setCaretPosition(this.getValue().length); }, 5);
 			return false;
 		}
 
