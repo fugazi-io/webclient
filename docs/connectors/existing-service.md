@@ -19,6 +19,10 @@ for such a descriptor:
 {
 	"name": "myservice",
 	"title": "My Service",
+	"remote": {
+		"origin": "http://myservice.com",
+		"base": "/api"
+	},
 	"types": {
 		"user": {
 			"title": "A user",
