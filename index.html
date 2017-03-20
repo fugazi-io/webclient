@@ -66,12 +66,22 @@
 		<main id="ui"></main>
 
 		<script>
+			function getQuery() {
+				var map = new Map();
+				var pairs = location.search.length > 1 ? location.search.substring(1).split("&") : [];
+				pairs.forEach(function (pair) {
+					var _a = pair.split("="), key = _a[0], value = _a[1];
+					map.set(key, value);
+				});
+				return map;
+			}
+
 			(function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){
 					(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 			})(window,document,"script","https://www.google-analytics.com/analytics.js","ga");
 
-			if (location.hostname === "localhost") {
+			if (location.hostname === "localhost" || getQuery().has("_ijt")) {
 				ga("set", "sendHitTask", null);
 			}
 
