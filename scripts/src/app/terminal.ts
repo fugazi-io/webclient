@@ -1,3 +1,4 @@
+/// <reference path="../../lib/analytics.d.ts" />
 /// <reference path="./input.ts" />
 /// <reference path="./modules.ts" />
 /// <reference path="./statements.ts" />
@@ -191,6 +192,7 @@ module fugazi.app.terminal {
 		}
 
 		private executeCommand(command: string): components.commands.ExecutionResult {
+			ga("send", "event", "Commands", "execution - start", command);
 			storage.local.store(this.properties.name, this.properties);
 
 			let result: components.commands.ExecutionResult = null;
@@ -201,10 +203,13 @@ module fugazi.app.terminal {
 				if (!isNull(executableStatement)) {
 					result = executableStatement.execute();
 				} else {
+					ga("send", "event", "Commands", "execution - None of the statements are executable", command);
 					throw new Exception("None of the statements are executable");
 				}
-
 			} catch (e) {
+				const type = typeof e;
+				const error = type === "string" ? e : (type === "error" ? e.message : e.toString());
+				ga("send", "event", "Commands", "execution - error: " + error, command);
 				result = new components.commands.ExecutionResult(components.registry.getType("any"), false);
 				result.reject(e);
 			}

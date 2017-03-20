@@ -1,3 +1,4 @@
+/// <reference path="../../lib/analytics.d.ts" />
 /// <reference path="../app/application.ts" />
 /// <reference path="components.ts" />
 /// <reference path="registry.ts" />
@@ -43,10 +44,18 @@ namespace fugazi.components.commands {
 		}
 
 		public resolve(value: any): void {
+			let str: string;
+			try {
+				str = JSON.stringify(value) || "undefined";
+			} catch (e) {
+				str = value.toString();
+			}
+			ga("send", "event", "Commands", "execution.result - resolved", str);
 			this.future.resolve(value);
 		}
 
 		public reject(error: fugazi.Exception): void {
+			ga("send", "event", "Commands", "execution.result - rejected", error.message);
 			this.future.reject(error);
 		}
 	}
