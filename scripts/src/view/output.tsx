@@ -46,6 +46,7 @@ module fugazi.view {
 	export type StyleChangeListener = () => void;
 	
 	export class OutputView extends View<OutputProperties, OutputState> {
+		private element: HTMLElement;
 		private shouldScrollBottom: boolean;
 
 		static defaultProps: OutputProperties = {
@@ -75,7 +76,7 @@ module fugazi.view {
 			var node = ReactDOM.findDOMNode(this);
 
 			if (this.shouldScrollBottom) {
-				node.scrollTop = node.scrollHeight
+				node.scrollTop = node.scrollHeight;
 			}
 
 			Ps.update(node);
@@ -148,7 +149,7 @@ module fugazi.view {
 				);
 			}
 			
-			return <section className="output">
+			return <section className="output" ref={ element => this.element = element }>
 				<div className="spacer"></div>
 				<ol className="items">{ blocks }</ol>
 			</section>;
@@ -160,8 +161,7 @@ module fugazi.view {
 		}
 
 		private checkOverflow(): boolean {
-			var node: any = ReactDOM.findDOMNode(this);
-			return node.scrollTop + node.offsetHeight === node.scrollHeight;
+			return Math.ceil(this.element.scrollTop + this.element.offsetHeight) >= this.element.scrollHeight;
 		}
 	}
 
