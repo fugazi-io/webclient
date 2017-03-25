@@ -207,8 +207,7 @@ module fugazi.app.terminal {
 					throw new Exception("None of the statements are executable");
 				}
 			} catch (e) {
-				const type = typeof e;
-				const error = type === "string" ? e : (type === "error" ? e.message : e.toString());
+				const error = typeof e === "string" ? e : (e.message ? e.message : e.toString());
 				ga("send", "event", "Commands", "execution - error: " + error, command);
 				result = new components.commands.ExecutionResult(components.registry.getType("any"), false);
 				result.reject(e);
