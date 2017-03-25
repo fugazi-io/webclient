@@ -3,7 +3,7 @@
   "version": "1.0.10",
   "description": "web based terminal application for executing local and remote commands",
   "dependencies": {
-    "typescript": "^2.1.4"
+    "typescript": "^2.2.1"
   },
   "devDependencies": {
     "http-server": "^0.9.0",
