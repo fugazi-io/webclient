@@ -68,6 +68,7 @@ Here's how to run it locally:
 * [Types](./docs/builtins/types.md)
 * [Commands](./docs/builtins/commands.md)
 * [Constraints](./docs/builtins/constraints.md)
+* [Converters](./docs/builtins/converters.md)
 
 ### Connectors
 * [Connectors](./docs/connectors/connectors.md)
