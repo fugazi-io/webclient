@@ -232,6 +232,17 @@ namespace fugazi.components.commands {
 
 			return value;
 		}
+
+		protected defaultManual(): string {
+			const markdown = super.defaultManual(),
+				builder = Component.markdown().h4("Syntax:").newLine();
+
+			this.syntax.forEach(rule => {
+				builder.li(rule.raw);
+			});
+
+			return markdown + "\n" + builder.newLine().toString();
+		}
 	}
 
 	export class LocalCommand extends Command {

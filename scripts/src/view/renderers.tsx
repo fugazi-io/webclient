@@ -1,3 +1,5 @@
+/// <reference path="../../lib/perfect-scrollbar.d.ts" />
+/// <reference path="../../lib/marked.d.ts" />
 /// <reference path="../components/types.ts" />
 /// <reference path="view.ts" />
 
@@ -79,6 +81,81 @@ module fugazi.view.renderers {
 		 */
 		protected toStringValue(value: any): string {
 			return fugazi.isNothing(value) ? "null" : value.toString();
+		}
+	}
+
+	class MarkdownRenderer extends marked.Renderer {
+		private static COMMAND_PATTERN = /\s*\/\/\s*command\s*\n/;
+		private static OUTPUT_PATTERN = /\s*\/\/\s*output/;
+
+		link(href: string, title: string, text: string): string {
+			if (title) {
+				return `<a href="${ href }" target="_blank" title="${ title }">${ text }</a>`;
+			}
+
+			return `<a href="${ href }" target="_blank">${ text }</a>`;
+		}
+
+		code(code: string, language: string): string {
+			let html = `<pre class="fugazi">`;
+
+			switch (language) {
+				case "fugazi-command":
+					html += MarkdownRenderer.parseCommand(code);
+
+					break;
+
+				case "fugazi-commands":
+					let buffer = code;
+
+					while (buffer.length > 0) {
+						const command = MarkdownRenderer.getSingleCommand(buffer);
+						buffer = buffer.replace(command, "").trim();
+						html += MarkdownRenderer.parseCommand(command);
+					}
+
+					break;
+
+				default:
+					return super.code(code, language);
+			}
+
+			return html + "</pre>";
+		}
+
+		private static getSingleCommand(code: string): string {
+			const offset = 5;
+			const index = code.trim().slice(offset).search(MarkdownRenderer.COMMAND_PATTERN) + offset;
+			if (index < offset) {
+				return code;
+			}
+
+			return code.substring(0, index);
+		}
+
+		private static parseCommand(code: string): string {
+			const outputIndex = code.search(MarkdownRenderer.OUTPUT_PATTERN);
+			const command = (outputIndex < 0 ? code : code.substring(0, code.search(MarkdownRenderer.OUTPUT_PATTERN))).replace(MarkdownRenderer.COMMAND_PATTERN, "").trim();
+			const output = outputIndex < 0 ? "" : code.substring(outputIndex).replace(MarkdownRenderer.OUTPUT_PATTERN, "").trim();
+
+			let html = `<span class="fugazi-command">command //</span><code class="lang-fugazi-command">${ command }</code>`;
+
+			if (output.length > 0) {
+				html += `<span class="fugazi-output">output:</span><code class="lang-fugazi-output">${ output }</code>`;
+			}
+
+			return html + "<div class=\"separator\"></div>";
+		}
+	}
+
+	export class UiMarkdownComponent extends RenderingComponent<RenderingComponentProperties, ViewState> {
+		private static renderer = new MarkdownRenderer();
+
+		render() {
+			return (
+				<div
+					className="markdown"
+					dangerouslySetInnerHTML={{ __html: marked(this.props.value, { renderer: UiMarkdownComponent.renderer }) }} />);
 		}
 	}
 
@@ -313,9 +390,10 @@ module fugazi.view.renderers {
 			componentClass = VoidComponent;
 		} else if (type.is(components.registry.getType("any"))) {
 			componentClass = AnyComponent;
-		//} else if (type.is(components.registry.getType("boolean")) || type === components.registry.get(components.ComponentType.Type, "number")) {
 		} else if (type.is(components.registry.getType("boolean")) || type.is(components.registry.getType("number"))) {
 			componentClass = PrimitiveComponent;
+		} else if (type.is(components.registry.getType("ui.markdown"))) {
+			componentClass = UiMarkdownComponent;
 		} else if (type.is(components.registry.getType("ui.message"))) {
 			componentClass = UiMessageComponent;
 		} else if (type.is(components.registry.getType("string"))) {

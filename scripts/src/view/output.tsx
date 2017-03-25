@@ -44,8 +44,45 @@ module fugazi.view {
 	}
 
 	export type StyleChangeListener = () => void;
-	
+
+	const PsSingleton = {
+		_mainContainer: null,
+		_currentContainer: null,
+		_params: { useSelectionScroll: true, suppressScrollX: true },
+		init: function(mainContainer: HTMLElement) {
+			this._mainContainer = mainContainer;
+			Ps.initialize(this._mainContainer, this._params);
+		},
+		focused: function(): boolean {
+			return this._currentContainer !== null;
+		},
+		focus: function(container: HTMLElement): boolean {
+			if (this.focused()) {
+				if (container !== this._currentContainer) {
+					this.blur();
+				}
+				return false;
+			}
+
+			Ps.destroy(this._mainContainer);
+			this._currentContainer = container;
+			Ps.initialize(this._currentContainer, this._params);
+			return true;
+		},
+		blur: function(container?: HTMLElement): boolean {
+			if (!this.focused() || (container && container !== this._currentContainer)) {
+				return false;
+			}
+
+			Ps.destroy(this._currentContainer);
+
+			this._currentContainer = null;
+			Ps.initialize(this._mainContainer, this._params);
+		}
+	};
+
 	export class OutputView extends View<OutputProperties, OutputState> {
+		private container: HTMLElement;
 		private shouldScrollBottom: boolean;
 
 		static defaultProps: OutputProperties = {
@@ -63,8 +100,7 @@ module fugazi.view {
 		}
 
 		public componentDidMount(): void {
-			var node: any = ReactDOM.findDOMNode(this);
-			Ps.initialize(node, { useSelectionScroll: true, suppressScrollX: true });
+			PsSingleton.init(this.container);
 		}
 
 		public componentWillUpdate(): void {
@@ -143,15 +179,25 @@ module fugazi.view {
 
 			if (this.state.sayhello) {
 				blocks.unshift(
-					<li key="hello" className="hello">fugazi version { app.version.code }</li>,
-					<li key="repoLink" className="repoLink">check out the <a target="_blank" href="https://github.com/fugazi-io/webclient">GitHub repo</a> for more info</li>
+					<li key="hello" className="hello version">fugazi version { app.version.code }</li>,
+					<li key="repoLink" className="hello moreInfo">
+						run <span className="help-command">help</span> for more info or
+						check out the <a target="_blank" href="https://github.com/fugazi-io/webclient">GitHub repo</a>
+					</li>,
+					<li key="helpUs" className="hello help">
+						we'd love to get your feedback, so if something isn't clear or not working <span style={{ fontWeight: "bold" }}>please</span> <a target="_blank" href="https://github.com/fugazi-io/webclient/issues">open an issue</a>
+					</li>
 				);
 			}
 			
-			return <section className="output">
+			return <section className="output" ref={ el => this.container = el } onClick={ this.onClick.bind(this) }>
 				<div className="spacer"></div>
 				<ol className="items">{ blocks }</ol>
 			</section>;
+		}
+
+		private onClick() {
+			PsSingleton.blur();
 		}
 
 		private onStyleChange(): void {
@@ -177,6 +223,9 @@ module fugazi.view {
 	}
 
 	class ResultView extends View<ResultViewProperties, ResultViewState> {
+		private container: HTMLDivElement;
+		private focused: boolean;
+
 		constructor(props: ResultViewProperties) {
 			super(props);
 
@@ -225,10 +274,20 @@ module fugazi.view {
 					break;
 			}
 
-			return <div className={ className }>
+			return <div className={ className } ref={ el => this.container = el } onDoubleClick={ this.onDoubleClick.bind(this) } onClick={ this.onClick.bind(this) }>
 				<i className="fa fa-square"></i>
 				{ element }
 			</div>;
+		}
+
+		private onClick(event: React.MouseEvent<HTMLDivElement>) {
+			event.stopPropagation();
+			PsSingleton.focus(this.container);
+		}
+
+		private onDoubleClick(event: React.MouseEvent<HTMLDivElement>) {
+			event.stopPropagation();
+			PsSingleton.blur(this.container);
 		}
 
 		private success(value: any): void {

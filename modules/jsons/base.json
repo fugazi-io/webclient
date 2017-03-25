@@ -33,9 +33,14 @@
 				"message": {
 					"title": "Message type",
 					"type": "string"
+				},
+				"markdown": {
+					"title": "Markdown based message type",
+					"type": "message"
 				}
 			}
 		},
+		"help": "help.json",
 		"net": "net.json",
 		"components": "components.json"
 	},

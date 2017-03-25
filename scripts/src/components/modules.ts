@@ -199,12 +199,36 @@ namespace fugazi.components.modules {
 			this.commands.set(aCommand.getName(), aCommand);
 		}
 
-		public hasCommand(name: string): boolean {
-			return this.commands.has(name);
+		public hasCommand(name: string, recursive = false): boolean {
+			if (this.commands.has(name)) {
+				return true;
+			}
+
+			if (!recursive) {
+				return false;
+			}
+
+			return this.modules.some(((value: Module, key: string) => value.hasCommand(name, true)) as collections.KeyValueBooleanIteratorCallback<Module>);
 		}
 
-		public getCommand(name: string): commands.Command {
-			return this.commands.get(name);
+		public getCommand(name: string, recursive = false): commands.Command {
+			if (this.commands.has(name)) {
+				return this.commands.get(name);
+			}
+
+			if (!recursive) {
+				return null;
+			}
+
+			let command: commands.Command;
+			this.modules.forEach((value) => {
+				if (command) {
+					return;
+				}
+				command = value.getCommand(name, true);
+			});
+
+			return command;
 		}
 
 		public getCommands(): commands.Command[] {
@@ -234,6 +258,63 @@ namespace fugazi.components.modules {
 
 		public forEachConverter(fn: (converter: converters.Converter) => void): void {
 			this.converters.values().forEach(fn);
+		}
+
+		protected defaultManual(): string {
+			const markdown = super.defaultManual(),
+				builder = Component.markdown();
+
+			if (this.modules.size() > 0) {
+				builder.h4("Modules:");
+
+				this.modules.forEach((module, name) => {
+					builder.li(name);
+				});
+
+				builder.newLine();
+			}
+
+			if (this.commands.size() > 0) {
+				builder.h4("Commands:");
+
+				this.commands.forEach((command, name) => {
+					builder.li(name);
+				});
+
+				builder.newLine();
+			}
+
+			if (this.types.size() > 0) {
+				builder.h4("Types:");
+
+				this.types.forEach((type, name) => {
+					builder.li(name);
+				});
+
+				builder.newLine();
+			}
+
+			if (this.constraints.size() > 0) {
+				builder.h4("Constraints:");
+
+				this.constraints.forEach((constraint, name) => {
+					builder.li(name);
+				});
+
+				builder.newLine();
+			}
+
+			if (this.converters.size() > 0) {
+				builder.h4("Converters:");
+
+				this.converters.forEach((converter, name) => {
+					builder.li(name);
+				});
+
+				builder.newLine();
+			}
+
+			return markdown + "\n" + builder.toString();
 		}
 	}
 
@@ -382,8 +463,22 @@ namespace fugazi.components.modules {
 			if (descriptor.isSingleSourceRemoteDescriptor(desc)) {
 				this._origins = new Map();
 				this._origins.set(RemoteSource.DEFAULT_ID, new net.Url(desc.origin));
-			} else {
+			} else if (descriptor.isMultiSourceRemoteDescriptor(desc)) {
 				this._origins = Map.from(desc.origins).map<string, net.Url>((origin, name) => [name, new net.Url(origin)]);
+			} else {
+				this._origins = new Map();
+
+				if (!this._base.startsWith("/")) {
+					let path = window.location.pathname;
+
+					if (path.lastIndexOf(".") > path.lastIndexOf("/")) {
+						path = path.substring(0, path.lastIndexOf("/") + 1);
+					}
+
+					this._base = path + this._base;
+				}
+
+				this._origins.set(RemoteSource.DEFAULT_ID, new net.Url(window.location.protocol + "//" + window.location.host));
 			}
 		}
 
@@ -558,6 +653,10 @@ namespace fugazi.components.modules {
 			return (remote as SingleSourceRemoteDescriptor).origin != null;
 		}
 
+		export function isMultiSourceRemoteDescriptor(remote: SourceRemoteDescriptor): remote is MultiSourceRemoteDescriptor {
+			return (remote as MultiSourceRemoteDescriptor).origins != null;
+		}
+
 		export interface RelativeRemoteDescriptor {
 			path: string;
 		}
@@ -608,7 +707,6 @@ namespace fugazi.components.modules {
 				try {
 					this.future.resolve(response.getDataAsJson());
 				} catch (e) {
-					console.error(e);
 					this.future.reject(new fugazi.Exception("illegal module descriptor"));
 				}
 			}

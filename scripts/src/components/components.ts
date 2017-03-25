@@ -103,12 +103,75 @@ namespace fugazi.components {
 		}
 	}
 
+	export class MarkdownBuilder {
+		private markdown = "";
+
+		h1(value: string): this {
+			return this.append("# " + value);
+		}
+
+		h2(value: string): this {
+			return this.append("## " + value);
+		}
+
+		h3(value: string): this {
+			return this.append("### " + value);
+		}
+
+		h4(value: string): this {
+			return this.append("#### " + value);
+		}
+
+		h5(value: string): this {
+			return this.append("##### " + value);
+		}
+
+		h6(value: string): this {
+			return this.append("###### " + value);
+		}
+
+		newLine(): this {
+			return this.append("\n", false);
+		}
+
+		li(value: string): this {
+			return this.append(" * " + value);
+		}
+
+		codeStart(language: string = ""): this {
+			return this.append("```" + language);
+		}
+
+		codeEnd(): this {
+			return this.append("```");
+		}
+
+		block(value: string): this {
+			return this.append("> " + value);
+		}
+
+		append(value: string, newLine = true): this {
+			this.markdown += value;
+			return newLine ? this.newLine() : this;
+		}
+
+		toString() {
+			return this.markdown;
+		}
+	}
+
+	export type Manual = {
+		method: "replace" | "append";
+		markdown: string;
+	}
+
 	export class Component {
 		protected path: Path;
 		protected type: ComponentType;
 		protected parent: Component;
 		protected name: string;
 		protected title: string;
+		protected manual: Manual;
 		protected description: string;
 
 		public constructor(type: ComponentType) {
@@ -131,6 +194,22 @@ namespace fugazi.components {
 			return this.title;
 		}
 
+		public getManual(): string {
+			let markdown: string;
+
+			if (this.manual) {
+				if (this.manual.method === "replace") {
+					markdown = this.manual.markdown;
+				} else {
+					markdown = this.defaultManual() + "\n" + this.manual.markdown;
+				}
+			} else {
+				markdown = this.defaultManual();
+			}
+
+			return markdown;
+		}
+
 		public getDescription(): string {
 			return this.description;
 		}
@@ -142,6 +221,28 @@ namespace fugazi.components {
 		public toString(): string {
 			return this.getName();
 		}
+
+		protected defaultManual(): string {
+			const markdown = Component.markdown();
+
+			markdown.h3(ComponentType[this.getComponentType()] + ": " + this.getName());
+
+			if (this.getTitle() !== this.getName()) {
+				markdown.h4(this.getTitle());
+			}
+
+			if (this.getDescription()) {
+				markdown.block(this.getDescription());
+			}
+
+			markdown.h4("**Path**: " + this.getPath().toString());
+
+			return markdown.toString();
+		}
+
+		protected static markdown(): MarkdownBuilder {
+			return new MarkdownBuilder();
+		}
 	}
 
 	export namespace descriptor {
@@ -149,6 +250,7 @@ namespace fugazi.components {
 			name: string;
 			title?: string;
 			description?: string;
+			manual?: Manual;
 			componentConstructor?: { new (): Component };
 		}
 
@@ -268,6 +370,7 @@ namespace fugazi.components {
 			private path: Path;
 			private name: string;
 			private title: string;
+			private manual: Manual;
 			private description: string;
 
 			private state: State;
@@ -397,6 +500,7 @@ namespace fugazi.components {
 				this.name = componentDescriptor.name;
 				this.title = fugazi.isNothing(componentDescriptor.title) ? componentDescriptor.name : componentDescriptor.title;
 				this.description = fugazi.isNothing(componentDescriptor.description) ? "" : componentDescriptor.description;
+				this.manual = componentDescriptor.manual;
 
 				this.path = this.parent ? this.parent.getPath().child(this.name) : new Path(this.name);
 
@@ -425,6 +529,7 @@ namespace fugazi.components {
 				(<any> this.component).path = this.path;
 				(<any> this.component).name = this.name;
 				(<any> this.component).title = this.title;
+				(<any> this.component).manual = this.manual;
 				(<any> this.component).description = this.description;
 			}
 		}
