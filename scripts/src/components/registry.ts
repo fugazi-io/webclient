@@ -10,7 +10,6 @@
  */
 
 module fugazi.components.registry {
-	import Module = fugazi.components.modules.Module;
 	var index: collections.Map<modules.Module> = collections.map<modules.Module>(),
 		defaultConverters: collections.Map<converters.Converter> = collections.map<converters.Converter>();
 
@@ -44,7 +43,7 @@ module fugazi.components.registry {
 
 					if (!props.augment && has(ComponentType.Module, actualModule.getPath().toString())) {
 						console.log(`already have module: "${ actualModule.getPath().toString() }"`);
-						future.resolve(get(ComponentType.Module, actualModule.getPath().toString()) as Module);
+						future.resolve(get(ComponentType.Module, actualModule.getPath().toString()) as modules.Module);
 					} else {
 						actualModule.loaded()
 							.then(() => {
@@ -89,6 +88,47 @@ module fugazi.components.registry {
 		}
 
 		return component;
+	}
+
+	export function getUnknown(pathString: string): Component | null {
+		const path = pathString.split(".");
+
+		if (!index.has(path[0])) {
+			return null;
+		}
+
+		let current: modules.Module = index.get(path[0]);
+		let i: number;
+		for (i = 1; i < path.length - 1; i++) {
+			if (!current.hasModule(path[i])) {
+				return null;
+			}
+
+			current = current.getModule(path[i]);
+		}
+
+		if (current.hasModule(path[i])) {
+			return current.getModule(path[i]);
+		}
+
+		if (current.hasCommand(path[i])) {
+			return current.getCommand(path[i]);
+		}
+
+		return null;
+	}
+
+	export function findCommand(name: string): commands.Command[] {
+		let commands = [] as commands.Command[];
+
+		index.values().forEach(module => {
+			let command = module.getCommand(name, true);
+			if (command) {
+				commands.push(command);
+			}
+		});
+
+		return commands;
 	}
 
 	function recursiveGet(type: ComponentType, path: string[], parent?: modules.Module): Component {

@@ -7,25 +7,36 @@ main#ui article.terminal section.output > .items > li {
 	overflow-x: hidden;
 }
 
-main#ui article.terminal section.output > .items .hello {
+main#ui article.terminal section.output > .items .hello a {
+	color: #7b7b7b;
+}
+
+main#ui article.terminal section.output > .items .hello a:hover {
+	color: #608b4e;
+	text-decoration: none;
+}
+
+main#ui article.terminal section.output > .items .hello.version {
 	color: #608b4e;
 	font-size: 11px;
 	padding-bottom: 3px;
 }
 
-main#ui article.terminal section.output > .items .repoLink {
+main#ui article.terminal section.output > .items .hello.moreInfo {
+	color: #7b7b7b;
+	font-size: 11px;
+	padding-bottom: 3px;
+}
+
+main#ui article.terminal section.output > .items .hello.moreInfo .help-command {
+	font-style: italic;
+	color: #007acc;
+}
+
+main#ui article.terminal section.output > .items .hello.help {
 	color: #7b7b7b;
 	font-size: 11px;
 	padding-bottom: 10px;
-}
-
-main#ui article.terminal section.output > .items .repoLink a {
-	color: #7b7b7b;
-}
-
-main#ui article.terminal section.output > .items .repoLink a:hover {
-	color: #608b4e;
-	text-decoration: none;
 }
 
 main#ui article.terminal section.output > .items .separator {
@@ -58,6 +69,13 @@ main#ui article.terminal section.output > .items > .execution .command .fa {
 
 main#ui article.terminal section.output > .items > .execution .result {
 	padding-top: 2px;
+	max-height: 150px;
+	overflow: hidden;
+	position: relative;
+}
+
+main#ui article.terminal section.output > .items > .execution .result.ps-container {
+	background-color: rgba(255, 255, 255, 0.03);
 }
 
 main#ui article.terminal section.output > .items > .execution .result > * {

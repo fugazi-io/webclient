@@ -1,0 +1,79 @@
+article.terminal section.output .result .markdown {
+	min-width: 50%;
+	overflow: scroll;
+}
+
+article.terminal section.output .result .markdown > * {
+	max-width: 90%;
+}
+
+article.terminal section.output .result .markdown h1,
+article.terminal section.output .result .markdown h2,
+article.terminal section.output .result .markdown h3 {
+	color: #608b4e;
+}
+
+article.terminal section.output .result .markdown h4,
+article.terminal section.output .result .markdown h5,
+article.terminal section.output .result .markdown h6 {
+	margin-top: 10px;
+}
+
+article.terminal section.output .result .markdown ul {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+article.terminal section.output .result .markdown li {
+	list-style: initial;
+	margin-left: 30px;
+	margin-top: 3px;
+	margin-bottom: 7px;
+}
+
+article.terminal section.output .result .markdown p {
+	padding-top: 3px;
+	padding-bottom: 5px;
+}
+
+article.terminal section.output .result .markdown blockquote {
+	padding: 5px 10px;
+	font-style: italic;
+}
+
+article.terminal section.output .result .markdown a {
+	color: #007acc;
+	text-decoration: none;
+}
+
+article.terminal section.output .result .markdown a:hover {
+	text-decoration: underline;
+}
+
+article.terminal section.output .result .markdown code {
+	font-style: italic;
+	font-weight: 700;
+	color: #4d4d4d;
+}
+
+article.terminal section.output .result .markdown pre {
+	background-color: #333333;
+	margin: 5px 5px;
+	padding: 2px 5px;
+}
+
+article.terminal section.output .result .markdown pre .fugazi-command {
+	margin-right: 10px;
+	font-weight: 700;
+	color: #007acc;
+}
+
+article.terminal section.output .result .markdown pre .fugazi-output {
+	margin-right: 10px;
+	font-weight: 700;
+	display: block;
+}
+
+article.terminal section.output .result .markdown pre code {
+	color: #7b7b7b;
+}

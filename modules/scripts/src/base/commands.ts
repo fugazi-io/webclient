@@ -1,4 +1,5 @@
 /// <reference path="../../../../scripts/bin/app/application.d.ts" />
+/// <reference path="../../../../scripts/bin/components/registry.d.ts" />
 /// <reference path="../../../../scripts/bin/components/components.d.ts" />
 
 /**
@@ -6,6 +7,13 @@
  */
 
 (function(): void {
+	let echoExamples = "#### Examples:\n";
+	echoExamples += "```fugazi-command\n// command\necho hey\n//output\n\"hey\"\n```\n\n";
+	echoExamples += "```fugazi-command\n// command\necho [1, 2, hey]\n// output\nlist [\n\t1\n\t2\n\t\"hey\"\n]```\n\n";
+
+	let manExamples = "#### Examples:\n";
+	manExamples += "```fugazi-commands\n// command\nman echo\n// command\nman http\n// command\nman \"io.fugazi.strings\"\n```\n\n";
+
 	fugazi.components.modules.descriptor.loaded(<fugazi.components.modules.descriptor.Descriptor> {
 		name: "io.fugazi",
 		commands: {
@@ -14,8 +22,52 @@
 				syntax: "echo (value any)",
 				returns: "any",
 				parametersForm: "arguments",
+				manual: {
+					method: "append",
+					markdown: echoExamples
+				},
 				handler: function(context: fugazi.app.modules.ModuleContext, value: any) {
 					return value;
+				}
+			},
+			manual: {
+				title: "Manual of a component",
+				syntax: [
+					"man (command string)",
+					"man (path components.path)"
+				],
+				returns: "ui.markdown",
+				parametersForm: "arguments",
+				manual: {
+					method: "append",
+					markdown: manExamples
+				},
+				handler: function(context: fugazi.app.modules.ModuleContext, value: string) {
+					let components: fugazi.components.Component[];
+
+					if (value.indexOf(".") > 0) {
+						components = [fugazi.components.registry.getUnknown(value)];
+					} else {
+						components = fugazi.components.registry.findCommand(value);
+					}
+
+					if (!components || components.length === 0) {
+						return {
+							status: fugazi.components.commands.handler.ResultStatus.Failure,
+							error: `couldn't find component "${ value }"`
+						}
+					}
+
+					let markdown = components[0].getManual();
+
+					if (!markdown) {
+						return {
+							status: fugazi.components.commands.handler.ResultStatus.Failure,
+							error: `"${ value }" has no manual`
+						}
+					}
+
+					return markdown;
 				}
 			},
 			version: {
