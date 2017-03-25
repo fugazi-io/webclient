@@ -37,10 +37,6 @@ main#ui article.terminal section.inputs .suggestible.input .suggestionPanel {
 	border-top-right-radius: 5px;
 }
 
-main#ui article.terminal section.inputs .suggestible.input .suggestionPanel:focus li.selected {
-	border: 1px solid #608b4e;
-}
-
 main#ui article.terminal section.inputs .bgtext.input .inputbox {
 	position: relative;
 	z-index: 10;
@@ -75,6 +71,10 @@ main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPan
 
 main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel li > span {
 	padding: 0px 7px;
+}
+
+main#ui article.terminal section.inputs .suggestible.input .suggestionPanel li.selected {
+	border: 1px solid #608b4e;
 }
 
 main#ui article.terminal section.inputs .suggestible.fugazi.input .suggestionPanel .path {

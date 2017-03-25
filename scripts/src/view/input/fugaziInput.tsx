@@ -46,8 +46,8 @@ namespace fugazi.view.input {
 		}
 
 		protected getItemRenderer(): ItemRenderer<app.statements.Statement> {
-			return (statement, index, selected) => {
-				return <StatementSuggestionItem key={ index.toString() } statement={ statement } selected={ selected }/>;
+			return (statement, index, handler, selected) => {
+				return <StatementSuggestionItem key={ index.toString() } index={ index } statement={ statement } handler={ handler } selected={ selected }/>;
 			}
 		}
 
@@ -144,7 +144,9 @@ namespace fugazi.view.input {
 	}
 
 	interface StatementSuggestionItemProperties extends ViewProperties {
+		index: number;
 		selected: boolean;
+		handler: ItemRendererMouseEventsHandler;
 		statement: app.statements.Statement;
 	}
 
@@ -158,7 +160,16 @@ namespace fugazi.view.input {
 				elements.push(StatementSuggestionItem.getElementFor(token));
 			});
 
-			return <li key={ this.props.key } className={ className }>{ elements }</li>;
+			return (
+				<li
+					key={ this.props.key }
+					className={ className }
+					onMouseEnter={ () => this.props.handler.onEnter(this.props.index) }
+					onMouseLeave={ () => this.props.handler.onLeave(this.props.index) }
+					onClick={ () => this.props.handler.onClick(this.props.index) }>
+					{ elements }
+				</li>
+			);
 		}
 
 		private static getElementFor(token: components.commands.syntax.RuleToken): JSX.Element {
