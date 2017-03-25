@@ -237,7 +237,12 @@ namespace fugazi.view.input {
 		focus: FocusType;
 	}
 
-	export type ItemRenderer<T> = (item: T, index: number, selected: boolean) => JSX.Element;
+	export type ItemRendererMouseEventsHandler = {
+		onEnter(index: number): void;
+		onLeave(index: number): void;
+		onClick(index: number): void;
+	};
+	export type ItemRenderer<T> = (item: T, index: number, handler: ItemRendererMouseEventsHandler, selected: boolean) => JSX.Element;
 
 	export abstract class SuggestibleInputView<P extends SuggestibleInputProperties<T>, S extends SuggestibleInputState<T>, T> extends InputView<P, S> {
 		private suggestionPanel: SuggestionPanel;
@@ -262,6 +267,7 @@ namespace fugazi.view.input {
 
 			this.setState(newState as S, () => {
 				if (this.state.focus === "input") {
+					this.suggestionPanel.blur();
 					this.inputbox.focus();
 					this.setCaretPosition(this.getValue().length);
 				} else {
@@ -291,9 +297,9 @@ namespace fugazi.view.input {
 				items={ this.state.suggestions || [] }
 				itemRenderer={ this.getItemRenderer() }
 				ref={ element => this.suggestionPanel = element }
-				onTabPressed={ () => this.onTabPressed() }
-				onEscapePressed={ () => this.onEscapePressed() }
-				onSuggestionItemPressed={ (item: any) => this.onSuggestionItemPressed(item) } />);
+				onTabPressed={ this.onTabPressed.bind(this) }
+				onEscapePressed={ this.onEscapePressed.bind(this) }
+				onSuggestionItemPressed={ this.onSuggestionItemPressed.bind(this) } />);
 
 			return elements;
 		}
@@ -320,6 +326,7 @@ namespace fugazi.view.input {
 	class SuggestionPanel extends View<SuggestionPanelProperties, SuggestionPanelState> {
 		private key: string;
 		private element: HTMLElement;
+		private isFocused: boolean;
 
 		constructor(props: SuggestionPanelProperties) {
 			super(props);
@@ -339,9 +346,22 @@ namespace fugazi.view.input {
 				if (this.props.items.empty()) {
 					item = <span key={ "span2" + this.key } className="message empty">no matches found</span>
 				} else {
+					const handler = {
+						onClick: (index: number) => {
+							this.selectSuggestionItem(index);
+							this.props.onSuggestionItemPressed(this.props.items[this.state.selected]);
+						},
+						onEnter: (index: number) => {
+							this.selectSuggestionItem(index);
+						},
+						onLeave: (index: number) => {
+							this.selectSuggestionItem(this.isFocused ? index : -1);
+						}
+					};
+
 					item = <ul key={ "ul" + this.key }>{ this.props.items.map(item => {
-						return this.props.itemRenderer(item, counter, this.state.selected === counter++);
-					}) } </ul>;
+						return this.props.itemRenderer(item, counter, handler, this.state.selected === counter++);
+					}) }</ul>;
 				}
 			} else {
 				throw new Exception("SuggestionPanel.render: both props.message and props.items are missing");
@@ -351,10 +371,28 @@ namespace fugazi.view.input {
 		}
 
 		public focus() {
+			this.isFocused = true;
+
 			this.setState({
 				selected: 0
 			}, () => {
 				this.element.focus();
+			});
+		}
+
+		public blur() {
+			this.isFocused = false;
+
+			this.setState({
+				selected: -1
+			}, () => {
+				this.element.blur();
+			});
+		}
+
+		private selectSuggestionItem(index: number) {
+			this.setState({
+				selected: index
 			});
 		}
 
@@ -369,29 +407,23 @@ namespace fugazi.view.input {
 				case "Tab":
 					event.stopPropagation();
 					event.preventDefault();
+					this.selectSuggestionItem(-1);
 					this.props.onTabPressed();
 					break;
 
 				case "Escape":
 					event.stopPropagation();
 					event.preventDefault();
+					this.selectSuggestionItem(-1);
 					this.props.onEscapePressed();
 					break;
 
 				case "ArrowUp":
-					this.setState({
-						selected: (this.props.items.length + this.state.selected - 1) % this.props.items.length
-					}, () => {
-						this.element.focus();
-					});
+					this.selectSuggestionItem((this.props.items.length + this.state.selected - 1) % this.props.items.length);
 					break;
 
 				case "ArrowDown":
-					this.setState({
-						selected: (this.state.selected + 1) % this.props.items.length
-					}, () => {
-						this.element.focus();
-					});
+					this.selectSuggestionItem((this.state.selected + 1) % this.props.items.length);
 					break;
 			}
 		}
