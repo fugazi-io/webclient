@@ -13,6 +13,14 @@
 				"endpoint": "help.md"
 			}
 		},
+		"commands": {
+			"title": "Commands help",
+			"syntax": "help commands",
+			"returns": "ui.markdown",
+			"handler": {
+				"endpoint": "commands.md"
+			}
+		},
 		"constraints": {
 			"title": "Type constraints help",
 			"syntax": "help constraints",
