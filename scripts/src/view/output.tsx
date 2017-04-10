@@ -169,7 +169,7 @@ module fugazi.view {
 								<i className="fa fa-square-o"></i>
 								{ (info as ExecutionOutputItemInfo).statement }
 							</div>
-							<ResultView result={ (info as ExecutionOutputItemInfo).result } onStyleChange={ this.onStyleChange.bind(this) } />
+							<ResultView result={ (info as ExecutionOutputItemInfo).result } onBeforeStyleChange={ this.onBeforeStyleChange.bind(this) } onStyleChange={ this.onStyleChange.bind(this) } />
 						</li>);
 					}
 				} else {
@@ -200,8 +200,11 @@ module fugazi.view {
 			PsSingleton.blur();
 		}
 
-		private onStyleChange(): void {
+		private onBeforeStyleChange(): void {
 			this.shouldScrollBottom = this.checkOverflow();
+		}
+
+		private onStyleChange(): void {
 			this.componentDidUpdate();
 		}
 
@@ -212,6 +215,7 @@ module fugazi.view {
 	}
 
 	interface ResultViewProperties extends ViewProperties {
+		onBeforeStyleChange: StyleChangeListener;
 		onStyleChange: StyleChangeListener;
 		result: components.commands.ExecutionResult;
 	}
@@ -239,6 +243,14 @@ module fugazi.view {
 		 */
 		public componentDidMount(): void {
 			this.props.result.then(this.success.bind(this)).catch(this.fail.bind(this));
+		}
+
+		public componentWillUpdate(): void {
+			this.props.onBeforeStyleChange();
+		}
+
+		public componentDidUpdate(): void {
+			this.props.onStyleChange();
 		}
 
 		/**
