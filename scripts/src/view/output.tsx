@@ -300,6 +300,10 @@ module fugazi.view {
 		private onDoubleClick(event: React.MouseEvent<HTMLDivElement>) {
 			event.stopPropagation();
 			PsSingleton.blur(this.container);
+			var selection = window.getSelection();
+			if (selection) {
+				selection.removeAllRanges();
+			}
 		}
 
 		private success(value: any): void {
