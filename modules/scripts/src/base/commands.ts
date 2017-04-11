@@ -14,6 +14,24 @@
 	let manExamples = "#### Examples:\n";
 	manExamples += "```fugazi-commands\n// command\nman echo\n// command\nman http\n// command\nman \"io.fugazi.strings\"\n```\n\n";
 
+	function jsonToFugazi(value: any): any {
+		if (typeof value !== 'object' || value === null || fugazi.is(value, Array)) {
+			return value;
+		} else {
+			return fugazi.collections.map(value);
+		}
+	}
+
+	function fugaziToJson(value: any): any {
+		if (value instanceof fugazi.collections.Map) {
+			return value.asObject();
+		} else if (fugazi.is(value, Array)) {
+			return value.map((v)=> fugaziToJson(v));
+		} else {
+			return value;
+		}
+	}
+
 	fugazi.components.modules.descriptor.loaded(<fugazi.components.modules.descriptor.Descriptor> {
 		name: "io.fugazi",
 		commands: {
@@ -87,6 +105,10 @@
 				returns: "any",
 				parametersForm: "arguments",
 				handler: function(context: fugazi.app.modules.ModuleContext, index: string | number, value: any[] | fugazi.collections.Map<any>) {
+					if (fugazi.isPlainObject(value)) {
+						value = fugazi.collections.map(value);
+					}
+
 					if (typeof index === "string" && value instanceof fugazi.collections.Map) {
 						if (value.has(index)) {
 							return value.get(index);
@@ -115,6 +137,24 @@
 					}
 
 					throw new fugazi.Exception("params must be string|map or number|list");
+				}
+			},
+			jsonParse: {
+				title: "parse input as json",
+				syntax: "jsonParse (value string)",
+				returns: "any",
+				parametersForm: "arguments",
+				handler: function(context: fugazi.app.modules.ModuleContext, value: string) {
+					return jsonToFugazi(JSON.parse(value));
+				}
+			},
+			jsonStringify: {
+				title: "stringify input to json",
+				syntax: "jsonStringify (value any)",
+				returns: "string",
+				parametersForm: "arguments",
+				handler: function(context: fugazi.app.modules.ModuleContext, value: any) {
+					return JSON.stringify(fugaziToJson(value));
 				}
 			}
 		}
