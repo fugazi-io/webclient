@@ -31,6 +31,32 @@ set a = [1, "str", { key: value }]
 echo $a
 ```
 
+#### Json parse
+Returns an the json value equivalent of the passed string  
+Syntax:
+```
+json parse JSON_STRING
+jsonParse JSON_STRING
+```
+Examples:
+```
+json parse '{ "key1": "value1", "key2": 4 }'
+jsonParse '[1, 2, 3, "string"]'
+```
+
+#### Json stringify
+Returns a json string representation of the passed value  
+Syntax:
+```
+json stringify VALUE
+jsonStringify VALUE
+```
+Examples:
+```
+json stringify { "key1": "value1", "key2": 4 }
+jsonStringify [1, 2, 3, "string"]
+```
+
 #### Extract
 Returns an inner value inside a compound value  
 Syntax: `echo INDEX from VALUE`
@@ -59,7 +85,7 @@ clear
 #### Set
 Stores a value into a variable  
 Path: `io.fugazi.terminal`  
-Syntax: 
+Syntax:
 ```
 VAR_NAME = VALUE
 set VAR_NAME = VALUE
