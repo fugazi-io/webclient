@@ -276,7 +276,7 @@ module fugazi.view {
 
 				case "success":
 					className += "success";
-					renderer = renderers.getRenderer(this.props.result.getType());
+					renderer = renderers.getRenderer(this.props.result.getType(), this.state.value);
 					element = renderer.render({ onStyleChange: this.props.onStyleChange, type: this.props.result.getType(), value: this.state.value });
 					break;
 

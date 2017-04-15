@@ -20,7 +20,7 @@ namespace fugazi.components.types {
 
 		public is(type: Type | string): boolean {
 			if (type instanceof Type) {
-				return type.parent == this.parent && type.name === this.name;
+				return type  === anyTypeInstance || (type.parent == this.parent && type.name === this.name);
 			}
 
 			if (typeof type === "string") {
@@ -72,6 +72,30 @@ namespace fugazi.components.types {
 
 		public validate(value: any): boolean {
 			return super.validate(value) && this.check(value);
+		}
+	}
+
+	let voidTypeInstance: VoidType;
+	export class VoidType extends CoreType {
+		constructor(parent:components.Component) {
+			super(parent, "void", "Void", value => value === undefined);
+			voidTypeInstance = this;
+		}
+	}
+
+	let anyTypeInstance: VoidType;
+	export class AnyType extends CoreType {
+		constructor(parent: components.Component) {
+			super(parent, "any", "Any", value => true);
+			anyTypeInstance = this;
+		}
+
+		public is(type: types.Type | string): boolean {
+			if (typeof type === "string") {
+				type = registry.getType(type as string);
+			}
+
+			return type != voidTypeInstance;
 		}
 	}
 
