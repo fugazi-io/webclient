@@ -197,8 +197,8 @@ module fugazi.app.terminal {
 
 			let result: components.commands.ExecutionResult = null;
 			try {
-				let session: statements.StatementSession = statements.createStatementsSession(command, this.contextProvider),
-					executableStatement: statements.Statement = session.getExecutable();
+				let session = statements.createStatementsSession(command, this.contextProvider),
+					executableStatement = session.getExecutable();
 
 				if (!isNull(executableStatement)) {
 					result = executableStatement.execute();
@@ -218,8 +218,8 @@ module fugazi.app.terminal {
 		
 		private queryForStatements(command: string, position: number): Promise<app.statements.Statement[]> {
 			let future = new Future<app.statements.Statement[]>(),
-				session: statements.StatementSession = statements.createStatementsSession(command, this.contextProvider),
-				suggestedStatements: statements.Statement[] = session.getSuggestions(position);
+				session = statements.createStatementsSession(command, this.contextProvider),
+				suggestedStatements = session.getSuggestions(position);
 
 			future.resolve(suggestedStatements);
 			

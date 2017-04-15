@@ -295,7 +295,7 @@ module fugazi.app.statements {
 				<input.CommandExpression[]> commandExpression.getExpressions().filter(exp => exp instanceof input.CommandExpression);
 
 			if (!commandExpressions.empty()) {
-				let executableStatements: Statement[] = commandExpressions.map(executableExpression => {
+				const executableStatements: Statement[] = commandExpressions.map(executableExpression => {
 						let executable = this.createExecutable(executableExpression);
 						if (executable === null) {
 							throw new Exception(`The statement "${executableExpression.input}" cannot be interpreted`);
@@ -304,10 +304,10 @@ module fugazi.app.statements {
 						return executable;
 					}),
 					preparedCommandExpression: input.CommandExpression = this.prepareCommand(commandExpression, executableStatements),
-					matches: semantics.PossibleInterpretation[] = semantics.match(preparedCommandExpression);
+					matches = semantics.match(preparedCommandExpression);
 
 				if (!matches.empty()) {
-					let firstMatch = matches.first();
+					const firstMatch = matches.first();
 					return new CompoundStatement(this.context,firstMatch.match.command,
 						firstMatch.match.rule, firstMatch.interpretedCommand, executableStatements);
 				}

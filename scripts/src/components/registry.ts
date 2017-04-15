@@ -365,28 +365,6 @@ module fugazi.components.registry {
 		return `${ from.getPath().toString() }=>${ to.getPath().toString() }`;
 	}
 
-	class VoidType extends types.CoreType {
-		constructor(parent:components.Component) {
-			super(parent, "void", "Void", value => value === undefined);
-		}
-	}
-
-	class AnyType extends types.CoreType {
-		constructor(parent: components.Component) {
-			super(parent, "any", "Any", value => true);
-		}
-
-		public is(type: types.Type | string): boolean {
-			if (typeof type === "string") {
-				type = getType(type as string);
-			}
-
-			let voidType = getType("void");
-
-			return type != voidType;
-		}
-	}
-
 	function createCoreModule(parentPath: Path): modules.Module {
 		let mapType: types.Type,
 			listType: types.Type,
@@ -398,8 +376,8 @@ module fugazi.components.registry {
 		(<any> coreModule).path = parentPath.child("core");
 
 		// types
-		coreModule.addType(new VoidType(coreModule));
-		coreModule.addType(new AnyType(coreModule));
+		coreModule.addType(new types.VoidType(coreModule));
+		coreModule.addType(new types.AnyType(coreModule));
 
 		coreModule.addType(new types.CoreType(
 			coreModule,

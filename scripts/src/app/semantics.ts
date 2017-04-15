@@ -176,7 +176,6 @@ module fugazi.app.semantics {
 					expression.getParameterValues() :
 					expression.value;
 
-
 				return Scoreboard.score(
 					this.token.tolerates(value),
 					this.token.validates(value),

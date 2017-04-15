@@ -383,13 +383,17 @@ module fugazi.view.renderers {
 		}
 	}
 
-	export function getRenderer(type: components.types.Type): Renderer {
+	export function getRenderer(type: components.types.Type, value?: any): Renderer {
 		var componentClass: RenderingComponentClass;
+
+		if (value != null) {
+			try {
+				return getRenderer(getTypeForValue(value));
+			} catch (e) {}
+		}
 
 		if (type.is(components.registry.getType("void"))) {
 			componentClass = VoidComponent;
-		} else if (type.is(components.registry.getType("any"))) {
-			componentClass = AnyComponent;
 		} else if (type.is(components.registry.getType("boolean")) || type.is(components.registry.getType("number"))) {
 			componentClass = PrimitiveComponent;
 		} else if (type.is(components.registry.getType("ui.markdown"))) {
@@ -402,6 +406,8 @@ module fugazi.view.renderers {
 			componentClass = ListComponent;
 		} else if (type.is(components.registry.getType("map"))) {
 			componentClass = MapComponent;
+		} else if (type.is(components.registry.getType("any"))) {
+			componentClass = AnyComponent;
 		} else {
 			throw new fugazi.Exception("parser not found for type");
 		}
