@@ -303,7 +303,7 @@ module fugazi.app.statements {
 
 						return executable;
 					}),
-					preparedCommandExpression: input.CommandExpression = this.prepareCommand(commandExpression, executableStatements),
+					preparedCommandExpression = this.prepareCommand(commandExpression, executableStatements),
 					matches = semantics.match(preparedCommandExpression);
 
 				if (!matches.empty()) {

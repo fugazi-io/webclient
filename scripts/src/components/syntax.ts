@@ -129,11 +129,11 @@ module fugazi.components.commands.syntax {
 		}
 
 		public tolerates(input: string | types.Type): boolean {
-			return isType(input) ? this.type.is(<types.Type> input) : this.type.satisfies(<string> input);
+			return isType(input) ? this.checkType(input) : this.type.satisfies(input);
 		}
 
 		public validates(input: string | types.Type): boolean {
-			return isType(input) ? this.type.is(<types.Type> input) : this.type.validate(input);
+			return isType(input) ? this.checkType(input) : this.type.validate(input);
 		}
 
 		public getTokenType(): TokenType {
@@ -147,6 +147,13 @@ module fugazi.components.commands.syntax {
 		public toString(): string {
 			return "[Parameter|" + this.type.toString() + "]";
 		}
+
+		private checkType(type: types.Type): boolean {
+			// used to be:
+			// return this.type.is(type)
+			// now:
+			return type.is(this.type);
+		}
 	}
 	
 	export namespace descriptor {
@@ -155,7 +162,7 @@ module fugazi.components.commands.syntax {
 		}
 	}
 
-	function isType(input: any): boolean {
+	function isType(input: any): input is types.Type {
 		return fugazi.is(input.satisfies, Function);
 	}
 
@@ -211,7 +218,7 @@ module fugazi.components.commands.syntax {
 					if (fugazi.is(part, String)) {
 						(<any> this.component).tokens.push(new Keyword(<string> part));
 					} else if (fugazi.is((<ParameterData> part).type, String)) {
-						let type = <types.Type> this.resolve(ComponentType.Type, <string> (<ParameterData> part).type);
+						let type = this.resolve(ComponentType.Type, <string> (<ParameterData> part).type) as types.Type;
 
 						if (type == null) {
 							throw new components.builder.Exception(`can not find type "${ <string> (<ParameterData> part).type }"`);
@@ -219,7 +226,7 @@ module fugazi.components.commands.syntax {
 
 						(<any> this.component).tokens.push(new Parameter((<ParameterData> part).name, type));
 					} else {
-						let typeBuilder = <components.builder.Builder<types.Type>> (<ParameterData> part).type;
+						let typeBuilder = (<ParameterData> part).type as components.builder.Builder<types.Type>;
 						typeBuilder.associate();
 
 						if (typeBuilder.getComponent() == null) {
