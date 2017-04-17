@@ -3,6 +3,43 @@
 A web based terminal application for executing local and remote commands.  
 The latest version of the terminal can be found here: http://fugazi.io
 
+### Short example
+Fugazi isn't a regular terminal, it won't execute the commands which you are used to.  
+In order to execute commands you need to load modules into the client, these modules will define the 
+commands which can be executed.
+
+The client comes with a some [built-in commands](./docs/builtins/commands.md), and here's a short 
+example of what you can do with it:
+
+In the fugazi terminal try to execute:
+```
+get "https://jsonplaceholder.typicode.com/posts/1"
+```
+This command will make an http GET request to that url and output the response. 
+(you can use other urls of course, as long as they support [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)).  
+If you only want to get the data from the response you can do so like this:
+```
+r = (get "https://jsonplaceholder.typicode.com/posts/1")
+extract data from $r 
+```
+Here we used a variable to hold the response and then extracted the data part from it, 
+but you can do it in one line using nested commands:
+```
+extract data from (get "https://jsonplaceholder.typicode.com/posts/1")
+```
+The only problem left though is that the return value is a string and not a map. 
+This happens because the response doesn't have json content type.  
+It's easy to go around it though:
+```
+r = (get "https://jsonplaceholder.typicode.com/posts/1")
+d = (extract data from $r)
+json parse $d
+```
+Or, in one line:
+```
+json parse (extract data from (get "https://jsonplaceholder.typicode.com/posts/1"))
+```
+
 ### Installation
 The client requires no servers, other than hosting the static files (scripts, styles, etc).  
 To run locally install the [npm package](https://www.npmjs.com/package/@fugazi/webclient):

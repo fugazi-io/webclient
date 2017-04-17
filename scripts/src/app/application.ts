@@ -11,7 +11,7 @@
 
 module fugazi.app {
 	export const version = {
-		code: "1.0.12",
+		code: "1.0.13",
 		name: "The Argument",
 		toString: function() {
 			return `${ this.name } (${ this.code })`;
