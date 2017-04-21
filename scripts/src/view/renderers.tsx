@@ -384,29 +384,36 @@ module fugazi.view.renderers {
 	}
 
 	export function getRenderer(type: components.types.Type, value?: any): Renderer {
-		var componentClass: RenderingComponentClass;
+		let componentClass: RenderingComponentClass;
+		let renderingType: components.types.Type = type;
 
 		if (value != null) {
 			try {
-				return getRenderer(getTypeForValue(value));
+				const valueType = getTypeForValue(value);
+
+				// use the type of the value only if it extends the passed in type
+				// for example if type = ui.markdown then type(value) = string
+				if (valueType.is(type)) {
+					renderingType = valueType;
+				}
 			} catch (e) {}
 		}
 
-		if (type.is(components.registry.getType("void"))) {
+		if (renderingType.is(components.registry.getType("void"))) {
 			componentClass = VoidComponent;
-		} else if (type.is(components.registry.getType("boolean")) || type.is(components.registry.getType("number"))) {
+		} else if (renderingType.is(components.registry.getType("boolean")) || renderingType.is(components.registry.getType("number"))) {
 			componentClass = PrimitiveComponent;
-		} else if (type.is(components.registry.getType("ui.markdown"))) {
+		} else if (renderingType.is(components.registry.getType("ui.markdown"))) {
 			componentClass = UiMarkdownComponent;
-		} else if (type.is(components.registry.getType("ui.message"))) {
+		} else if (renderingType.is(components.registry.getType("ui.message"))) {
 			componentClass = UiMessageComponent;
-		} else if (type.is(components.registry.getType("string"))) {
+		} else if (renderingType.is(components.registry.getType("string"))) {
 			componentClass = StringComponent;
-		} else if (type.is(components.registry.getType("list"))) {
+		} else if (renderingType.is(components.registry.getType("list"))) {
 			componentClass = ListComponent;
-		} else if (type.is(components.registry.getType("map"))) {
+		} else if (renderingType.is(components.registry.getType("map"))) {
 			componentClass = MapComponent;
-		} else if (type.is(components.registry.getType("any"))) {
+		} else if (renderingType.is(components.registry.getType("any"))) {
 			componentClass = AnyComponent;
 		} else {
 			throw new fugazi.Exception("parser not found for type");
