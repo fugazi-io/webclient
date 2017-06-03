@@ -95,21 +95,25 @@ module fugazi.utils {
 		private id: string;
 		private cached: boolean;
 		private timer: utils.Timer;
-		private url: string;
+		//private url: string;
+		private url: net.Url;
 		private scriptElement: HTMLScriptElement;
 		private future: fugazi.Future<HTMLScriptElement>;
 		
 		public constructor(url: string, id: string, cached: boolean) {
 			this.id = id;
-			this.url = url;
+			this.url = new net.Url(new URL(url));
 			this.cached = cached;
 			this.future = new fugazi.Future<HTMLScriptElement>();
 		}
 		
 		public load(): Promise<HTMLScriptElement> {
-			var src: string = this.url + (this.cached ? "?dummy=" + new Date().getTime() : "");
+			if (this.cached) {
+				this.url.addParam("dummy", new Date().getTime());
+			}
+
 			this.scriptElement = <HTMLScriptElement> dom.create("script", {
-				src: src,
+				src: this.url.toString(),
 				id: this.id
 			});
 	
