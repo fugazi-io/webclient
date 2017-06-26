@@ -240,7 +240,7 @@ namespace fugazi.components.types {
 	}
 
 	export namespace builder {
-		var textualDefinitionPattern: RegExp = /^([a-z0-9\.]+)(?:<(.+)>)?(?:\[(.+)\])?$/i;
+		const textualDefinitionPattern: RegExp = /^([a-z0-9\.]+)(?:<(.+)>)?(?:\[(.+)\])?$/i;
 
 		export function create(typeDescriptor: string | descriptor.Descriptor | { [name: string]: any }, parent: components.builder.Builder<components.Component>): components.builder.Builder<Type> {
 			let loader: components.descriptor.Loader<descriptor.Descriptor>;
@@ -283,7 +283,7 @@ namespace fugazi.components.types {
 			return "unknown";
 		}
 
-		abstract class Builder<T extends Definition> extends components.builder.BaseBuilder<Type, descriptor.Descriptor> {
+		abstract class TypeBuilder<T extends Definition> extends components.builder.BaseBuilder<Type, descriptor.Descriptor> {
 			protected base: string;
 
 			protected onDescriptorReady(): void {
@@ -302,9 +302,9 @@ namespace fugazi.components.types {
 			protected abstract parseDefinition(definition: T): void;
 		}
 
-		class TextualBuilder extends Builder<TextualDefinition> {
+		class TextualBuilder extends TypeBuilder<TextualDefinition> {
 			private genericsReference: string;
-			private genericsBuilder: Builder<TextualDefinition>;
+			private genericsBuilder: TypeBuilder<TextualDefinition>;
 			private constraints: string;
 
 			constructor(loader: components.descriptor.Loader<descriptor.Descriptor>, parent?: components.builder.Builder<Component>) {
@@ -320,14 +320,20 @@ namespace fugazi.components.types {
 			}
 
 			protected concreteAssociate(): void {
-				var genericsType: Type,
+				let genericsType: Type,
 					constraint: constraints.Constraint,
 					boundConstraints: constraints.BoundConstraint[];
 
 				super.concreteAssociate();
 
 				if (this.genericsReference || this.genericsBuilder) {
-					genericsType = <Type> (this.genericsReference ? this.resolve(ComponentType.Type, this.genericsReference) : (<any> this.genericsBuilder).component);
+					if (this.genericsBuilder) {
+						this.genericsBuilder.associate();
+						genericsType = (<any> this.genericsBuilder).component;
+					} else {
+						genericsType = this.resolve(ComponentType.Type, this.genericsReference) as Type;
+					}
+
 					constraint = <constraints.Constraint> this.resolve(ComponentType.Constraint, "generics");
 					(<any> this.component).constraints.push(constraint.bindWithArray([genericsType]));
 				}
@@ -339,7 +345,7 @@ namespace fugazi.components.types {
 			}
 
 			protected parseDefinition(definition: TextualDefinition): void {
-				var anonymousDescriptor: descriptor.Descriptor = descriptorFromAnonymousDefinition(definition),
+				let anonymousDescriptor: descriptor.Descriptor = descriptorFromAnonymousDefinition(definition),
 					match: RegExpMatchArray = definition.match(textualDefinitionPattern);
 
 				if (match === null) {
@@ -353,7 +359,7 @@ namespace fugazi.components.types {
 					if (descriptor.isAnonymousDefinition(match[2])) {
 						this.innerBuilderCreated();
 						anonymousDescriptor.type = match[2];
-						this.genericsBuilder = <Builder<TextualDefinition>> create(anonymousDescriptor, this);
+						this.genericsBuilder = <TypeBuilder<TextualDefinition>> create(anonymousDescriptor, this);
 					} else {
 						this.genericsReference = match[2];
 					}
@@ -366,9 +372,9 @@ namespace fugazi.components.types {
 			}
 		}
 
-		class StructBuilder extends Builder<StructDefinition> {
+		class StructBuilder extends TypeBuilder<StructDefinition> {
 			private fieldsReferences: collections.Map<string>;
-			private fieldsBuilders: collections.Map<Builder<Definition>>;
+			private fieldsBuilders: collections.Map<TypeBuilder<Definition>>;
 
 			constructor(loader: components.descriptor.Loader<descriptor.Descriptor>, parent?: components.builder.Builder<Component>) {
 				super(ReducedConstrainedType, loader, parent);
@@ -408,7 +414,7 @@ namespace fugazi.components.types {
 			}
 
 			protected concreteAssociate(): void {
-				var fields: collections.Map<Type> = collections.map<Type>(),
+				let fields: collections.Map<Type> = collections.map<Type>(),
 					constraint: constraints.Constraint = <constraints.Constraint> this.resolve(ComponentType.Constraint, "struct");
 
 				super.concreteAssociate();
@@ -418,7 +424,7 @@ namespace fugazi.components.types {
 				});
 
 				this.fieldsBuilders.keys().forEach(name => {
-					var fieldBuilder = this.fieldsBuilders.get(name);
+					let fieldBuilder = this.fieldsBuilders.get(name);
 					fieldBuilder.associate();
 					fields.set(name, <Type> (<any> fieldBuilder).component);
 				});
@@ -427,26 +433,26 @@ namespace fugazi.components.types {
 			}
 
 			protected parseDefinition(definition: StructDefinition): void {
-				var fieldNames: string[] = Object.keys(definition);
+				let fieldNames: string[] = Object.keys(definition);
 
 				this.fieldsReferences = collections.map<string>();
-				this.fieldsBuilders = collections.map<Builder<Definition>>();
+				this.fieldsBuilders = collections.map<TypeBuilder<Definition>>();
 				this.base = (<descriptor.StructDescriptor> this.componentDescriptor).base;
 
 				fieldNames.forEach(fieldName => {
-					var fieldDefinition: Definition = definition[fieldName],
+					let fieldDefinition: Definition = definition[fieldName],
 						fieldDefinitionType: string = getDefinitionType(fieldDefinition);
 
 					if (fieldDefinitionType === "text") {
 						if (descriptor.isAnonymousDefinition(<TextualDefinition> fieldDefinition)) {
 							this.innerBuilderCreated();
-							this.fieldsBuilders.set(fieldName, <Builder<TextualDefinition>> create(<string> fieldDefinition, this));
+							this.fieldsBuilders.set(fieldName, <TypeBuilder<TextualDefinition>> create(<string> fieldDefinition, this));
 						} else {
 							this.fieldsReferences.set(fieldName, <string> fieldDefinition);
 						}
 					} else if (fieldDefinitionType === "struct") {
 						this.innerBuilderCreated();
-						this.fieldsBuilders.set(fieldName, <Builder<StructDefinition>> create(descriptorFromAnonymousDefinition(fieldDefinition), this));
+						this.fieldsBuilders.set(fieldName, <TypeBuilder<StructDefinition>> create(descriptorFromAnonymousDefinition(fieldDefinition), this));
 					} else {
 						throw new components.builder.Exception("illegal field " + fieldName);
 					}

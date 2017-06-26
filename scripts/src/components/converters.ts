@@ -48,10 +48,10 @@ namespace fugazi.components.converters {
 
 	export namespace builder {
 		export function create(converterDescriptor: descriptor.Descriptor, parent: components.builder.Builder<components.Component>): components.builder.Builder<Converter> {
-			return new Builder(Converter, new components.descriptor.ExistingLoader(converterDescriptor), parent);
+			return new ConverterBuilder(Converter, new components.descriptor.ExistingLoader(converterDescriptor), parent);
 		}
 
-		class Builder extends components.builder.BaseBuilder<Converter, descriptor.Descriptor> {
+		class ConverterBuilder extends components.builder.BaseBuilder<Converter, descriptor.Descriptor> {
 			protected onDescriptorReady(): void {}
 
 			protected concreteBuild(): void {

@@ -501,7 +501,7 @@ namespace fugazi.components.commands {
 			throw new components.builder.Exception("invalid command descriptor");
 		}
 
-		class Builder<T extends Command> extends components.builder.BaseBuilder<T, descriptor.Descriptor> {
+		class CommandBuilder<T extends Command> extends components.builder.BaseBuilder<T, descriptor.Descriptor> {
 			private returnType: types.TextualDefinition | components.builder.Builder<types.Type>;
 			private syntaxBuilders: components.builder.Builder<syntax.SyntaxRule>[];
 
@@ -581,7 +581,7 @@ namespace fugazi.components.commands {
 			return handler.PassedParametersForm.Arguments;
 		}
 
-		class LocalCommandBuilder extends Builder<LocalCommand> {
+		class LocalCommandBuilder extends CommandBuilder<LocalCommand> {
 			constructor(loader: components.descriptor.Loader<descriptor.Descriptor>, parent?: components.builder.Builder<Component>, ctor?: { new (): LocalCommand }) {
 				super(ctor || LocalCommand, loader, parent);
 			}
@@ -603,7 +603,7 @@ namespace fugazi.components.commands {
 			}
 		}
 
-		class RemoteCommandBuilder extends Builder<RemoteCommand> {
+		class RemoteCommandBuilder extends CommandBuilder<RemoteCommand> {
 			constructor(loader: components.descriptor.Loader<descriptor.Descriptor>, parent?: components.builder.Builder<Component>) {
 				super(RemoteCommand, loader, parent);
 			}
