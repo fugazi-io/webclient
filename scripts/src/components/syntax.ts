@@ -171,7 +171,7 @@ module fugazi.components.commands.syntax {
 			var anonymousDescriptor: descriptor.Descriptor = <descriptor.Descriptor> components.builder.createAnonymousDescriptor(ComponentType.SyntaxRule);
 			anonymousDescriptor.rule = rule;
 
-			return new Builder(new components.descriptor.ExistingLoader(anonymousDescriptor), parent);
+			return new SyntaxRuleBuilder(new components.descriptor.ExistingLoader(anonymousDescriptor), parent);
 		}
 
 		interface ParameterData {
@@ -179,7 +179,7 @@ module fugazi.components.commands.syntax {
 			type: string | components.builder.Builder<types.Type>;
 		}
 		
-		class Builder extends components.builder.BaseBuilder<SyntaxRule, descriptor.Descriptor> {
+		class SyntaxRuleBuilder extends components.builder.BaseBuilder<SyntaxRule, descriptor.Descriptor> {
 			private parser: {
 					rule: string;
 					parts: Array<string | ParameterData>;

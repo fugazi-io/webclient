@@ -1,4 +1,3 @@
-/// <reference path="registry.ts" />
 /// <reference path="types.ts" />
 
 /**
@@ -103,10 +102,10 @@ module fugazi.components.types.constraints {
 
 	export module builder {
 		export function create(constraintDescriptor: descriptor.Descriptor, parent: components.builder.Builder<components.Component>): components.builder.Builder<Constraint> {
-			return new Builder(new components.descriptor.ExistingLoader(constraintDescriptor), parent);
+			return new ConstraintBuilder(new components.descriptor.ExistingLoader(constraintDescriptor), parent);
 		}
 
-		class Builder extends components.builder.BaseBuilder<Constraint, descriptor.Descriptor> {
+		class ConstraintBuilder extends components.builder.BaseBuilder<Constraint, descriptor.Descriptor> {
 			private types: string[];
 			private validator: UnboundConstraintValidator;
 
@@ -129,7 +128,7 @@ module fugazi.components.types.constraints {
 			}
 
 			protected concreteAssociate(): void {
-				var type: Type;
+				let type: Type;
 
 				for (var i = 0; i < this.types.length; i++) {
 					type = <Type> this.resolve(components.ComponentType.Type, this.types[i]);

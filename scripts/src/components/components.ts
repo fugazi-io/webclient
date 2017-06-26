@@ -82,8 +82,14 @@ namespace fugazi.components {
 			return new Path(parent);
 		}
 
-		public startsWith(prefix: Path): boolean {
-			return prefix.names.every((name, index) => this.names[index] === name);
+		public startsWith(prefix: string | string[] | Path): boolean {
+			if (typeof prefix === "string") {
+				prefix = prefix.split(".");
+			} else if (prefix instanceof Path) {
+				prefix = prefix.names;
+			}
+
+			return prefix.every((name, index) => this.names[index] === name);
 		}
 
 		public clone(): Path {
