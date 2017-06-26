@@ -115,7 +115,8 @@ Here's how to run it locally:
 * [Simple Math Module](./docs/examples/math.md)
 
 #### Getting help
-Use the [issues](//github.com/fugazi-io/webclient/issues) for any bug, request, question
+Use the [issues](//github.com/fugazi-io/webclient/issues) for any bug, request, question.  
+Or you can find us in [our gitter](https://gitter.im/fugazi-io/Lobby)
 
 ### Contribution
 We're looking for more help, if you're interested find us in this `gmail.com` address: `terminal.fugazi.io`

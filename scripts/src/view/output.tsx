@@ -185,7 +185,7 @@ module fugazi.view {
 						check out the <a target="_blank" href="https://github.com/fugazi-io/webclient">GitHub repo</a>
 					</li>,
 					<li key="helpUs" className="hello help">
-						we'd love to get your feedback, so if something isn't clear or not working <span style={{ fontWeight: "bold" }}>please</span> <a target="_blank" href="https://github.com/fugazi-io/webclient/issues">open an issue</a>
+						we'd love to get your feedback, so if something isn't clear or not working find us in <a target="_blank" href="https://gitter.im/fugazi-io/Lobby">our gitter</a>
 					</li>
 				);
 			}

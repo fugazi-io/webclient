@@ -99,22 +99,32 @@
 			extract: {
 				title: "returns an item inside a compound type",
 				syntax: [
+					"(value map) . (index string)",
+					"(value map) (index list<string>)",
 					"extract (index string) from (value map)",
+					"(value list) (index list<number[numbers.integer]>)",
 					"extract (index number[numbers.integer]) from (value list)",
 				],
 				returns: "any",
-				parametersForm: "arguments",
-				handler: function(context: fugazi.app.modules.ModuleContext, index: string | number, value: any[] | fugazi.collections.Map<any>) {
+				parametersForm: "map",
+				handler: function(context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>) {
+					let index: string | [string] | number | [number] = params.get("index");
+					let value: any[] | fugazi.collections.Map<any> = params.get("value");
+
 					if (fugazi.isPlainObject(value)) {
 						value = fugazi.collections.map(value);
 					}
 
-					if (typeof index === "string" && value instanceof fugazi.collections.Map) {
-						if (value.has(index)) {
-							return value.get(index);
+					if ((typeof index === "string" || (index instanceof Array && typeof index[0] === "string")) && value instanceof fugazi.collections.Map) {
+						if (index instanceof Array) {
+							index = index.join(".");
 						}
 
-						const path = index.split(".");
+						if (value.has(index as string)) {
+							return value.get(index as string);
+						}
+
+						const path = (index as string).split(".");
 						if (path.length > 1) {
 							let result: any = value;
 
@@ -128,7 +138,11 @@
 						}
 
 						throw new fugazi.Exception("index not found");
-					} else if (typeof index === "number" && value instanceof Array) {
+					} else if ((typeof index === "number" || (index instanceof Array && typeof index[0] === "number")) && value instanceof Array) {
+						if (index instanceof Array) {
+							index = index[0];
+						}
+
 						if (index < 0 || index >= value.length) {
 							throw new fugazi.Exception("index out of bound");
 						}

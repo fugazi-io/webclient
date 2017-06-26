@@ -70,6 +70,17 @@ extract arr from $map
 extract "obj.num" from $map
 ```
 
+Or:
+```
+arr = [11, 22, 33]
+$arr [1]
+
+map = { str: string, arr: [1, 2, 3], obj: { num: 45, bool: true } }
+$map . arr
+$map ["arr"]
+$map ["obj", "num"]
+```
+
 ### `io.fugazi.terminal` commands
 Commands regarding a specific terminal instance.
 
