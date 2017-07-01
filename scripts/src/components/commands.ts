@@ -125,6 +125,19 @@ namespace fugazi.components.commands {
 		}
 	}
 
+	function getHandlerErrorMessage(error: any): string {
+		if (typeof error === "string") {
+			return error;
+		}
+
+		// TODO: should be 'error instanceof Error' but it fails in runtime, for some reason Error is undefined
+		if (error instanceof window["Error"]) {
+			return error.message;
+		}
+
+		return error.toString();
+	}
+
 	export abstract class Command extends Component {
 		protected asynced: boolean;
 		protected returnType: types.Type;
@@ -179,7 +192,7 @@ namespace fugazi.components.commands {
 						value: result
 					} : {
 						status: handler.ResultStatus.Failure,
-						error: result
+						error: getHandlerErrorMessage(result)
 					};
 			}
 
