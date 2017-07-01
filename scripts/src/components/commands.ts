@@ -158,7 +158,7 @@ namespace fugazi.components.commands {
 		public executeLater(context: app.modules.ModuleContext): Executer {
 			let executionResult = this.returnType.is("any") ? new ExecutionResultAny(this.returnType, this.asynced) : new ExecutionResult(this.returnType, this.asynced),
 				executer = new Executer(executionResult, params => {
-					this.invokeHandler(context, params).then(this.handleHandlerResult.bind(this, executionResult), executionResult.reject.bind(executionResult));
+					this.invokeHandler(context, params).then(this.handleHandlerResult.bind(this, "then", executionResult), this.handleHandlerResult.bind(this, "catch", executionResult));
 				});
 
 			return executer;
@@ -172,12 +172,15 @@ namespace fugazi.components.commands {
 
 		protected abstract invokeHandler(context: app.modules.ModuleContext, params: ExecutionParameters): Promise<handler.Result>;
 
-		protected handleHandlerResult(executionResult: ExecutionResult, result: handler.Result): void {
+		protected handleHandlerResult(cbType: "then" | "catch", executionResult: ExecutionResult, result: handler.Result): void {
 			if (!handler.isHandlerResult(result)) {
-				result = {
-					status: handler.ResultStatus.Success,
-					value: result
-				};
+				result = cbType === "then" ? {
+						status: handler.ResultStatus.Success,
+						value: result
+					} : {
+						status: handler.ResultStatus.Failure,
+						error: result
+					};
 			}
 
 			if (result.status === handler.ResultStatus.Prompt) {
@@ -305,7 +308,6 @@ namespace fugazi.components.commands {
 					try {
 						const preparedEndpointParams = this.expandEndpointArguments(context, params);
 						this.executeVia(future, remote, remoteSourceId, preparedEndpointParams);
-
 					} catch (e) {
 						future.reject(e);
 					}
@@ -381,19 +383,12 @@ namespace fugazi.components.commands {
 
 		private success(future: Future<handler.Result>, response: net.HttpResponse): void {
 			this.authenticator.interceptResponse(response);
-			let data;
-			try {
-				data = JSON.parse(response.getData());
-			} catch (e) {
-				data = response.getData();
-			}
-
-			future.resolve(data);
+			future.resolve(response.guessData());
 		}
 
 		private failure(future: Future<handler.Result>, response: net.HttpResponse): void {
 			this.authenticator.interceptResponse(response);
-			future.reject(new fugazi.Exception(response.getData()));
+			future.reject(response.guessData());
 		}
 	}
 
