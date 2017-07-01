@@ -251,8 +251,8 @@ module fugazi.net {
 		},
 		None: null,
 		fromString: function(contentType: string): ContentType {
-			for (var i = 0; i < CONTENT_TYPES.length; i++) {
-				if (CONTENT_TYPES[i].toString() === contentType) {
+			for (let i = 0; i < CONTENT_TYPES.length; i++) {
+				if (contentType.toLowerCase().includes(CONTENT_TYPES[i].toString().toLowerCase())) {
 					return CONTENT_TYPES[i];
 				}
 			}
