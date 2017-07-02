@@ -118,7 +118,7 @@ namespace fugazi.components.modules {
 		}
 
 		public hasParameter(name: string): boolean {
-			return this.params.has(name);
+			return this.params.has(name) || (this.parent && (this.parent as Module).hasParameter(name));
 		}
 
 		public getParameter(name: string, context: app.modules.ModuleContext): string {

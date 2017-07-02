@@ -635,8 +635,8 @@ namespace fugazi.components.commands {
 					if (!existing.empty() && !existing.every(name => (this.component.getParent() as modules.Module).hasParameter(name))) {
 						throw new fugazi.Exception(
 							`Cannot build remote command ${ this.component.getPath().toString() }, ` +
-							`since syntax rule ${ rule.getName() } does not provide all the parameters ` +
-							`required by endpoint "${ (this.component as any).endpoint }"`
+							`since syntax rule "${ rule.raw }" does not provide all the parameters ` +
+							`required by endpoint "${ (this.component as any).endpoint.raw }"`
 						);
 					}
 				});
