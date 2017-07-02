@@ -109,7 +109,7 @@ module fugazi.app.statements {
 		}
 
 		protected processParts(): void {
-			var inputExpressions: input.Expression<any>[] = this.expression.getExpressions(),
+			let inputExpressions: input.Expression<any>[] = this.expression.getExpressions(),
 				ruleTokens: components.commands.syntax.RuleToken[] = this.rule.getTokens();
 
 			if (inputExpressions.length !== ruleTokens.length) {
@@ -117,7 +117,7 @@ module fugazi.app.statements {
 				return;
 			}
 
-			for (var i = 0; i < inputExpressions.length; i++) {
+			for (let i = 0; i < inputExpressions.length; i++) {
 				this.createPart(ruleTokens[i], inputExpressions[i]);
 			}
 		}
@@ -157,7 +157,7 @@ module fugazi.app.statements {
 			let invalidParameters: ParameterPart[] = [],
 				commandParams: components.commands.ExecutionParameters = new components.commands.ExecutionParameters();
 
-			for (var i = 0; i < this.params.length; i++) {
+			for (let i = 0; i < this.params.length; i++) {
 				let parameterPart: ParameterPart = this.params[i];
 
 				if (parameterPart.validate()) {
