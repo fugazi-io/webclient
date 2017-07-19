@@ -67,7 +67,7 @@ namespace fugazi.app.frames {
 
 	export function create<T extends Frame>(source: net.Url): Promise<T> {
 		let origin = source.origin,
-			future = new Future<Frame>();
+			future = new Future<T>();
 
 		if (!remoteProxies.has(origin)) {
 			let frame = new ProxyFrame(source);
@@ -75,7 +75,7 @@ namespace fugazi.app.frames {
 			remoteProxies.set(origin, frame);
 		}
 
-		future.resolve(remoteProxies.get(origin));
+		future.resolve(remoteProxies.get(origin) as T);
 
 		return future.asPromise();
 	}
