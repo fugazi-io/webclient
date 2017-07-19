@@ -19,17 +19,12 @@
 				cors: true,
 				url: params.get("url"),
 				method: fugazi.net.stringToHttpMethod(params.get("method")),
-				contentType: fugazi.net.ContentTypes.fromString(params.get("contentType")),
 				headers: params.get("headers"),
 				timeout: params.get("timeout")
 			};
 
-		if (params.get("contentType") === "json") {
-			props.contentType = fugazi.net.ContentTypes.Json;
-		} else if (params.get("contentType") === "multipart") {
-			props.contentType = fugazi.net.ContentTypes.Form.Multipart;
-		} else if (params.get("contentType") === "urlEncoded") {
-			props.contentType = fugazi.net.ContentTypes.Form.UrlEncoded;
+		if (params.has("contentType")) {
+			props.contentType = fugazi.net.ContentTypes.fromString(params.get("contentType"));
 		}
 
 		fugazi.net.http(props).success(response => {

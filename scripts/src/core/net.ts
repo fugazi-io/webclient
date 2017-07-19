@@ -486,6 +486,7 @@ module fugazi.net {
 		}
 
 		protected open(data?: string | fugazi.PlainObject<any> | collections.Map<any>): void {
+			console.log(`${ httpMethodToString(this.method) } | ${ this.url.toString() }`);
 			this.xhr.open(httpMethodToString(this.method), this.url.toString(), true);
 		}
 
