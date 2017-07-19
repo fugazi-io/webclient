@@ -1,5 +1,3 @@
-/// <reference path="../../lib/react.d.ts" />
-
 /// <reference path="./storage.ts" />
 /// <reference path="../core/configuration.ts" />
 /// <reference path="../core/dom.ts" />

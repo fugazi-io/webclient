@@ -55,11 +55,14 @@ namespace fugazi.view.input {
 		public constructor(props: P, className: string, prompt?: string) {
 			super(props);
 
-			this.state.value = props.value || "";
 
 			this.prompt = prompt;
 			this.className = ["input", className];
 			this.keymap = collections.map<() => void>();
+		}
+
+		public componentWillMount() {
+			this.setState({value : this.props.value || ""});
 		}
 
 		public componentDidMount(): void {
@@ -250,12 +253,16 @@ namespace fugazi.view.input {
 		public constructor(props: P, className: string, prompt?: string) {
 			super(props, "suggestible " + className, prompt);
 
-			this.state.showing = false;
-			this.state.message = null;
-			this.state.suggestions = this.props.suggestions;
-			this.state.focus = "input";
 		}
 
+		public componentWillMount() {
+			this.setState({
+				showing : false,
+				message : null,
+				suggestions : this.props.suggestions,
+				focus : "input"
+			});
+		}
 		protected onTabPressed(): boolean {
 			let newState = !this.state.showing ?
 				{
@@ -328,11 +335,11 @@ namespace fugazi.view.input {
 		private element: HTMLElement;
 		private isFocused: boolean;
 
-		constructor(props: SuggestionPanelProperties) {
-			super(props);
-
+		public componentWillMount() {
 			this.key = utils.generateId();
-			this.state.selected = -1;
+			this.setState({
+				selected: -1
+			});
 		}
 
 		public render(): JSX.Element {
@@ -441,7 +448,9 @@ namespace fugazi.view.input {
 		public constructor(props: P, className: string, prompt?: string) {
 			super(props, "bgtext " + className, prompt);
 
-			this.state.backgroundText = props.backgroundText || "";
+			this.setState({
+				backgroundText : props.backgroundText || ""
+			});
 		}
 
 		protected getContainerElements(): JSX.Element[] {

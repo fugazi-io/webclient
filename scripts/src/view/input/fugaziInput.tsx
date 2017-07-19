@@ -27,10 +27,14 @@ namespace fugazi.view.input {
 
 		constructor(props: FugaziInputProperties) {
 			super(props, "fugazi", props.prompt || DEFAULT_FUGAZI_PROMPT);
-			this.addKeyMapping(false, true, false, "R", this.onShowSearch.bind(this));
+		}
 
+		public componentWillMount(){
+			this.addKeyMapping(false, true, false, "R", this.onShowSearch.bind(this));
 			if (this.props.searchResult && this.props.searchResult.length > 0 ) {
-				this.state.value = this.props.searchResult;
+				this.setState({
+					value : this.props.searchResult
+				});
 			}
 		}
 
@@ -162,7 +166,6 @@ namespace fugazi.view.input {
 
 			return (
 				<li
-					key={ this.props.key }
 					className={ className }
 					onMouseEnter={ () => this.props.handler.onEnter(this.props.index) }
 					onMouseLeave={ () => this.props.handler.onLeave(this.props.index) }

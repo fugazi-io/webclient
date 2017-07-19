@@ -1,6 +1,3 @@
-
-/// <reference path="../../lib/perfect-scrollbar.d.ts" />
-
 /// <reference path="../core/utils.ts" />
 /// <reference path="../app/application.ts" />
 /// <reference path="../components/commands.ts" />
@@ -108,7 +105,7 @@ module fugazi.view {
 		}
 
 		public componentDidUpdate(): void {
-			var node = ReactDOM.findDOMNode(this);
+			var node = ReactDOM.findDOMNode(this) as HTMLElement;
 
 			if (this.shouldScrollBottom) {
 				node.scrollTop = node.scrollHeight

@@ -1,6 +1,8 @@
-/// <reference path="../../lib/react.d.ts" />
 /// <reference path="../core/utils.ts" />
 /// <reference path="terminal.tsx" />
+
+// import {CSSProperties} from "react";
+// import * as React from "react";
 
 module fugazi.view {
 	export interface MainProperties extends ViewProperties {}
@@ -20,7 +22,7 @@ module fugazi.view {
 		}
 
 		public createTerminal(properties: TerminalProperties): Promise<TerminalView> {
-			var terminals: TerminalProperties[] = this.state.terminals.clone(),
+			const terminals: TerminalProperties[] = this.state.terminals.clone(),
 				future = new fugazi.Future<TerminalView>();
 
 			terminals.push(properties);
@@ -37,7 +39,7 @@ module fugazi.view {
 		public render(): JSX.Element {
 			let terminals: JSX.Element[] = [];
 
-			for (var i = 0; i < this.state.terminals.length; i++) {
+			for (let i = 0; i < this.state.terminals.length; i++) {
 				terminals.push(<TerminalView
 						key={ this.state.terminals[i].name }
 						ref={ this.state.terminals[i].name }
@@ -58,7 +60,7 @@ module fugazi.view {
 		}
 	}
 
-	class GitHubRibbon extends React.Component<void, void> {
+	class GitHubRibbon extends React.Component {
 		private static VERSIONS = [{
 			src: "365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67",
 			canonical: "red_aa0000"
@@ -86,12 +88,12 @@ module fugazi.view {
 				top: 0,
 				right: 0,
 				border: 0
-			}
+			};// as CSSProperties;
 
 			return (
 				<a target="_blank" href="https://github.com/fugazi-io/webclient">
 					<img
-						style={ style }
+						style={ style as any }
 						alt="Go to GitHub repo page"
 						data-canonical-src={ `https://s3.amazonaws.com/github/ribbons/forkme_right_${ version.canonical }.png` }
 						src={ `https://camo.githubusercontent.com/${ version.src }` }

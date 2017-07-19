@@ -377,7 +377,7 @@ namespace fugazi.components.modules {
 				return {
 					status: commands.handler.ResultStatus.Failure,
 					error: "username is empty"
-				} as commands.handler.FailResult;
+				} ; //as commands.handler.FailResult;
 			}
 
 			this.username = username.trim();

@@ -1,4 +1,3 @@
-/// <reference path="../../lib/analytics.d.ts" />
 /// <reference path="../app/application.ts" />
 /// <reference path="components.ts" />
 /// <reference path="registry.ts" />
