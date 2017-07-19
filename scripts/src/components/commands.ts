@@ -190,15 +190,15 @@ namespace fugazi.components.commands {
 				result = cbType === "then" ? {
 						status: handler.ResultStatus.Success,
 						value: result
-					} : {
+					} as handler.SuccessResult : {
 						status: handler.ResultStatus.Failure,
 						error: getHandlerErrorMessage(result)
-					};
+					} as handler.FailResult;
 			}
 
-			if (result.status === handler.ResultStatus.Prompt) {
-				executionResult.resolve((result as handler.PromptResult).prompt);
-			} else if (result.status === handler.ResultStatus.Success) {
+			if (handler.isPromptHandlerResult(result)) {
+				executionResult.resolve(result.prompt);
+			} else if (handler.isSuccessHandlerResult(result)) {
 				if (this.convert) {
 					try {
 						result.value = this.knownConvertResult(result.value);
@@ -216,13 +216,17 @@ namespace fugazi.components.commands {
 				} catch(e) {
 					executionResult.reject(e);
 				}
-			} else {
+			} else if (handler.isFailureHandlerResult(result)) {
 				executionResult.reject(new fugazi.Exception(result.error));
+			} else if (handler.isOAuth2HandlerResult(result)) {
+
+			} else {
+				executionResult.reject(new fugazi.Exception("Unknown protocol error"));
 			}
 		}
 
 		protected validateResultValue(result: any): boolean {
-			return this.returnType.validate(handler.isHandlerResult(result) ? result.value : result);
+			return this.returnType.validate(handler.isSuccessHandlerResult(result) ? result.value : result);
 		}
 
 		private knownConvertResult(value: any): any {
@@ -354,8 +358,8 @@ namespace fugazi.components.commands {
 
 			if (remote.proxied()) {
 				remote.frame(remoteSourceId).execute(props, data)
-					.then(this.success.bind(this))
-					.catch(this.failure.bind(this));
+					.then(this.success.bind(this, future))
+					.catch(this.failure.bind(this, future));
 			} else {
 				net.http(props)
 					.success(this.success.bind(this, future))
@@ -406,20 +410,47 @@ namespace fugazi.components.commands {
 	}
 
 	export namespace handler {
-		export function isHandlerResult(value: any): value is Result {
-			return fugazi.isPlainObject(value) && typeof ResultStatus[value.status] === "string";
+		export function isHandlerResult(obj: any): obj is Result {
+			return fugazi.isPlainObject(obj) && typeof ResultStatus[obj.status] === "string";
+		}
+
+		export function isSuccessHandlerResult(obj: any): obj is SuccessResult {
+			return isHandlerResult(obj) && obj.status === handler.ResultStatus.Success;
+		}
+
+		export function isFailureHandlerResult(obj: any): obj is FailResult {
+			return isHandlerResult(obj) && obj.status === handler.ResultStatus.Failure && typeof (obj as FailResult).error === "string";
+		}
+
+		export function isOAuth2HandlerResult(obj: any): obj is OAuth2Result {
+			return isHandlerResult(obj) && obj.status === handler.ResultStatus.OAuth2 && typeof (obj as OAuth2Result).authorizationUri === "string";
+		}
+
+		export function isPromptHandlerResult(obj: any): obj is PromptResult {
+			return isHandlerResult(obj) && obj.status === handler.ResultStatus.Prompt && fugazi.isPlainObject((obj as PromptResult).prompt);
 		}
 
 		export enum ResultStatus {
 			Success,
 			Failure,
+			OAuth2,
 			Prompt
 		}
 
 		export interface Result {
 			status: ResultStatus;
+		}
+
+		export interface SuccessResult extends Result {
 			value?: any;
-			error?: string;
+		}
+
+		export interface FailResult extends Result {
+			error: string;
+		}
+
+		export interface OAuth2Result extends Result {
+			authorizationUri: string;
 		}
 
 		export interface PromptData {

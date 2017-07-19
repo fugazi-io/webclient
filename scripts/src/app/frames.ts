@@ -4,145 +4,74 @@
 /// <reference path="../core/utils.ts" />
 /// <reference path="../app/application.ts" />
 /// <reference path="../components/commands.ts" />
-/// <reference path="../proxyframe/protocol.ts" />
+/// <reference path="../channels/protocol.ts" />
 
 namespace fugazi.app.frames {
-	let remoteProxies = collections.map() as collections.Map<Frame>,
-		pendingLoaders = collections.map() as collections.Map<Loader>,
-		pendingRequests = collections.map() as collections.Map<Future<ProxyHttpResponse>>,
-		framesContainer: HTMLDivElement;
+	const LOAD_TIMEOUT = 3000;
+	const HANDSHAKE_TIMEOUT = 3000;
 
-	window.addEventListener("message", envelope => {
-		console.log("[app.frames] message received");
-
-		let message;
-		try {
-			message = proxyframe.baseMessageHandler(envelope);
-		} catch (e) {
-			return;
-		}
-
-		console.log("[app.frames] message data: ", message);
-
-		switch (message.type) {
-			case proxyframe.MessageTypes.ProxyFrameHandshake:
-				handleRemoteProxyHandshakeMessage(message.data as proxyframe.RemoteProxyHandshakeMessage, envelope.origin);
-				break;
-			
-			case proxyframe.MessageTypes.ProxyFrameExecuteCommandResponse:
-				handlerRemoteProxyExecutionResponse(message.data as proxyframe.RemoteProxyExecuteCommandResponse);
-				break;
-		}
-	});
-
-	function handleRemoteProxyHandshakeMessage(message: proxyframe.RemoteProxyHandshakeMessage, origin: string) {
-		if (message.frameOrigin != origin) {
-			return;
-		}
-
-		if (!pendingLoaders.has(message.frameId)) {
-			return;
-		}
-
-		let loader = pendingLoaders.get(message.frameId);
-
-		loader.onHandshake();
-	}
-
-	function handlerRemoteProxyExecutionResponse(message: proxyframe.RemoteProxyExecuteCommandResponse) {
-		if (!pendingRequests.has(message.requestId)) {
-			return;
-		}
-
-		const future = pendingRequests.get(message.requestId);
-		const proxyResponse = new ProxyHttpResponse(message);
-		if (message.status == "ok") {
-			future.resolve(proxyResponse);
-		} else {
-			future.reject(proxyResponse);
-		}
-	}
-
-	export interface Frame { }
-
-	export function create<T extends Frame>(source: net.Url): Promise<T> {
-		let origin = source.origin,
-			future = new Future<T>();
-
-		if (!remoteProxies.has(origin)) {
-			let frame = new ProxyFrame(source);
-			frame.load();
-			remoteProxies.set(origin, frame);
-		}
-
-		future.resolve(remoteProxies.get(origin) as T);
-
-		return future.asPromise();
-	}
-
-	export interface RemoteProxyData {
-		id: string;
-		scriptsBase: string;
-		parentOrigin: string;
-	}
-
-	function remoteProxyDataFactory(id: string): RemoteProxyData {
-		return {
-			id: id,
-			scriptsBase: new net.Url("scripts/bin", app.location.base()).toString(),
-			parentOrigin: window.location.origin
-		};
-	}
+	let framesContainer: HTMLDivElement;
 
 	class Loader {
-		private static LOAD_TIMEOUT = 3000;
-		private static HANDSHAKE_TIMEOUT = 3000;
-
-		private id: string;
+		private source: net.Url;
+		private channelId: string;
 		private timer: utils.Timer;
 		private element: HTMLIFrameElement;
 		private future: Future<HTMLIFrameElement>;
 
-		constructor(id: string, source: net.Url) {
+		constructor(channelId: string, source: net.Url) {
 			this.future = new Future();
-			this.id = id;
+			this.channelId = channelId;
 
-			pendingLoaders.set(this.id, this);
+			this.source = channels.createUrlWithData(source, channelId);
+		}
 
-			source = source.clone();
-			source.setHash(encodeURIComponent(JSON.stringify(remoteProxyDataFactory(this.id))));
-
+		load(): Promise<HTMLIFrameElement> {
 			this.element = dom.create("iframe", {}, framesContainer) as HTMLIFrameElement;
 			this.element.onload = this.onLoaded.bind(this);
-			this.element.src = source.toString();
-			this.timer = new utils.Timer(Loader.LOAD_TIMEOUT, this.onFailed.bind(this, "frame load timed out"));
-		}
+			this.element.src = this.source.toString();
+			this.timer = new utils.Timer(LOAD_TIMEOUT, this.onFailed.bind(this, "frame load timed out"));
 
-		then(fn: (element: HTMLIFrameElement) => void): Loader {
-			this.future.then(fn);
-			return this;
-		}
-
-		catch(fn: (error: Exception) => void): Loader {
-			this.future.catch(fn);
-			return this;
-		}
-
-		onHandshake(): void {
-			this.timer.cancel();
-			pendingLoaders.remove(this.id);
-			this.future.resolve(this.element);
+			return this.future.asPromise();
 		}
 
 		private onLoaded(): void {
 			this.timer.cancel();
-			this.timer = new utils.Timer(Loader.HANDSHAKE_TIMEOUT, this.onFailed.bind(this, "loaded frame is invalid"));
+			this.future.resolve(this.element);
 		}
 
 		private onFailed(reason: string): void {
-			pendingLoaders.remove(this.id);
 			dom.remove(this.element);
 			this.future.reject(new Exception(reason));
+		}
+	}
+
+	export class FrameChannel extends channels.Channel {
+		private source: net.Url;
+		private element: HTMLIFrameElement;
+		private handshakeTimer: utils.Timer;
+
+		constructor(id: string, source: net.Url, element: HTMLIFrameElement) {
+			super(id, source.origin, element.contentWindow);
+
+			this.source = source;
+			this.element = element;
+
+			const handler = () => {
+				this.handshakeTimer.cancel();
+				this.unregister(channels.MessageTypes.Handshake, handler);
+			};
+			this.register(channels.MessageTypes.Handshake, handler);
+
+			this.handshakeTimer = new utils.Timer(HANDSHAKE_TIMEOUT, () => {
+				dom.remove(this.element);
+			});
+		}
+
+		public static from<T>(this: { new(id: string, source: net.Url, element: HTMLIFrameElement): T }, source: net.Url): Promise<T> {
+			const id = utils.generateId({ max: 15, min: 8 });
+			const loader = new Loader(id, source);
+			return loader.load().then(frame => new this(id, source, frame));
 		}
 	}
 
@@ -153,7 +82,7 @@ namespace fugazi.app.frames {
 		private httpStatusText: string;
 		private data: string;
 
-		constructor (responseProperties: proxyframe.RemoteProxyExecuteCommandResponse) {
+		constructor (responseProperties: channels.frames.proxy.ExecuteCommandResponsePayload) {
 			this.contentType = responseProperties.contentType;
 			this.statusCode = responseProperties.statusCode;
 			this.httpStatus = responseProperties.httpStatus;
@@ -231,66 +160,32 @@ namespace fugazi.app.frames {
 		}
 	}
 
-	export class BaseFrame implements Frame {
-		private id: string;
-		private element: HTMLIFrameElement;
-		protected source: net.Url;
-
-		constructor(source: net.Url) {
-			this.source = source;
-			this.id = utils.generateId({ max: 15, min: 8 });
-		}
-
-		public load(): Promise<Frame> {
-			let future = new Future<Frame>();
-
-			new Loader(this.id, this.source)
-				.then(element => {
-						this.element = element;
-						this.message(proxyframe.MessageTypes.ProxyFrameHandshakeAck);
-						remoteProxies.set(this.source.origin, this);
-
-						future.resolve(this);
-					})
-				.catch(error => future.reject(error));
-
-			return future.asPromise();
-		}
-
-		protected message(type: string, data?: any): string {
-			const id = utils.generateId({ min: 5, max: 10 });
-
-			console.log(`[app.frames] posting message of type ${ type } with data: `, data);
-
-			this.element.contentWindow.postMessage(JSON.stringify({
-				id: id,
-				type: type,
-				data: data || {}
-			}), this.source.origin);
-
-			return id;
-		}
-	}
-
-	export class ProxyFrame extends BaseFrame {
+	export class ProxyFrameChannel extends FrameChannel {
 		execute(properties: net.RequestProperties, data?: string | net.RequestData): Promise<net.HttpResponse> {
-			let future = new Future<ProxyHttpResponse>(),
-				message: proxyframe.RemoteProxyExecuteCommandRequest = {
+			const request: channels.frames.proxy.ExecuteCommandRequestPayload = {
 					method: properties.method,
 					url: properties.url.toString(),
 					headers: properties.headers,
 					data: data instanceof collections.Map ? data.asObject() : data
 				};
 
-			const messageId = this.message(proxyframe.MessageTypes.ProxyFrameExecuteCommandRequest, message);
-			pendingRequests.set(messageId, future);
-
-			return future.asPromise();
+			return new Promise<net.HttpResponse>(resolve => {
+				const listener = (response: channels.ChannelMessage<channels.frames.proxy.ExecuteCommandResponsePayload>) => {
+					if (response.payload.requestId === requestId) {
+						this.unregister(channels.frames.proxy.MessageTypes.ExecuteCommandResponse, listener);
+						resolve(new ProxyHttpResponse(response.payload));
+					}
+				}
+				this.register(channels.frames.proxy.MessageTypes.ExecuteCommandResponse, listener);
+				const requestId = this.sendMessage(channels.frames.proxy.MessageTypes.ExecuteCommandRequest, request);
+			});
 		}
 	}
 
 	// init
-	app.bus.register(app.Events.Loaded, function(): void {
+	app.bus.register(app.Events.Loaded, () => {
+		channels.init();
+
 		framesContainer = dom.create("div", {
 			id: "frames"
 		}, document.body) as HTMLDivElement;

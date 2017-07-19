@@ -283,7 +283,7 @@ module fugazi.app.terminal {
 							return {
 								status: components.commands.handler.ResultStatus.Failure,
 								error: "can't guess type"
-							}
+							} as components.commands.handler.FailResult
 						}
 
 						context.getParent().storeVariable(name, type, value);
@@ -306,18 +306,18 @@ module fugazi.app.terminal {
 							return {
 								status: components.commands.handler.ResultStatus.Failure,
 								error: `No such module '${moduleName}'`
-							}
+							} as components.commands.handler.FailResult
 						} else if (isNothing(theModule.getRemote().base(source))) {
 							return {
 								status: components.commands.handler.ResultStatus.Failure,
 								error: `Module '${moduleName}' has no remote description for '${ source}'`
-							}
+							} as components.commands.handler.FailResult
 						} else {
 							context.getParent().setRemoteSource(theModule.getPath(), source);
 							return {
 								status: components.commands.handler.ResultStatus.Success,
 								value: `set '${moduleName}' to work with remote source '${source}'`
-							}
+							} as components.commands.handler.SuccessResult
 						}
 					}
 				}

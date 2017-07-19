@@ -261,7 +261,7 @@ namespace fugazi.components {
 		}
 
 		export interface Loader<T extends Descriptor> {
-			then(fn: (aDescriptor: T) => void): Loader<T>;
+			then(fn: (aDescriptor: T) => T): Loader<T>;
 			catch(fn: (error: fugazi.Exception) => void): Loader<T>;
 			getUrl(): net.Url;
 			getUrlFor(path: string): net.Url;
@@ -282,7 +282,7 @@ namespace fugazi.components {
 				return this.baseUrl == null ? null : new net.Url(path, this.baseUrl);
 			}
 
-			public abstract then(fn: (aDescriptor: T) => void): Loader<T>;
+			public abstract then(fn: (aDescriptor: T) => T): Loader<T>;
 			public abstract catch(fn: (error: fugazi.Exception) => void): Loader<T>;
 		}
 
@@ -294,7 +294,7 @@ namespace fugazi.components {
 				this.aDescriptor = aDescriptor;
 			}
 
-			then(fn: (aDescriptor: T) => void | T): Loader<T> {
+			then(fn: (aDescriptor: T) => T): Loader<T> {
 				let result = fn(this.aDescriptor);
 
 				if (fugazi.isPlainObject(result) && fugazi.is((<T> result).name, String)) {
