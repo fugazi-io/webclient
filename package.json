@@ -1,6 +1,6 @@
 {
   "name": "@fugazi/webclient",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "web based terminal application for executing local and remote commands",
   "dependencies": {
     "typescript": "^2.2.1"
