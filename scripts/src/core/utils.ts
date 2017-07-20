@@ -70,7 +70,7 @@ module fugazi.utils {
 	
 		reset(): void {
 			this.cancel();
-			this.name = setTimeout(this.callback, this.interval) as any as number;
+			this.name = window.setTimeout(this.callback, this.interval);
 		}
 	
 		cancel(): void {

@@ -447,9 +447,11 @@ namespace fugazi.view.input {
 	export class BackgroundTextInput<P extends BackgroundTextInputProperties, S extends BackgroundTextInputState> extends InputView<P, S> {
 		public constructor(props: P, className: string, prompt?: string) {
 			super(props, "bgtext " + className, prompt);
+		}
 
+		componentWillMount(){
 			this.setState({
-				backgroundText : props.backgroundText || ""
+				backgroundText : this.props.backgroundText || ""
 			});
 		}
 
