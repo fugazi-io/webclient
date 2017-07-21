@@ -80,12 +80,6 @@ namespace fugazi.app.frames {
 		return future.asPromise();
 	}
 
-	export interface RemoteProxyData {
-		id: string;
-		scriptsBase: string;
-		parentOrigin: string;
-	}
-
 	function remoteProxyDataFactory(id: string): RemoteProxyData {
 		return {
 			id: id,

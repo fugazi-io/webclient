@@ -1,63 +1,58 @@
-/// <reference path="../core/types.ts" />
-/// <reference path="../core/net.ts" />
+import * as collections from "../core/types/collections";
+import * as types from "../core/types/index";
+import * as net from "../core/net";
 
-/**
- * Created by hoggeg on 19/08/2016.
- */
+export interface Message {
+	id: string;
+	type: string;
+}
 
-namespace fugazi.proxyframe {
-	export interface Message {
-		id: string;
-		type: string;
+export var MessageTypes = {
+	ProxyFrameHandshake: "remoteproxyframehandshakemessage",
+	ProxyFrameHandshakeAck: "remoteproxyframehandshakemessageack",
+	ProxyFrameExecuteCommandRequest: "remoteproxyframeexecutecommandrequest",
+	ProxyFrameExecuteCommandResponse: "remoteproxyframeexecutecommandresponse"
+};
+
+export interface RemoteProxyHandshakeMessage {
+	frameId: string;
+	frameOrigin: string;
+}
+
+export interface RemoteProxyExecuteCommandRequest {
+	method: net.HttpMethod;
+	url: string;
+	headers: collections.Map<string> | types.PlainObject<string>;
+	data?: string | types.PlainObject<any>;
+}
+
+export interface RemoteProxyExecuteCommandResponse {
+	requestId: string;
+	statusCode: number;
+	headers: collections.Map<string> | types.PlainObject<string>;
+	contentType: string,
+	httpStatus: number,
+	httpStatusText: string,
+	status: "ok" | "error";
+	data: string;
+}
+
+export function baseMessageHandler(message: MessageEvent, origin?: string): any {
+	let data;
+
+	if (origin && message.origin !== origin) {
+		throw new types.Exception("illegal origin");
 	}
 
-	export var MessageTypes = {
-		ProxyFrameHandshake: "remoteproxyframehandshakemessage",
-		ProxyFrameHandshakeAck: "remoteproxyframehandshakemessageack",
-		ProxyFrameExecuteCommandRequest: "remoteproxyframeexecutecommandrequest",
-		ProxyFrameExecuteCommandResponse: "remoteproxyframeexecutecommandresponse"
-	};
-
-	export interface RemoteProxyHandshakeMessage {
-		frameId: string;
-		frameOrigin: string;
+	try {
+		data = JSON.parse(message.data);
+	} catch (e) {
+		throw new types.Exception("invalid message payload");
 	}
 
-	export interface RemoteProxyExecuteCommandRequest {
-		method: net.HttpMethod;
-		url: string;
-		headers: collections.Map<string> | fugazi.PlainObject<string>;
-		data?: string | fugazi.PlainObject<any>;
+	if (typeof(data.id) !== "string" && typeof(data.type) !== "string") {
+		throw new types.Exception("unknown type");
 	}
 
-	export interface RemoteProxyExecuteCommandResponse {
-		requestId: string;
-		statusCode: number;
-		headers: collections.Map<string> | fugazi.PlainObject<string>;
-		contentType: string,
-		httpStatus: number,
-		httpStatusText: string,
-		status: "ok" | "error";
-		data: string;
-	}
-
-	export function baseMessageHandler(message: MessageEvent, origin?: string): any {
-		let data;
-
-		if (origin && message.origin !== origin) {
-			throw new Exception("illegal origin");
-		}
-
-		try {
-			data = JSON.parse(message.data);
-		} catch (e) {
-			throw new Exception("invalid message payload");
-		}
-
-		if (typeof(data.id) !== "string" && typeof(data.type) !== "string") {
-			throw new Exception("unknown type");
-		}
-
-		return data;
-	}
+	return data;
 }
