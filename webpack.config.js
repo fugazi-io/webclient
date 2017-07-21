@@ -23,7 +23,7 @@ module.exports = env => {
 	return {
 		devtool: 'eval',
 		entry: removeEmpty({
-			main: path.join(__dirname, 'scripts', 'bin', 'app', 'kickstart.ts'),
+			main: path.join(__dirname, 'scripts', 'bin', 'app', 'kickstart.js'),
 		}),
 		output: {
 			path: outPath,

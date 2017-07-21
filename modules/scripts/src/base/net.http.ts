@@ -1,4 +1,4 @@
-import {HttpMethod, Descriptor, ModuleContext, Module, Component, Map, RequestProperties, PrivilegedModuleContext, LoadProperties} from "../../../../scripts/bin/app/modules.api";
+import {Descriptor, HttpMethod, Map, ModuleContext, RequestProperties} from "../../../../scripts/bin/app/modules.api";
 
 (function(): void {
 	interface HttpResponse {

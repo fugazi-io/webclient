@@ -1,5 +1,3 @@
-import {Descriptor, ModuleContext, Module, Component, Map, PrivilegedModuleContext, LoadProperties} from "../../../../scripts/bin/app/modules.api";
-
 (function(): void {
 	fugazi.loaded({
 		name: "io.fugazi",

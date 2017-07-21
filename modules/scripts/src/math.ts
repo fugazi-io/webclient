@@ -1,4 +1,4 @@
-import {Descriptor, ModuleContext, Map} from "../../../scripts/bin/app/modules.api";
+import {Descriptor, Map, ModuleContext} from "../../../scripts/bin/app/modules.api";
 
 (function(): void {
 	fugazi.loaded(<Descriptor> {

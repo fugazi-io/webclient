@@ -1,4 +1,4 @@
-import {Descriptor, BoundConstraintValidator, Map} from "../../../../scripts/bin/app/modules.api";
+import {BoundConstraintValidator, Descriptor, Map} from "../../../../scripts/bin/app/modules.api";
 
 (function(): void {
 	fugazi.loaded(<Descriptor> {

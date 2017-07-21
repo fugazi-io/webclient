@@ -20,48 +20,6 @@
 		<link rel="stylesheet" href="style/input.css" />
 
 		<link rel="stylesheet" href="style/renderers.css" />
-		
-		<!-- core
-		<script src="scripts/bin/core/polyfill.js"></script>
-		<script src="scripts/bin/core/location.js"></script>
-		<script src="scripts/bin/core/configuration.js"></script>
-		<script src="scripts/bin/core/logger.js"></script>
-		<script src="scripts/bin/core/types.js"></script>
-		<script src="scripts/bin/core/utils.js"></script>
-		<script src="scripts/bin/core/dom.js"></script>
-		<script src="scripts/bin/core/net.js"></script>
-		-->
-		<!-- app
-		<script src="scripts/bin/app/storage.js"></script>
-
-		<script src="scripts/bin/components/components.js"></script>
-		<script src="scripts/bin/components/modules.js"></script>
-		<script src="scripts/bin/components/types.js"></script>
-		<script src="scripts/bin/components/constraints.js"></script>
-		<script src="scripts/bin/components/converters.js"></script>
-		<script src="scripts/bin/components/syntax.js"></script>
-		<script src="scripts/bin/components/commands.js"></script>
-
-		<script src="scripts/bin/app/application.js"></script>
-		<script src="scripts/bin/proxyframe/protocol.js"></script>
-		<script src="scripts/bin/app/frames.js"></script>
-		<script src="scripts/bin/components/registry.js"></script>
-		<script src="scripts/bin/app/modules.js"></script>
-		<script src="scripts/bin/app/terminal.js"></script>
-
-		<script src="scripts/bin/app/input.js"></script>
-		<script src="scripts/bin/app/semantics.js"></script>
-		<script src="scripts/bin/app/statements.js"></script>
- -->
-		<!-- view
-		<script src="scripts/bin/view/view.js"></script>
-		<script src="scripts/bin/view/renderers.js"></script>
-		<script src="scripts/bin/view/output.js"></script>
-		<script src="scripts/bin/view/input/base.js"></script>
-		<script src="scripts/bin/view/input/fugaziInput.js"></script>
-		<script src="scripts/bin/view/terminal.js"></script>
-		<script src="scripts/bin/view/main.js"></script>
-		 -->
 
 		<script src="scripts/lib/lz-string.js"></script>
 		<script src="scripts/lib/perfect-scrollbar.js"></script>
@@ -71,5 +29,37 @@
 	</head>
 	<body>
 		<main id="ui"></main>
+
+		<script>
+			function getQuery() {
+				var map = new Map();
+				var pairs = location.search.length > 1 ? location.search.substring(1).split("&") : [];
+				pairs.forEach(function (pair) {
+					var _a = pair.split("="), key = _a[0], value = _a[1];
+					map.set(key, value);
+				});
+				return map;
+			}
+
+			function ignoreAnalyticsReports() {
+				return location.hostname === "localhost" ||
+					location.pathname === "/webclient/index.html" ||
+					getQuery().has("_ijt");
+			}
+
+			(function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){
+					(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,"script","https://www.google-analytics.com/analytics.js","ga");
+
+			if (ignoreAnalyticsReports()) {
+				console.log("ignoring analytics reports");
+				ga("set", "sendHitTask", null);
+			}
+
+			ga("create", "UA-91051756-1", "auto");
+			ga("send", "pageview");
+		</script>
+
 	</body>
 </html>

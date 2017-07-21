@@ -1,5 +1,3 @@
-import {BoundConstraintValidator, HttpMethod, Descriptor, ModuleContext, Module, Component, Map, RequestProperties, PrivilegedModuleContext, LoadProperties} from "../../../../scripts/bin/app/modules.api";
-
 type RawCollection = {
 	_id: string,
 	_returned: number,

@@ -1,4 +1,4 @@
-import {Descriptor, ModuleContext, Component, Map} from "../../../../scripts/bin/app/modules.api";
+import {Component, Descriptor, Map, ModuleContext} from "../../../../scripts/bin/app/modules.api";
 
 
 (function(): void {

@@ -1,4 +1,11 @@
-import {Descriptor, ModuleContext, Module, Component, Map, PrivilegedModuleContext, LoadProperties} from "../../../../scripts/bin/app/modules.api";
+import {
+	Component,
+	Descriptor,
+	LoadProperties,
+	Module,
+	ModuleContext,
+	PrivilegedModuleContext
+} from "../../../../scripts/bin/app/modules.api";
 
 (function(): void {
 	interface ComponentStruct {

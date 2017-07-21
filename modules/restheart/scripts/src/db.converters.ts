@@ -1,5 +1,3 @@
-import {BoundConstraintValidator, HttpMethod, Descriptor, ModuleContext, Module, Component, Map, RequestProperties, PrivilegedModuleContext, LoadProperties} from "../../../../scripts/bin/app/modules.api";
-
 (function(): void {
 	fugazi.loaded({
 		name: "restheart.databases",
