@@ -1,27 +1,12 @@
-import * as output from "../view/output";
 import * as input from "./input";
 import * as terminal from "./terminal";
 import * as semantics from "./semantics";
 import * as modules from "./modules";
-import * as baseInput from "../view/input/base";
-import * as view from "../view/view";
-import * as renderers from "../view/renderers";
-import * as fugaziInput from "../view/input/fugaziInput";
 import * as app from "./application";
-import * as utils from "../core/utils";
-import * as logger from "../core/logger";
-import * as collections from "../core/types.collections";
 import * as coreTypes from "../core/types";
-import * as net from "../core/net";
-import * as components from "../components/components";
-import * as componentsBuilder from "../components/components.builder";
-import * as componentsDescriptor from "../components/components.descriptor";
 import * as types from "../components/types";
 import * as syntax from "../components/syntax";
 import * as commands from "../components/commands";
-import * as commandsHandler from "../components/commands.handler";
-import * as handler from "../components/commands.handler";
-import * as descriptor from "../components/commands.descriptor";
 
 export enum StatementPartRole {
 	Keyword,

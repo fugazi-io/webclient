@@ -1,4 +1,4 @@
-import * as location from "./location"
+import * as location from "./location";
 
 const SCRIPTS_BASE_URL: string = location.relative("scripts/bin");
 

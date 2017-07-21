@@ -1,6 +1,3 @@
-import * as types from "./types";
-import * as coreTypes from "../core/types";
-
 import * as components from "./components";
 import * as componentsBuilder from "./components.builder";
 import * as componentsDescriptor from "./components.descriptor";

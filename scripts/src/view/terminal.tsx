@@ -3,19 +3,9 @@ import * as baseInput from "./input/base";
 import * as view from "./view";
 import * as fugaziInput from "./input/fugaziInput";
 import * as statements from "../app/statements";
-import * as utils from "../core/utils";
-import * as collections from "../core/types.collections";
-import * as coreTypes from "../core/types";
-import * as net from "../core/net";
-import * as components from "../components/components";
-import * as componentsBuilder from "../components/components.builder";
 import * as componentsDescriptor from "../components/components.descriptor";
-import * as types from "../components/types";
-import * as syntax from "../components/syntax";
 import * as commands from "../components/commands";
 import * as commandsHandler from "../components/commands.handler";
-import * as handler from "../components/commands.handler";
-import * as descriptor from "../components/commands.descriptor";
 import * as React from "react";
 
 export interface TerminalFactory {

@@ -1,5 +1,5 @@
-import * as collections from './types.collections';
-import * as types from './types';
+import * as collections from "./types.collections";
+import * as types from "./types";
 
 let domReady = false;
 document.addEventListener("DOMContentLoaded", () => {

@@ -1,4 +1,3 @@
-
 import * as coreTypes from "../core/types";
 import * as net from "../core/net";
 import * as modules from "./modules";
@@ -110,8 +109,8 @@ function getPassedParametersForm(str: string): handler.PassedParametersForm {
 }
 
 class LocalCommandBuilder extends CommandBuilder<commands.LocalCommand> {
-	constructor(loader: componentsDescriptor.Loader<descriptor.Descriptor>, parent?: componentsBuilder.Builder<components.Component>, ctor?: { new ():commands.LocalCommand }) {
-		super(ctor ||commands.LocalCommand, loader, parent);
+	constructor(loader: componentsDescriptor.Loader<descriptor.Descriptor>, parent?: componentsBuilder.Builder<components.Component>, ctor?: { new (): commands.LocalCommand }) {
+		super(ctor || commands.LocalCommand, loader, parent);
 	}
 
 	protected concreteBuild(): void {
