@@ -1,6 +1,10 @@
-/// <reference path="../../../../scripts/bin/core/net.d.ts" />
-
-/// <reference path="../../../../scripts/bin/components/components.d.ts" />
+import {Descriptor} from "../../../../scripts/src/components/modules.descriptor";
+import {Map} from "../../../../scripts/src/core/types.collections";
+import {ModuleContext} from "../../../../scripts/src/app/modules";
+import {Component} from "../../../../scripts/src/components/components";
+import {Module} from "../../../../scripts/src/components/modules";
+import {LoadProperties} from "../../../../scripts/src/components/registry";
+import {HttpMethod, RequestProperties} from "../../../../scripts/src/core/net";
 
 /**
  * Created by nitzan on 05/05/2016.
@@ -12,10 +16,10 @@
 		data: any;
 	}
 
-	function httpRequest(context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>): Promise<HttpResponse> {
+	function httpRequest(context: ModuleContext, params: Map<any>): Promise<HttpResponse> {
 		let future = new fugazi.Future<HttpResponse>(),
-			data: string | fugazi.collections.Map<any> = params.get("data"),
-			props: fugazi.net.RequestProperties = {
+			data: string | Map<any> = params.get("data"),
+			props: RequestProperties = {
 				cors: true,
 				url: params.get("url"),
 				method: fugazi.net.stringToHttpMethod(params.get("method")),
@@ -39,7 +43,7 @@
 		return future.asPromise();
 	}
 
-	function httpRequestByMethod(method: fugazi.net.HttpMethod, context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>) {
+	function httpRequestByMethod(method: HttpMethod, context: ModuleContext, params: Map<any>) {
 		params.set("method", fugazi.net.httpMethodToString(method));
 		return httpRequest(context, params);
 	}
@@ -74,7 +78,7 @@
 			];
 		};
 
-	fugazi.components.modules.descriptor.loaded(<fugazi.components.modules.descriptor.Descriptor> {
+	fugazi.components.modules.descriptor.loaded(<Descriptor> {
 		name: "io.fugazi.net.http",
 		commands: {
 			http: {

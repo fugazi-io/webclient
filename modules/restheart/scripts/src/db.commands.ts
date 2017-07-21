@@ -1,11 +1,4 @@
-/**
- * Created by nitzan on 07/01/2017.
- */
-
-/// <reference path="../../../../scripts/bin/app/application.d.ts" />
-/// <reference path="../../../../scripts/bin/app/modules.d.ts" />
-/// <reference path="../../../../scripts/bin/components/components.d.ts" />
-/// <reference path="../../../../scripts/bin/components/converters.d.ts" />
+import {ModuleContext} from "../../../../scripts/src/app/modules";
 
 (function(): void {
 	fugazi.components.modules.descriptor.loaded({
@@ -16,7 +9,7 @@
 				returns: "ui.message",
 				parametersForm: "arguments",
 				syntax: "use (dbname string)",
-				handler: (context: fugazi.app.modules.ModuleContext, dbname: string) => {
+				handler: (context: ModuleContext, dbname: string) => {
 					if (context.data.has("default.db")) {
 						console.log(`previous default db: ${ context.data.get("default.db") }`);
 					}

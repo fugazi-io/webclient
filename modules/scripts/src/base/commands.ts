@@ -1,6 +1,7 @@
-/// <reference path="../../../../scripts/bin/app/application.d.ts" />
-/// <reference path="../../../../scripts/bin/components/registry.d.ts" />
-/// <reference path="../../../../scripts/bin/components/components.d.ts" />
+import {Descriptor} from "../../../../scripts/src/components/modules.descriptor";
+import {Map} from "../../../../scripts/src/core/types.collections";
+import {ModuleContext} from "../../../../scripts/src/app/modules";
+import {Component} from "../../../../scripts/src/components/components";
 
 /**
  * Created by nitzan on 07/06/2016.
@@ -32,7 +33,7 @@
 		}
 	}
 
-	fugazi.components.modules.descriptor.loaded(<fugazi.components.modules.descriptor.Descriptor> {
+	fugazi.components.modules.descriptor.loaded(<Descriptor> {
 		name: "io.fugazi",
 		commands: {
 			echo: {
@@ -44,7 +45,7 @@
 					method: "append",
 					markdown: echoExamples
 				},
-				handler: function(context: fugazi.app.modules.ModuleContext, value: any) {
+				handler: function(context: ModuleContext, value: any) {
 					return value;
 				}
 			},
@@ -60,8 +61,8 @@
 					method: "append",
 					markdown: manExamples
 				},
-				handler: function(context: fugazi.app.modules.ModuleContext, value: string) {
-					let components: fugazi.components.Component[];
+				handler: function(context: ModuleContext, value: string) {
+					let components: Component[];
 
 					if (value.indexOf(".") > 0) {
 						components = [fugazi.components.registry.getUnknown(value)];
@@ -92,7 +93,7 @@
 				title: "show fugazi client version",
 				syntax: "version",
 				returns: "ui.message",
-				handler: function(context: fugazi.app.modules.ModuleContext) {
+				handler: function(context: ModuleContext) {
 					return fugazi.app.version.toString();
 				}
 			},
@@ -107,9 +108,9 @@
 				],
 				returns: "any",
 				parametersForm: "map",
-				handler: function(context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>) {
+				handler: function(context: ModuleContext, params: Map<any>) {
 					let index: string | [string] | number | [number] = params.get("index");
-					let value: any[] | fugazi.collections.Map<any> = params.get("value");
+					let value: any[] | Map<any> = params.get("value");
 
 					if (fugazi.isPlainObject(value)) {
 						value = fugazi.collections.map(value);
@@ -161,7 +162,7 @@
 				],
 				returns: "any",
 				parametersForm: "arguments",
-				handler: function(context: fugazi.app.modules.ModuleContext, value: string) {
+				handler: function(context: ModuleContext, value: string) {
 					try {
 						return jsonToFugazi(JSON.parse(value));
 					} catch (e) {
@@ -177,7 +178,7 @@
 				],
 				returns: "string",
 				parametersForm: "arguments",
-				handler: function(context: fugazi.app.modules.ModuleContext, value: any) {
+				handler: function(context: ModuleContext, value: any) {
 					return JSON.stringify(fugaziToJson(value));
 				}
 			}

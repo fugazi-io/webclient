@@ -1,12 +1,17 @@
-/// <reference path="../../../scripts/bin/components/components.d.ts" />
-/// <reference path="../../../scripts/bin/components/modules.d.ts" />
+import {Descriptor} from "../../../scripts/src/components/modules.descriptor";
+import {Map} from "../../../scripts/src/core/types.collections";
+import {ModuleContext} from "../../../scripts/src/app/modules";
+import {Component} from "../../../scripts/src/components/components";
+import {Module} from "../../../scripts/src/components/modules";
+import {LoadProperties} from "../../../scripts/src/components/registry";
+import {HttpMethod, RequestProperties} from "../../../scripts/src/core/net";
 
 /**
  * Created by nitzan on 19/04/2016.
  */
 
 (function(): void {
-	fugazi.components.modules.descriptor.loaded(<fugazi.components.modules.descriptor.Descriptor> {
+	fugazi.components.modules.descriptor.loaded(<Descriptor> {
 		name: "samples.math",
 		title: "Math Sample Module",
 		types: {
@@ -29,7 +34,7 @@
 					"add (a number) (b number)",
 					"add (numbers list<number>)"
 				],
-				handler: function(context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>): number {
+				handler: function(context: ModuleContext, params: fugazi.collections.Map<any>): number {
 					if (params.has("a") && params.has("b")) {
 						return params.get("a") + params.get("b");
 					}
@@ -48,7 +53,7 @@
 					"sub (a number) (b number)",
 					"sub (numbers list<number>)"
 				],
-				handler: function(context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>): number {
+				handler: function(context: ModuleContext, params: Map<any>): number {
 					if (params.has("a") && params.has("b")) {
 						return params.get("a") - params.get("b");
 					}
@@ -67,7 +72,7 @@
 					"mul (a number) (b number)",
 					"mul (numbers list<number>)"
 				],
-				handler: function(context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>): number {
+				handler: function(context: ModuleContext, params: Map<any>): number {
 					if (params.has("a") && params.has("b")) {
 						return params.get("a") * params.get("b");
 					}
@@ -86,7 +91,7 @@
 					"div (a number) (b number)",
 					"div (numbers list<number>)"
 				],
-				handler: function(context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>): number {
+				handler: function(context: ModuleContext, params: Map<any>): number {
 					if (params.has("a") && params.has("b")) {
 						return params.get("a") / params.get("b");
 					}
@@ -104,7 +109,7 @@
 					"(a integer)!",
 					"factorial of (a integer)"
 				],
-				handler: function(context: fugazi.app.modules.ModuleContext, a: number): number {
+				handler: function(context: ModuleContext, a: number): number {
 					let i = 1,
 						result = 1;
 
@@ -122,7 +127,7 @@
 				syntax: [
 					"fib (a integer)"
 				],
-				handler: function(context: fugazi.app.modules.ModuleContext, a: number): number {
+				handler: function(context: ModuleContext, a: number): number {
 					var result: number,
 						cache: number[] = [],
 						fn = index => {

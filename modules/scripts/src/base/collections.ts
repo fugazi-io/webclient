@@ -1,12 +1,12 @@
-/// <reference path="../../../../scripts/bin/components/components.d.ts" />
-/// <reference path="../../../../scripts/bin/components/modules.d.ts" />
-
+import {Descriptor} from "../../../../scripts/src/components/modules.descriptor";
+import {BoundConstraintValidator} from "../../../../scripts/src/components/constraints";
+import {Map} from "../../../../scripts/src/core/types.collections";
 /**
  * Created by nitzan on 24/04/2016.
  */
 
 (function(): void {
-	fugazi.components.modules.descriptor.loaded(<fugazi.components.modules.descriptor.Descriptor> {
+	fugazi.components.modules.descriptor.loaded(<Descriptor> {
 		name: "io.fugazi.collections",
 		constraints: [
 			{
@@ -14,10 +14,10 @@
 				title: "Maximum Size",
 				types: ["list", "map"],
 				params: ["max"],
-				validator: function(max: number): fugazi.components.types.constraints.BoundConstraintValidator {
-					return function(value: Array<any> | fugazi.collections.Map<any>): boolean {
+				validator: function(max: number): BoundConstraintValidator {
+					return function(value: Array<any> | Map<any>): boolean {
 						return (fugazi.is(value, Array) && (<Array<any>> value).length <= max)
-							|| (fugazi.is(value, fugazi.collections.Map) && (<fugazi.collections.Map<any>> value).size() <= max);
+							|| (fugazi.is(value, fugazi.collections.Map) && (<Map<any>> value).size() <= max);
 					}
 				}
 			},
@@ -26,10 +26,10 @@
 				title: "Minimum Size",
 				types: ["list", "map"],
 				params: ["min"],
-				validator: function(min: number): fugazi.components.types.constraints.BoundConstraintValidator {
-					return function(value: Array<any> | fugazi.collections.Map<any>): boolean {
+				validator: function(min: number): BoundConstraintValidator {
+					return function(value: Array<any> | Map<any>): boolean {
 						return (fugazi.is(value, Array) && (<Array<any>> value).length >= min)
-							|| (fugazi.is(value, fugazi.collections.Map) && (<fugazi.collections.Map<any>> value).size() >= min);
+							|| (fugazi.is(value, fugazi.collections.Map) && (<Map<any>> value).size() >= min);
 					}
 				}
 			},
@@ -38,10 +38,10 @@
 				title: "Exact Size",
 				types: ["list", "map"],
 				params: ["size"],
-				validator: function(size: number): fugazi.components.types.constraints.BoundConstraintValidator {
-					return function(value: Array<any> | fugazi.collections.Map<any>): boolean {
+				validator: function(size: number): BoundConstraintValidator {
+					return function(value: Array<any> | Map<any>): boolean {
 						return (fugazi.is(value, Array) && (<Array<any>> value).length === size)
-							|| (fugazi.is(value, fugazi.collections.Map) && (<fugazi.collections.Map<any>> value).size() === size);
+							|| (fugazi.is(value, fugazi.collections.Map) && (<Map<any>> value).size() === size);
 					}
 				}
 			}

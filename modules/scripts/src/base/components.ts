@@ -1,7 +1,9 @@
-/// <reference path="../../../../scripts/bin/components/components.d.ts" />
-/// <reference path="../../../../scripts/bin/components/modules.d.ts" />
-/// <reference path="../../../../scripts/bin/app/terminal.d.ts" />
-/// <reference path="../../../../scripts/bin/app/modules.d.ts" />
+import {Descriptor} from "../../../../scripts/src/components/modules.descriptor";
+import {Map} from "../../../../scripts/src/core/types.collections";
+import {ModuleContext, PrivilegedModuleContext} from "../../../../scripts/src/app/modules";
+import {Component} from "../../../../scripts/src/components/components";
+import {Module} from "../../../../scripts/src/components/modules";
+import {LoadProperties} from "../../../../scripts/src/components/registry";
 
 /**
  * Created by nitzan on 24/04/2016.
@@ -21,7 +23,7 @@
 		modules: ModuleStruct[];
 	}
 
-	function componentToStruct(aComponent: fugazi.components.Component): ComponentStruct {
+	function componentToStruct(aComponent: Component): ComponentStruct {
 		return {
 			name: aComponent.getName(),
 			title: aComponent.getTitle() || aComponent.getName(),
@@ -29,7 +31,7 @@
 		};
 	}
 
-	function moduleToStruct(aModule: fugazi.components.modules.Module): ModuleStruct {
+	function moduleToStruct(aModule: Module): ModuleStruct {
 		var struct: ModuleStruct = <ModuleStruct> componentToStruct(aModule);
 
 		struct.modules = aModule.getModules().map(moduleToStruct);
@@ -40,7 +42,7 @@
 		return struct;
 	}
 
-	fugazi.components.modules.descriptor.loaded(<fugazi.components.modules.descriptor.Descriptor> {
+	fugazi.components.modules.descriptor.loaded(<Descriptor> {
 		name: "io.fugazi.components",
 		commands: {
 			load: {
@@ -50,7 +52,7 @@
 				parametersForm: "struct",
 				syntax: "load module from (url net.url)",
 				componentConstructor: fugazi.app.terminal.TerminalCommand,
-				handler: function(context: fugazi.app.modules.PrivilegedModuleContext, props: fugazi.components.registry.LoadProperties): Promise<string> {
+				handler: function(context: PrivilegedModuleContext, props: LoadProperties): Promise<string> {
 					return fugazi.components.registry.load(props).then<string>(loadedModule => {
 						context.getParent().getTerminal().moduleLoaded(loadedModule);
 						return "module " + loadedModule.getPath().toString() + " loaded";
@@ -65,7 +67,7 @@
 					"list modules",
 					"list modules in (path path)"
 				],
-				handler: function(context: fugazi.app.modules.ModuleContext, props: { path?: string }): ModuleStruct[] {
+				handler: function(context: ModuleContext, props: { path?: string }): ModuleStruct[] {
 					return fugazi.components.registry.getModules(props.path).map(moduleToStruct);
 				}
 			},
@@ -74,7 +76,7 @@
 				returns: "list<component>",
 				parametersForm: "struct",
 				syntax: "list types in (path path)",
-				handler: function(context: fugazi.app.modules.ModuleContext, props: { path: string }): ComponentStruct[] {
+				handler: function(context: ModuleContext, props: { path: string }): ComponentStruct[] {
 					return fugazi.components.registry.getModule(props.path).getTypes().map(componentToStruct);
 				}
 			},
@@ -83,7 +85,7 @@
 				returns: "list<component>",
 				parametersForm: "struct",
 				syntax: "list constraints in (path path)",
-				handler: function(context: fugazi.app.modules.ModuleContext, props: { path: string }): ComponentStruct[] {
+				handler: function(context: ModuleContext, props: { path: string }): ComponentStruct[] {
 					return fugazi.components.registry.getModule(props.path).getConstraints().map(componentToStruct);
 				}
 			},
@@ -92,7 +94,7 @@
 				returns: "list<component>",
 				parametersForm: "struct",
 				syntax: "list commands in (path path)",
-				handler: function(context: fugazi.app.modules.ModuleContext, props: { path: string }): ComponentStruct[] {
+				handler: function(context: ModuleContext, props: { path: string }): ComponentStruct[] {
 					return fugazi.components.registry.getModule(props.path).getCommands().map(componentToStruct);
 				}
 			},
@@ -101,7 +103,7 @@
 				returns: "list<component>",
 				parametersForm: "struct",
 				syntax: "list converters in (path path)",
-				handler: function(context: fugazi.app.modules.ModuleContext, props: { path: string }): ComponentStruct[] {
+				handler: function(context: ModuleContext, props: { path: string }): ComponentStruct[] {
 					return fugazi.components.registry.getModule(props.path).getConverters().map(componentToStruct);
 				}
 			}
