@@ -1,4 +1,5 @@
 import * as modules from "./modules";
+import * as modulesBuilder from "./modules.builder";
 import * as commands from "./commands";
 import * as application from "../app/application";
 import * as applicationBus from "../app/application.bus";
@@ -30,7 +31,7 @@ export interface LoadProperties {
 export function load(props: LoadProperties): Promise<modules.Module> {
 	let url: net.Url = props.url instanceof net.Url ? <net.Url> props.url : new net.Url(<string> props.url),
 		future = new coreTypes.Future<modules.Module>(),
-		moduleBuilder = modules.builder.create(url) as modules.builder.Builder;
+		moduleBuilder = modulesBuilder.create(url) as modulesBuilder.Builder;
 
 	moduleBuilder.build()
 		.then(wrapper => {

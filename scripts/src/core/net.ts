@@ -1,5 +1,6 @@
 import * as collections from "./types.collections";
 import * as types from "./types";
+import * as polyfill from "./polyfill";
 
 const HEADERS = {
 	ContentType: "Content-Type"
@@ -75,7 +76,7 @@ export class QueryString extends collections.Map<string> {
 	}
 }
 
-export class Url implements URLUtils {
+export class Url implements polyfill.URLUtils {
 	private url: URL;
 
 	public constructor(url: URL);

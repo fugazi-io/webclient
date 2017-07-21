@@ -1,19 +1,22 @@
+import * as collections from "./types.collections";
+import * as types from "./types";
+
 /**
  * Fills in for missing implementation of needed functionality in built-in types
  */
-
-interface ObjectConstructor {
-	is<T>(obj: any, type: { new(): T }): obj is T;
-	is(obj: any, type: any): boolean;
-	isObject(obj: any): boolean;
-	equals(obj1: any, obj2: any): boolean;
-	merge(...sources: any[]): any;
-	merge<T>(...sources: T[]): T;
-	deepMerge(...sources: any[]): any;
-	deepMerge<T>(...sources: T[]): T;
-	partial<S extends T, T>(source: S, options: { include?: Array<keyof S>, exclude?: Array<keyof S> }): T;
+declare global {
+	interface ObjectConstructor {
+		is<T>(obj: any, type: { new(): T }): obj is T;
+		is(obj: any, type: any): boolean;
+		isObject(obj: any): boolean;
+		equals(obj1: any, obj2: any): boolean;
+		merge(...sources: any[]): any;
+		merge<T>(...sources: T[]): T;
+		deepMerge(...sources: any[]): any;
+		deepMerge<T>(...sources: T[]): T;
+		partial<S extends T, T>(source: S, options: { include?: Array<keyof S>, exclude?: Array<keyof S> }): T;
+	}
 }
-
 function equals(obj1: any, obj2: any): boolean {
 	if (Number.isNaN(obj1) && Number.isNaN(obj2)) {
 		return true;
@@ -101,7 +104,7 @@ Object.partial = function <S extends T, T>(source: S, options: { include?: Array
 	return partial;
 }
 
-interface URLUtils {
+export interface URLUtils {
 	hash: string;
 	search: string;
 	pathname: string;
@@ -122,22 +125,24 @@ interface URL extends URLUtils {
 /**
  * string
  */
+declare global {
 
-interface String {
-	empty(): boolean;
-	trimLeft(): string;
-	trimRight(): string;
-	startsWith(searchString: string, position?: number): boolean;
-	endsWith(searchString: string, position?: number): boolean;
-	has(substr: string): boolean;
-	first(): string;
-	last(): string;
-	test(regex: RegExp): boolean;
-	exec(regex: RegExp): RegExpExecArray;
-	count(character: string): number;
-	forEach(fn: (char: string, index?: number, str?: string) => void): void;
-	some(fn: (char: string, index?: number, str?: string) => boolean): boolean;
-	every(fn: (char: string, index?: number, str?: string) => boolean): boolean;
+	interface String {
+		empty(): boolean;
+		trimLeft(): string;
+		trimRight(): string;
+		startsWith(searchString: string, position?: number): boolean;
+		endsWith(searchString: string, position?: number): boolean;
+		has(substr: string): boolean;
+		first(): string;
+		last(): string;
+		test(regex: RegExp): boolean;
+		exec(regex: RegExp): RegExpExecArray;
+		count(character: string): number;
+		forEach(fn: (char: string, index?: number, str?: string) => void): void;
+		some(fn: (char: string, index?: number, str?: string) => boolean): boolean;
+		every(fn: (char: string, index?: number, str?: string) => boolean): boolean;
+	}
 }
 
 String.prototype.empty = function (): boolean {
@@ -237,23 +242,26 @@ String.prototype.every = function (fn: (char: string, index?: number, str?: stri
 /**
  * array
  */
-interface ArrayConstructor {
-	from(arrayLike: any, mapFn?: Function, thisArg?: any): Array<any>;
-}
+declare global {
 
-interface Array<T> {
-	empty(): boolean;
-	first(condition?: (item: T) => boolean): T;
-	last(): T;
-	clone(): Array<T>;
-	equals(other: Array<T>): boolean;
-	includes(item: T, fromIndex?: number): boolean;
-	includesAll(items: T[]): boolean;
-	includesAll(...items: T[]): boolean;
-	remove(item: T | number): T;
-	replace(item: number | T, other: T): T;
-	extend(other: Array<T>): void;
-	getIterator(): fugazi.collections.ArrayIterator<any>;
+	interface ArrayConstructor {
+		from(arrayLike: any, mapFn?: Function, thisArg?: any): Array<any>;
+	}
+
+	interface Array<T> {
+		empty(): boolean;
+		first(condition?: (item: T) => boolean): T;
+		last(): T;
+		clone(): Array<T>;
+		equals(other: Array<T>): boolean;
+		includes(item: T, fromIndex?: number): boolean;
+		includesAll(items: T[]): boolean;
+		includesAll(...items: T[]): boolean;
+		remove(item: T | number): T;
+		replace(item: number | T, other: T): T;
+		extend(other: Array<T>): void;
+		getIterator(): collections.ArrayIterator<any>;
+	}
 }
 
 Array.prototype.empty = function (): boolean {
@@ -261,7 +269,7 @@ Array.prototype.empty = function (): boolean {
 }
 
 Array.prototype.first = function (condition?: (item: any) => boolean): any {
-	if (!fugazi.is(condition, Function)) {
+	if (!types.is(condition, Function)) {
 		return this[0];
 	}
 
@@ -289,8 +297,8 @@ Array.prototype.clone = function (): Array<any> {
 	return cloned;
 }
 
-Array.prototype.getIterator = function (): fugazi.collections.ArrayIterator<any> {
-	return new fugazi.collections.ArrayIterator<any>(this);
+Array.prototype.getIterator = function (): collections.ArrayIterator<any> {
+	return new collections.ArrayIterator<any>(this);
 }
 
 if (!Array.prototype.includes) {
@@ -362,7 +370,7 @@ Array.prototype.remove = function (obj: any): any {
 }
 
 Array.prototype.replace = function (item: number | any, other: any): any {
-	var index: number = fugazi.is(item, Number) ? item : this.indexOf(item);
+	var index: number = types.is(item, Number) ? item : this.indexOf(item);
 	item = this[index];
 	this[index] = other;
 	return item;
@@ -374,8 +382,31 @@ Array.prototype.extend = function (other: Array<any>): void {
 	}
 }
 
-interface MapConstructor {
-	from<V>(obj: { [key: string]: V } | Map<any, V>, deep?: boolean): Map<string, V>;
+/**
+ * Map
+ */
+
+declare global {
+
+	interface MapConstructor {
+		from<V>(obj: { [key: string]: V } | Map<any, V>, deep?: boolean): Map<string, V>;
+	}
+
+	interface Map<K, V> {
+		empty(): boolean;
+		find(value: V): K;
+		contains(value: V): boolean;
+		clone(deep?: boolean): Map<K, V>;
+		toObject(): { [key: string]: any };
+		equals(other: Map<K, V>): boolean;
+		merge(...maps: Array<Map<K, V> | { [key: string]: V }>): void;
+		deepMerge(...maps: Array<Map<K, V> | { [key: string]: V }>): void;
+		some(callback: (value: V, key: K, map: Map<K, V>) => boolean, thisArg?: any): boolean;
+		every(callback: (value: V, key: K, map: Map<K, V>) => boolean, thisArg?: any): boolean;
+		map<T>(callback: (value: V, key: K, map: Map<K, V>) => T, thisArg?: any): T[];
+		map<K2, V2>(callback: (value: V, key: K, map: Map<K, V>) => [K2, V2], thisArg?: any): Map<K2, V2>;
+	}
+
 }
 
 Map.from = function (obj: { [key: string]: any } | Map<any, any>, deep = false): Map<string, any> {
@@ -398,22 +429,6 @@ Map.from = function (obj: { [key: string]: any } | Map<any, any>, deep = false):
 
 	return new Map(data);
 }
-
-interface Map<K, V> {
-	empty(): boolean;
-	find(value: V): K;
-	contains(value: V): boolean;
-	clone(deep?: boolean): Map<K, V>;
-	toObject(): { [key: string]: any };
-	equals(other: Map<K, V>): boolean;
-	merge(...maps: Array<Map<K, V> | { [key: string]: V }>): void;
-	deepMerge(...maps: Array<Map<K, V> | { [key: string]: V }>): void;
-	some(callback: (value: V, key: K, map: Map<K, V>) => boolean, thisArg?: any): boolean;
-	every(callback: (value: V, key: K, map: Map<K, V>) => boolean, thisArg?: any): boolean;
-	map<T>(callback: (value: V, key: K, map: Map<K, V>) => T, thisArg?: any): T[];
-	map<K2, V2>(callback: (value: V, key: K, map: Map<K, V>) => [K2, V2], thisArg?: any): Map<K2, V2>;
-}
-
 Map.prototype.toString = function (): string {
 	return JSON.stringify(this.toObject());
 }
