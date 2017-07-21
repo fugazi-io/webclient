@@ -1,4 +1,4 @@
-import {Callback, is, isNothing, isPlainObject, isUndefined, PlainObject} from "./index";
+import {Callback, is, isNothing, isPlainObject, isUndefined, PlainObject} from "./types";
 export interface ArrayLike<T> {
 	length: number;
 	[index: number]: T;

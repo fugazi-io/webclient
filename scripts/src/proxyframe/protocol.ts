@@ -1,5 +1,5 @@
-import * as collections from "../core/types/collections";
-import * as types from "../core/types/index";
+import * as collections from "../core/types.collections";
+import * as types from "../core/types";
 import * as net from "../core/net";
 
 export interface Message {

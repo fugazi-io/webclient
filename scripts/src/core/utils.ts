@@ -1,5 +1,5 @@
 import * as dom from "./dom";
-import * as types from "./types/index";
+import * as types from "./types";
 
 export function defaults(obj: Object, other: Object): void {
 	for (var key in other) {
