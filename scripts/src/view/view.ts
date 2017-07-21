@@ -1,6 +1,3 @@
-/// <reference path="../../lib/react.d.ts" />
-/// <reference path="../../lib/react-dom.d.ts" />
-
 /// <reference path="main.tsx" />
 
 "use strict";

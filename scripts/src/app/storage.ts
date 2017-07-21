@@ -1,5 +1,3 @@
-/// <reference path="../../lib/lz-string.d.ts" />
-
 "use strict";
 
 module fugazi.app.storage {

@@ -1,4 +1,3 @@
-/// <reference path="../../lib/analytics.d.ts" />
 /// <reference path="./input.ts" />
 /// <reference path="./modules.ts" />
 /// <reference path="./statements.ts" />

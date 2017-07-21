@@ -1,5 +1,3 @@
-/// <reference path="../../lib/perfect-scrollbar.d.ts" />
-/// <reference path="../../lib/marked.d.ts" />
 /// <reference path="../components/types.ts" />
 /// <reference path="view.ts" />
 
@@ -180,7 +178,9 @@ module fugazi.view.renderers {
 			} as T;
 
 			if (props.type instanceof components.types.ConstrainedType) {
-				this.state.generics = (props.type as components.types.ConstrainedType).getConstraintParamValue(genericsConstraint, "type");
+				this.setState({
+					generics : (props.type as components.types.ConstrainedType).getConstraintParamValue(genericsConstraint, "type")
+				});
 			}
 		}
 
@@ -192,9 +192,10 @@ module fugazi.view.renderers {
 		 * @override
 		 */
 		public render(): JSX.Element {
+			let fold : FoldState = this.state.fold;
 			let paths: components.Path[],
 				collectionSizeElement,
-				className = "typedValue collection " + FoldState[this.state.fold].toLowerCase(),
+				className = "typedValue collection " + FoldState[fold].toLowerCase(),
 				iconClassName = "icon fold fa " + (this.state.fold === FoldState.Collapsed ? "fa-chevron-right" : "fa-chevron-down");
 
 			if (this.props.type instanceof components.types.ConstrainedType) {
@@ -294,11 +295,15 @@ module fugazi.view.renderers {
 			}
 
 			if (fieldsList && fieldsList.length > 0) {
-				this.state.isStruct = true;
-				this.state.fields = collections.map<components.types.Type>();
+				this.setState({
+					isStruct : true,
+					fields : collections.map<components.types.Type>()
+				});
 				fieldsList.forEach(map => this.state.fields.extend(map));
 			} else {
-				this.state.isStruct = false;
+				this.setState({
+					isStruct: false
+				});
 			}
 		}
 
