@@ -8,6 +8,7 @@ import * as types from "./types";
 import * as constraints from "./constraints";
 import * as converters from "./converters";
 import * as commands from "./commands";
+import * as handler from "./commands.handler";
 import * as descriptor from "./modules.descriptor";
 import * as appFrames from "../app/frames";
 import * as appModules from "../app/modules";
@@ -326,7 +327,7 @@ export abstract class Authenticator {
 
 	public abstract descriptor(): commandsDescriptor.LocalCommandDescriptor;
 
-	public abstract authenticate(context: app.Context, ...params: any[]): commands.handler.Result;
+	public abstract authenticate(context: app.Context, ...params: any[]): handler.Result;
 
 	public abstract interceptRequest(options: net.RequestProperties, data?: net.RequestData): void;
 
@@ -342,7 +343,7 @@ class NoAuthentication extends Authenticator {
 		return null;
 	}
 
-	public authenticate(): commands.handler.Result {
+	public authenticate(): handler.Result {
 		throw new Error("NoAuthentication.authenticate shouldn't be called");
 	}
 
@@ -379,23 +380,23 @@ class BasicAuthentication extends Authenticator {
 		}) as commandsDescriptor.LocalCommandDescriptor;
 	}
 
-	public authenticate(context: app.Context, username: string): commands.handler.Result {
+	public authenticate(context: app.Context, username: string): handler.Result {
 		if (!username || username.trim().length === 0) {
 			return {
-				status: commands.handler.ResultStatus.Failure,
+				status: handler.ResultStatus.Failure,
 				error: "username is empty"
 			}; //as commands.handler.FailResult;
 		}
 
 		this.username = username.trim();
 		return {
-			status: commands.handler.ResultStatus.Prompt,
+			status: handler.ResultStatus.Prompt,
 			prompt: {
 				type: "password",
 				message: "Enter your password:",
 				handlePromptValue: this.handlePassword.bind(this)
 			}
-		} as commands.handler.Result;
+		} as handler.Result;
 	}
 
 	public authenticated(): boolean {

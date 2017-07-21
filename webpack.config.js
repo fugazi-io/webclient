@@ -23,17 +23,18 @@ module.exports = env => {
 	return {
 		devtool: 'eval',
 		entry: removeEmpty({
-			main: path.join(__dirname, 'scripts', 'src', 'app', 'kickstart.ts'),
+			main: path.join(__dirname, 'scripts', 'bin', 'app', 'kickstart.ts'),
 		}),
 		output: {
 			path: outPath,
-			filename: '[name].js',
+			filename: '[name].bundle.js',
 			pathinfo: isNotProd,
 			publicPath: '/'
 		},
 		module: {
+			noParse: [/\.min\.js$/, /\.bundle\.js$/],
 			rules: [
-				{
+				/*{
 					test: /\.tsx?$/,
 					use: {
 						loader: 'ts-loader',
@@ -44,7 +45,7 @@ module.exports = env => {
 							}
 						}
 					}
-				},
+				}, */
 				{
 					test: /\.js$/,
 					use: ["source-map-loader"],

@@ -299,7 +299,7 @@ Array.prototype.clone = function (): Array<any> {
 
 Array.prototype.getIterator = function (): collections.ArrayIterator<any> {
 	return new collections.ArrayIterator<any>(this);
-}
+} as any;
 
 if (!Array.prototype.includes) {
 	Array.prototype.includes = function (searchElement: any, fromIndex?: number) {

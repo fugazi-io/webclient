@@ -38,10 +38,9 @@
     "transpile-core-watch": "npm run transpile-core -- --watch",
     "transpile-modules-watch": "npm run transpile-modules -- --watch",
     "transpile-watch": "run-p transpile-core-watch transpile-modules-watch",
-    "serve": "http-server -p 3330",
+    "serve": "webpack-dev-server --history-api-fallback --hot --inline --progress --colors --port 3330",
     "dev": "npm-run-all transpile -p transpile-watch serve",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --history-api-fallback --hot --inline --progress --colors --port 3000",
     "build": "webpack --env.prod --progress --colors"
   },
   "repository": {

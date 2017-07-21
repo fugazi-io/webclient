@@ -1,13 +1,4 @@
-import {Descriptor} from "../../../../scripts/src/components/modules.descriptor";
-import {Map} from "../../../../scripts/src/core/types.collections";
-import {ModuleContext, PrivilegedModuleContext} from "../../../../scripts/src/app/modules";
-import {Component} from "../../../../scripts/src/components/components";
-import {Module} from "../../../../scripts/src/components/modules";
-import {LoadProperties} from "../../../../scripts/src/components/registry";
-
-/**
- * Created by nitzan on 24/04/2016.
- */
+import {Descriptor, ModuleContext, Module, Component, Map, PrivilegedModuleContext, LoadProperties} from "../../../../scripts/bin/app/modules.api";
 
 (function(): void {
 	interface ComponentStruct {
@@ -42,7 +33,7 @@ import {LoadProperties} from "../../../../scripts/src/components/registry";
 		return struct;
 	}
 
-	fugazi.components.modules.descriptor.loaded(<Descriptor> {
+	fugazi.loaded(<Descriptor> {
 		name: "io.fugazi.components",
 		commands: {
 			load: {
@@ -51,9 +42,9 @@ import {LoadProperties} from "../../../../scripts/src/components/registry";
 				returns: "ui.message",
 				parametersForm: "struct",
 				syntax: "load module from (url net.url)",
-				componentConstructor: fugazi.app.terminal.TerminalCommand,
+				componentConstructor: fugazi.terminal.TerminalCommand,
 				handler: function(context: PrivilegedModuleContext, props: LoadProperties): Promise<string> {
-					return fugazi.components.registry.load(props).then<string>(loadedModule => {
+					return fugazi.registry.load(props).then<string>(loadedModule => {
 						context.getParent().getTerminal().moduleLoaded(loadedModule);
 						return "module " + loadedModule.getPath().toString() + " loaded";
 					});
@@ -68,7 +59,7 @@ import {LoadProperties} from "../../../../scripts/src/components/registry";
 					"list modules in (path path)"
 				],
 				handler: function(context: ModuleContext, props: { path?: string }): ModuleStruct[] {
-					return fugazi.components.registry.getModules(props.path).map(moduleToStruct);
+					return fugazi.registry.getModules(props.path).map(moduleToStruct);
 				}
 			},
 			listTypes: {
@@ -77,7 +68,7 @@ import {LoadProperties} from "../../../../scripts/src/components/registry";
 				parametersForm: "struct",
 				syntax: "list types in (path path)",
 				handler: function(context: ModuleContext, props: { path: string }): ComponentStruct[] {
-					return fugazi.components.registry.getModule(props.path).getTypes().map(componentToStruct);
+					return fugazi.registry.getModule(props.path).getTypes().map(componentToStruct);
 				}
 			},
 			listConstraints: {
@@ -86,7 +77,7 @@ import {LoadProperties} from "../../../../scripts/src/components/registry";
 				parametersForm: "struct",
 				syntax: "list constraints in (path path)",
 				handler: function(context: ModuleContext, props: { path: string }): ComponentStruct[] {
-					return fugazi.components.registry.getModule(props.path).getConstraints().map(componentToStruct);
+					return fugazi.registry.getModule(props.path).getConstraints().map(componentToStruct);
 				}
 			},
 			listCommands: {
@@ -95,7 +86,7 @@ import {LoadProperties} from "../../../../scripts/src/components/registry";
 				parametersForm: "struct",
 				syntax: "list commands in (path path)",
 				handler: function(context: ModuleContext, props: { path: string }): ComponentStruct[] {
-					return fugazi.components.registry.getModule(props.path).getCommands().map(componentToStruct);
+					return fugazi.registry.getModule(props.path).getCommands().map(componentToStruct);
 				}
 			},
 			listConverters: {
@@ -104,7 +95,7 @@ import {LoadProperties} from "../../../../scripts/src/components/registry";
 				parametersForm: "struct",
 				syntax: "list converters in (path path)",
 				handler: function(context: ModuleContext, props: { path: string }): ComponentStruct[] {
-					return fugazi.components.registry.getModule(props.path).getConverters().map(componentToStruct);
+					return fugazi.registry.getModule(props.path).getConverters().map(componentToStruct);
 				}
 			}
 		}

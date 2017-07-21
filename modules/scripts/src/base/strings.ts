@@ -1,12 +1,8 @@
-import {Descriptor} from "../../../../scripts/src/components/modules.descriptor";
-import {BoundConstraintValidator} from "../../../../scripts/src/components/constraints";
+import {BoundConstraintValidator, HttpMethod, Descriptor, ModuleContext, Module, Component, Map, RequestProperties, PrivilegedModuleContext, LoadProperties} from "../../../../scripts/bin/app/modules.api";
 
-/**
- * Created by nitzan on 24/04/2016.
- */
 
 (function(): void {
-	fugazi.components.modules.descriptor.loaded(<Descriptor> {
+	fugazi.loaded(<Descriptor> {
 		name: "io.fugazi.strings",
 		constraints: [
 			{

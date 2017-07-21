@@ -4,6 +4,7 @@ import * as statements from "../app/statements";
 import * as constants from "../app/constants";
 import * as logger from "../core/logger";
 import * as coreTypes from "../core/types";
+import * as handler from "../components/commands.handler";
 import * as commands from "../components/commands";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
@@ -318,7 +319,7 @@ class ResultView extends view.View<ResultViewProperties, ResultViewState> {
 	private success(value: any): void {
 		this.setState({
 			status: "success",
-			value: commands.handler.isPromptData(value) ? value.message : value
+			value: handler.isPromptData(value) ? value.message : value
 		});
 	}
 

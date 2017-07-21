@@ -1,11 +1,5 @@
-import {Descriptor} from "../../../../scripts/src/components/modules.descriptor";
-import {Map} from "../../../../scripts/src/core/types.collections";
-import {ModuleContext} from "../../../../scripts/src/app/modules";
-import {Component} from "../../../../scripts/src/components/components";
+import {Descriptor, ModuleContext, Component, Map} from "../../../../scripts/bin/app/modules.api";
 
-/**
- * Created by nitzan on 07/06/2016.
- */
 
 (function(): void {
 	let echoExamples = "#### Examples:\n";
@@ -33,7 +27,7 @@ import {Component} from "../../../../scripts/src/components/components";
 		}
 	}
 
-	fugazi.components.modules.descriptor.loaded(<Descriptor> {
+	fugazi.loaded(<Descriptor> {
 		name: "io.fugazi",
 		commands: {
 			echo: {
@@ -65,14 +59,14 @@ import {Component} from "../../../../scripts/src/components/components";
 					let components: Component[];
 
 					if (value.indexOf(".") > 0) {
-						components = [fugazi.components.registry.getUnknown(value)];
+						components = [fugazi.registry.getUnknown(value)];
 					} else {
-						components = fugazi.components.registry.findCommand(value);
+						components = fugazi.registry.findCommand(value);
 					}
 
 					if (!components || components.length === 0) {
 						return {
-							status: fugazi.components.commands.handler.ResultStatus.Failure,
+							status: fugazi.handler.ResultStatus.Failure,
 							error: `couldn't find component "${ value }"`
 						}
 					}
@@ -81,7 +75,7 @@ import {Component} from "../../../../scripts/src/components/components";
 
 					if (!markdown) {
 						return {
-							status: fugazi.components.commands.handler.ResultStatus.Failure,
+							status: fugazi.handler.ResultStatus.Failure,
 							error: `"${ value }" has no manual`
 						}
 					}
@@ -94,7 +88,7 @@ import {Component} from "../../../../scripts/src/components/components";
 				syntax: "version",
 				returns: "ui.message",
 				handler: function(context: ModuleContext) {
-					return fugazi.app.version.toString();
+					return fugazi.version.toString();
 				}
 			},
 			extract: {

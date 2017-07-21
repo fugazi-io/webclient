@@ -1,7 +1,7 @@
-import {ModuleContext} from "../../../../scripts/src/app/modules";
+import {BoundConstraintValidator, HttpMethod, Descriptor, ModuleContext, Module, Component, Map, RequestProperties, PrivilegedModuleContext, LoadProperties} from "../../../../scripts/bin/app/modules.api";
 
 (function(): void {
-	fugazi.components.modules.descriptor.loaded({
+	fugazi.loaded({
 		name: "restheart.databases",
 		commands: {
 			use: {

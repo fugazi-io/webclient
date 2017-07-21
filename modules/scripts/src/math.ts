@@ -1,17 +1,7 @@
-import {Descriptor} from "../../../scripts/src/components/modules.descriptor";
-import {Map} from "../../../scripts/src/core/types.collections";
-import {ModuleContext} from "../../../scripts/src/app/modules";
-import {Component} from "../../../scripts/src/components/components";
-import {Module} from "../../../scripts/src/components/modules";
-import {LoadProperties} from "../../../scripts/src/components/registry";
-import {HttpMethod, RequestProperties} from "../../../scripts/src/core/net";
-
-/**
- * Created by nitzan on 19/04/2016.
- */
+import {Descriptor, ModuleContext, Map} from "../../../scripts/bin/app/modules.api";
 
 (function(): void {
-	fugazi.components.modules.descriptor.loaded(<Descriptor> {
+	fugazi.loaded(<Descriptor> {
 		name: "samples.math",
 		title: "Math Sample Module",
 		types: {
@@ -34,7 +24,7 @@ import {HttpMethod, RequestProperties} from "../../../scripts/src/core/net";
 					"add (a number) (b number)",
 					"add (numbers list<number>)"
 				],
-				handler: function(context: ModuleContext, params: fugazi.collections.Map<any>): number {
+				handler: function(context: ModuleContext, params: Map<any>): number {
 					if (params.has("a") && params.has("b")) {
 						return params.get("a") + params.get("b");
 					}

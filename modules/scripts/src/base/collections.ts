@@ -1,12 +1,7 @@
-import {Descriptor} from "../../../../scripts/src/components/modules.descriptor";
-import {BoundConstraintValidator} from "../../../../scripts/src/components/constraints";
-import {Map} from "../../../../scripts/src/core/types.collections";
-/**
- * Created by nitzan on 24/04/2016.
- */
+import {Descriptor, BoundConstraintValidator, Map} from "../../../../scripts/bin/app/modules.api";
 
 (function(): void {
-	fugazi.components.modules.descriptor.loaded(<Descriptor> {
+	fugazi.loaded(<Descriptor> {
 		name: "io.fugazi.collections",
 		constraints: [
 			{

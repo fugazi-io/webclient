@@ -1,14 +1,4 @@
-import {Descriptor} from "../../../../scripts/src/components/modules.descriptor";
-import {Map} from "../../../../scripts/src/core/types.collections";
-import {ModuleContext} from "../../../../scripts/src/app/modules";
-import {Component} from "../../../../scripts/src/components/components";
-import {Module} from "../../../../scripts/src/components/modules";
-import {LoadProperties} from "../../../../scripts/src/components/registry";
-import {HttpMethod, RequestProperties} from "../../../../scripts/src/core/net";
-
-/**
- * Created by nitzan on 05/05/2016.
- */
+import {HttpMethod, Descriptor, ModuleContext, Module, Component, Map, RequestProperties, PrivilegedModuleContext, LoadProperties} from "../../../../scripts/bin/app/modules.api";
 
 (function(): void {
 	interface HttpResponse {
@@ -78,7 +68,7 @@ import {HttpMethod, RequestProperties} from "../../../../scripts/src/core/net";
 			];
 		};
 
-	fugazi.components.modules.descriptor.loaded(<Descriptor> {
+	fugazi.loaded(<Descriptor> {
 		name: "io.fugazi.net.http",
 		commands: {
 			http: {

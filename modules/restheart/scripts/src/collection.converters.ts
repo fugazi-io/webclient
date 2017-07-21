@@ -1,10 +1,4 @@
-/**
- * Created by nitzan on 02/01/2017.
- */
-
-/// <reference path="../../../../scripts/bin/app/application.d.ts" />
-/// <reference path="../../../../scripts/bin/components/components.d.ts" />
-/// <reference path="../../../../scripts/bin/components/converters.d.ts" />
+import {BoundConstraintValidator, HttpMethod, Descriptor, ModuleContext, Module, Component, Map, RequestProperties, PrivilegedModuleContext, LoadProperties} from "../../../../scripts/bin/app/modules.api";
 
 type RawCollection = {
 	_id: string,
@@ -26,7 +20,7 @@ type Collection = {
 }
 
 (function(): void {
-	fugazi.components.modules.descriptor.loaded({
+	fugazi.loaded({
 		name: "restheart.collections",
 		converters: {
 			RawCollections2Collections: {

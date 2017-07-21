@@ -1,13 +1,7 @@
-/// <reference path="../../../../scripts/bin/app/application.d.ts" />
-/// <reference path="../../../../scripts/bin/components/components.d.ts" />
-/// <reference path="../../../../scripts/bin/components/converters.d.ts" />
-
-/**
- * Created by nitzan on 22/06/2016.
- */
+import {Descriptor, ModuleContext, Module, Component, Map, PrivilegedModuleContext, LoadProperties} from "../../../../scripts/bin/app/modules.api";
 
 (function(): void {
-	fugazi.components.modules.descriptor.loaded({
+	fugazi.loaded({
 		name: "io.fugazi",
 		converters: {
 			string2boolean: {
