@@ -35,7 +35,7 @@ function equals(obj1: any, obj2: any): boolean {
 	return obj1 == obj2;
 }
 
-Object.is = function<T>(obj: any, type: { new(): T }): obj is T {
+Object.is = function <T>(obj: any, type: { new(): T }): obj is T {
 	if (Number.isNaN(type as any) && Number.isNaN(obj)) {
 		return true;
 	}
@@ -55,19 +55,19 @@ Object.is = function<T>(obj: any, type: { new(): T }): obj is T {
 	return false;
 }
 
-Object.isObject = function(obj: any): boolean {
+Object.isObject = function (obj: any): boolean {
 	return obj && obj.constructor === this || false;
 };
 
-Object.equals = function(obj1: any, obj2: any): boolean {
+Object.equals = function (obj1: any, obj2: any): boolean {
 	return equals(obj1, obj2);
 }
 
-Object.merge = function<T>(...sources: T[]): T {
+Object.merge = function <T>(...sources: T[]): T {
 	return Object.assign({}, ...sources);
 }
 
-Object.deepMerge = function<T>(...sources: T[]): T {
+Object.deepMerge = function <T>(...sources: T[]): T {
 	let merged = Object.assign({}, sources[0]) as any;
 
 	for (let i = 1; i < sources.length; i++) {
@@ -85,7 +85,7 @@ Object.deepMerge = function<T>(...sources: T[]): T {
 	return merged;
 }
 
-Object.partial = function<S extends T, T>(source: S, options: { include?: Array<keyof S>, exclude?: Array<keyof S> }): T {
+Object.partial = function <S extends T, T>(source: S, options: { include?: Array<keyof S>, exclude?: Array<keyof S> }): T {
 	const partial = {} as T;
 
 	if (options.include) {
@@ -140,63 +140,63 @@ interface String {
 	every(fn: (char: string, index?: number, str?: string) => boolean): boolean;
 }
 
-String.prototype.empty = function(): boolean {
+String.prototype.empty = function (): boolean {
 	return this.length == 0;
 }
 
 if (!String.prototype.trim) {
-	String.prototype.trim = function(): string {
+	String.prototype.trim = function (): string {
 		return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, "");
 	};
 }
 
 if (!String.prototype.trimLeft) {
-	String.prototype.trimLeft = function(): string {
+	String.prototype.trimLeft = function (): string {
 		return this.replace(/^\s+/, "");
 	};
 }
 
 if (!String.prototype.trimRight) {
-	String.prototype.trimRight = function(): string {
+	String.prototype.trimRight = function (): string {
 		return this.replace(/\s+$/, "");
 	};
 }
 
 if (!String.prototype.startsWith) {
-	String.prototype.startsWith = function(searchString: string, position?: number): boolean {
+	String.prototype.startsWith = function (searchString: string, position?: number): boolean {
 		position = position || 0;
 		return this.indexOf(searchString, position) === position;
 	};
 }
 
 if (!String.prototype.endsWith) {
-	String.prototype.endsWith = function(searchString: string, position?: number): boolean {
+	String.prototype.endsWith = function (searchString: string, position?: number): boolean {
 		position = position || this.length;
 		return this.lastIndexOf(searchString, position) === position;
 	};
 }
 
-String.prototype.has = function(substr: string): boolean {
+String.prototype.has = function (substr: string): boolean {
 	return this.indexOf(substr) >= 0;
 }
 
-String.prototype.test = function(regex: RegExp): boolean {
+String.prototype.test = function (regex: RegExp): boolean {
 	return regex.test(this);
 }
 
-String.prototype.exec = function(regex: RegExp): RegExpExecArray {
+String.prototype.exec = function (regex: RegExp): RegExpExecArray {
 	return regex.exec(this);
 }
 
-String.prototype.first = function(): string {
+String.prototype.first = function (): string {
 	return this.charAt(0);
 }
 
-String.prototype.last = function(): string {
+String.prototype.last = function (): string {
 	return this.charAt(this.length - 1);
 }
 
-String.prototype.count = function(character: string): number {
+String.prototype.count = function (character: string): number {
 	var count = 0;
 
 	for (var i: number = 0; i < this.length; i++) {
@@ -208,13 +208,13 @@ String.prototype.count = function(character: string): number {
 	return count;
 }
 
-String.prototype.forEach = function(fn: (char: string, index?: number, str?: string) => void): void {
+String.prototype.forEach = function (fn: (char: string, index?: number, str?: string) => void): void {
 	for (let i = 0; i < this.length; i++) {
 		fn(this.charAt(i), i, this);
 	}
 }
 
-String.prototype.some = function(fn: (char: string, index?: number, str?: string) => boolean): boolean {
+String.prototype.some = function (fn: (char: string, index?: number, str?: string) => boolean): boolean {
 	for (let i = 0; i < this.length; i++) {
 		if (fn(this.charAt(i), i, this)) {
 			return true;
@@ -224,7 +224,7 @@ String.prototype.some = function(fn: (char: string, index?: number, str?: string
 	return false;
 }
 
-String.prototype.every = function(fn: (char: string, index?: number, str?: string) => boolean): boolean {
+String.prototype.every = function (fn: (char: string, index?: number, str?: string) => boolean): boolean {
 	for (let i = 0; i < this.length; i++) {
 		if (!fn(this.charAt(i), i, this)) {
 			return false;
@@ -256,11 +256,11 @@ interface Array<T> {
 	getIterator(): fugazi.collections.ArrayIterator<any>;
 }
 
-Array.prototype.empty = function(): boolean {
+Array.prototype.empty = function (): boolean {
 	return this.length == 0;
 }
 
-Array.prototype.first = function(condition?: (item: any) => boolean): any {
+Array.prototype.first = function (condition?: (item: any) => boolean): any {
 	if (!fugazi.is(condition, Function)) {
 		return this[0];
 	}
@@ -274,13 +274,13 @@ Array.prototype.first = function(condition?: (item: any) => boolean): any {
 	return null;
 }
 
-Array.prototype.last = function(): any {
+Array.prototype.last = function (): any {
 	return this[this.length - 1];
 }
 
-Array.prototype.clone = function(): Array<any> {
+Array.prototype.clone = function (): Array<any> {
 	var cloned: Array<any> = [],
-		iterator: (item: any) => void = function(item: any): void {
+		iterator: (item: any) => void = function (item: any): void {
 			this.push(item);
 		}.bind(cloned);
 
@@ -289,12 +289,12 @@ Array.prototype.clone = function(): Array<any> {
 	return cloned;
 }
 
-Array.prototype.getIterator = function(): fugazi.collections.ArrayIterator<any> {
+Array.prototype.getIterator = function (): fugazi.collections.ArrayIterator<any> {
 	return new fugazi.collections.ArrayIterator<any>(this);
 }
 
 if (!Array.prototype.includes) {
-	Array.prototype.includes = function(searchElement: any, fromIndex?: number) {
+	Array.prototype.includes = function (searchElement: any, fromIndex?: number) {
 		"use strict";
 
 		var O = Object(this);
@@ -310,7 +310,9 @@ if (!Array.prototype.includes) {
 			k = n;
 		} else {
 			k = len + n;
-			if (k < 0) {k = 0;}
+			if (k < 0) {
+				k = 0;
+			}
 		}
 
 		var currentElement;
@@ -327,11 +329,11 @@ if (!Array.prototype.includes) {
 	};
 }
 
-Array.prototype.includesAll = function(...items: any[]): boolean {
+Array.prototype.includesAll = function (...items: any[]): boolean {
 	return this.includesAll(items);
 }
 
-Array.prototype.includesAll = function(items: any[]): boolean {
+Array.prototype.includesAll = function (items: any[]): boolean {
 	for (var i = 0; i < items.length; i++) {
 		if (!this.includes(items[i])) {
 			return false;
@@ -341,17 +343,17 @@ Array.prototype.includesAll = function(items: any[]): boolean {
 	return true;
 }
 
-Array.prototype.equals = function(other: Array<any>): boolean {
+Array.prototype.equals = function (other: Array<any>): boolean {
 	if (this.length !== other.length) {
 		return false;
 	}
 
-	return other.every(function(item: any): boolean {
+	return other.every(function (item: any): boolean {
 		return this.includes(item);
 	}.bind(this));
 }
 
-Array.prototype.remove = function(obj: any): any {
+Array.prototype.remove = function (obj: any): any {
 	if (typeof(obj) !== "number") {
 		obj = this.indexOf(obj);
 	}
@@ -359,14 +361,14 @@ Array.prototype.remove = function(obj: any): any {
 	return this.splice(obj, 1)[0];
 }
 
-Array.prototype.replace = function(item: number | any, other: any): any {
+Array.prototype.replace = function (item: number | any, other: any): any {
 	var index: number = fugazi.is(item, Number) ? item : this.indexOf(item);
 	item = this[index];
 	this[index] = other;
 	return item;
 }
 
-Array.prototype.extend = function(other: Array<any>): void {
+Array.prototype.extend = function (other: Array<any>): void {
 	if (other) {
 		Array.prototype.push.apply(this, other);
 	}
@@ -376,7 +378,7 @@ interface MapConstructor {
 	from<V>(obj: { [key: string]: V } | Map<any, V>, deep?: boolean): Map<string, V>;
 }
 
-Map.from = function(obj: { [key: string]: any } | Map<any, any>, deep = false): Map<string, any> {
+Map.from = function (obj: { [key: string]: any } | Map<any, any>, deep = false): Map<string, any> {
 	if (Object.is(obj, Map)) {
 		return obj;
 	}
@@ -406,17 +408,17 @@ interface Map<K, V> {
 	equals(other: Map<K, V>): boolean;
 	merge(...maps: Array<Map<K, V> | { [key: string]: V }>): void;
 	deepMerge(...maps: Array<Map<K, V> | { [key: string]: V }>): void;
-	some(callback: (value: V,  key: K, map: Map<K, V>) => boolean, thisArg?: any): boolean;
+	some(callback: (value: V, key: K, map: Map<K, V>) => boolean, thisArg?: any): boolean;
 	every(callback: (value: V, key: K, map: Map<K, V>) => boolean, thisArg?: any): boolean;
 	map<T>(callback: (value: V, key: K, map: Map<K, V>) => T, thisArg?: any): T[];
 	map<K2, V2>(callback: (value: V, key: K, map: Map<K, V>) => [K2, V2], thisArg?: any): Map<K2, V2>;
 }
 
-Map.prototype.toString = function(): string {
+Map.prototype.toString = function (): string {
 	return JSON.stringify(this.toObject());
 }
 
-Map.prototype.clone = function(deep = false): Map<any, any> {
+Map.prototype.clone = function (deep = false): Map<any, any> {
 	return this.map((value: any, key: any) => {
 		if (deep && value && typeof value.clone === "function") {
 			return [key, value.clone()];
@@ -426,7 +428,7 @@ Map.prototype.clone = function(deep = false): Map<any, any> {
 	});
 }
 
-Map.prototype.toObject = function(): { [key: string]: any } {
+Map.prototype.toObject = function (): { [key: string]: any } {
 	const obj = {} as { [key: string]: any };
 
 	this.forEach((value: any, key: string) => {
@@ -436,7 +438,7 @@ Map.prototype.toObject = function(): { [key: string]: any } {
 	return obj;
 }
 
-Map.prototype.equals = function(other: Map<any, any>) {
+Map.prototype.equals = function (other: Map<any, any>) {
 	if (!other || !(other instanceof Map) || other.size !== this.size) {
 		return false;
 	}
@@ -444,7 +446,7 @@ Map.prototype.equals = function(other: Map<any, any>) {
 	return this.every((value: any, key: any) => equals(value, other.get(key)));
 }
 
-Map.prototype.merge = function(...maps: Array<Map<any, any> | { [key: string]: any }>): void {
+Map.prototype.merge = function (...maps: Array<Map<any, any> | { [key: string]: any }>): void {
 	for (let i = 0; i < maps.length; i++) {
 		Map.from(maps[i]).forEach((value, key) => {
 			this.set(key, value);
@@ -452,7 +454,7 @@ Map.prototype.merge = function(...maps: Array<Map<any, any> | { [key: string]: a
 	}
 }
 
-Map.prototype.deepMerge = function(...maps: Array<Map<any, any> | { [key: string]: any }>): void {
+Map.prototype.deepMerge = function (...maps: Array<Map<any, any> | { [key: string]: any }>): void {
 	for (let i = 0; i < maps.length; i++) {
 		Map.from(maps[i]).forEach((value, key) => {
 			if (Object.is(value, Map) && Object.is(this.get(key), Map)) {
@@ -465,7 +467,7 @@ Map.prototype.deepMerge = function(...maps: Array<Map<any, any> | { [key: string
 }
 
 if (!Map.prototype.empty) {
-	Map.prototype.empty = function(): boolean {
+	Map.prototype.empty = function (): boolean {
 		"use strict";
 
 		return this.size === 0;
@@ -473,7 +475,7 @@ if (!Map.prototype.empty) {
 }
 
 if (!Map.prototype.find) {
-	Map.prototype.find = function(value: any): any {
+	Map.prototype.find = function (value: any): any {
 		for (let entry of this.entries()) {
 			if (Object.equals(value, entry[1])) {
 				return entry[0];
@@ -485,13 +487,13 @@ if (!Map.prototype.find) {
 }
 
 if (!Map.prototype.contains) {
-	Map.prototype.contains = function(value: any): boolean {
+	Map.prototype.contains = function (value: any): boolean {
 		return this.find(value) !== null;
 	}
 }
 
 if (!Map.prototype.some) {
-	Map.prototype.some = function(callback: (value: any, key: any, map: Map<any, any>) => boolean, thisArg?: any): boolean {
+	Map.prototype.some = function (callback: (value: any, key: any, map: Map<any, any>) => boolean, thisArg?: any): boolean {
 		for (let entry of this.entries()) {
 			if (callback.call(thisArg || this, entry[1], entry[0], this)) {
 				return true;
@@ -503,7 +505,7 @@ if (!Map.prototype.some) {
 }
 
 if (!Map.prototype.every) {
-	Map.prototype.every = function(callback: (value: any, key: any, map: Map<any, any>) => boolean, thisArg?: any): boolean {
+	Map.prototype.every = function (callback: (value: any, key: any, map: Map<any, any>) => boolean, thisArg?: any): boolean {
 		for (let entry of this.entries()) {
 			if (!callback.call(thisArg || this, entry[1], entry[0], this)) {
 				return false;
@@ -515,7 +517,7 @@ if (!Map.prototype.every) {
 }
 
 if (!Map.prototype.map) {
-	Map.prototype.map = function(callback: (value: any, key: any, map: Map<any, any>) => any, thisArg?: any): any {
+	Map.prototype.map = function (callback: (value: any, key: any, map: Map<any, any>) => any, thisArg?: any): any {
 		let mappedArray: any[] = [];
 		let mappedMap: Map<any, any> = new Map();
 
