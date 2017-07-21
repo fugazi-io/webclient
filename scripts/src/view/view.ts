@@ -1,19 +1,16 @@
-/// <reference path="main.tsx" />
+import * as React from "react";
 
-"use strict";
+export interface ViewProperties {
+	ref?: (<T>(el: T) => void) | string;
+	key?: string;
+}
 
-module fugazi.view {
-	export interface ViewProperties {
-		ref?: (<T>(el: T) => void) | string;
-		key?: string;
-	}
+export interface ViewState {
+}
 
-	export interface ViewState {}
-
-	export class View<P extends ViewProperties, S extends ViewState> extends React.Component<P, S> {
-		constructor(props?: P) {
-			super(props);
-			this.state = <S> {};
-		}
+export class View<P extends ViewProperties, S extends ViewState> extends React.Component<P, S> {
+	constructor(props?: P) {
+		super(props);
+		this.state = <S> {};
 	}
 }

@@ -1,120 +1,129 @@
-/// <reference path="../components/types.ts" />
-/// <reference path="../components/components.ts" />
-/// <reference path="../components/commands.ts" />
+import * as output from "./output";
+import * as baseInput from "./input/base";
+import * as view from "./view";
+import * as fugaziInput from "./input/fugaziInput";
+import * as statements from "../app/statements";
+import * as utils from "../core/utils";
+import * as collections from "../core/types.collections";
+import * as coreTypes from "../core/types";
+import * as net from "../core/net";
+import * as components from "../components/components";
+import * as componentsBuilder from "../components/components.builder";
+import * as componentsDescriptor from "../components/components.descriptor";
+import * as types from "../components/types";
+import * as syntax from "../components/syntax";
+import * as commands from "../components/commands";
+import * as commandsHandler from "../components/commands.handler";
+import * as handler from "../components/commands.handler";
+import * as descriptor from "../components/commands.descriptor";
+import * as React from "react";
 
-/// <reference path="output.tsx" />
-/// <reference path="input/fugaziInput.tsx" />
+export interface TerminalFactory {
+	createTerminal(properties: TerminalProperties): Promise<TerminalView>;
+}
 
-"use strict";
+export interface ExecuteCommand {
+	(command: string): commands.ExecutionResult;
+}
 
-module fugazi.view {
-	export interface TerminalFactory {
-		createTerminal(properties: TerminalProperties):  Promise<TerminalView>;
+export interface StatementsQuerier {
+	(command: string, position: number): Promise<statements.Statement[]>;
+}
+
+export interface TerminalProperties extends componentsDescriptor.Descriptor, view.ViewProperties {
+	executer: ExecuteCommand;
+	querier: StatementsQuerier;
+	history?: string[];
+}
+
+export interface TerminalState extends view.ViewState {
+	promptMode: boolean;
+	searchHistoryMode: boolean;
+	searchHistoryResult?: string;
+}
+
+export class TerminalView extends view.View<TerminalProperties, TerminalState> {
+	private promptValueHandler: (value: string) => void;
+
+	public constructor(props: TerminalProperties) {
+		super(props);
+
+		this.state = {
+			promptMode: false,
+			searchHistoryMode: false
+		};
 	}
 
-	export interface ExecuteCommand {
-		(command: string): components.commands.ExecutionResult;
+	public clearOutput(): void {
+		this.getOutput().clear();
 	}
 
-	export interface StatementsQuerier {
-		(command: string, position: number): Promise<app.statements.Statement[]>;
-	}
+	public render(): JSX.Element {
+		let inputView: JSX.Element;
 
-	export interface TerminalProperties extends components.descriptor.Descriptor, ViewProperties {
-		executer: ExecuteCommand;
-		querier: StatementsQuerier;
-		history?: string[];
-	}
-
-	export interface TerminalState extends ViewState {
-		promptMode: boolean;
-		searchHistoryMode: boolean;
-		searchHistoryResult?: string;
-	}
-
-	export class TerminalView extends View<TerminalProperties, TerminalState> {
-		private promptValueHandler: (value: string) => void;
-
-		public constructor(props: TerminalProperties) {
-			super(props);
-
-			this.state = {
-				promptMode: false,
-				searchHistoryMode: false
-			};
+		if (this.state.promptMode) {
+			inputView = <baseInput.PasswordInputView handler={ this.handlePassword.bind(this) }/>
+		} else if (this.state.searchHistoryMode) {
+			inputView = <fugaziInput.SearchHistoryInputView
+				history={ this.props.history }
+				resultHandler={ this.handleHistorySearchResult.bind(this) }/>
+		} else {
+			inputView = <fugaziInput.FugaziInputView
+				history={ this.props.history }
+				searchResult={ this.state.searchHistoryResult }
+				onQuery={ this.props.querier }
+				onExecute={ this.onExecute.bind(this) }
+				onSearchHistoryRequested={ this.switchToHistorySearch.bind(this) }/>;
 		}
 
-		public clearOutput(): void {
-			this.getOutput().clear();
-		}
+		return <article className="terminal">
+			<output.OutputView ref="output"/>
+			<section className="inputs">
+				{ inputView }
+			</section>
+		</article>;
+	}
 
-		public render(): JSX.Element {
-			let inputView: JSX.Element;
+	private switchToHistorySearch(): void {
+		this.setState({
+			searchHistoryMode: true
+		} as TerminalState);
+	}
 
-			if (this.state.promptMode) {
-				inputView = <input.PasswordInputView handler={ this.handlePassword.bind(this) } />
-			} else if (this.state.searchHistoryMode) {
-				inputView = <input.SearchHistoryInputView
-					history={ this.props.history }
-					resultHandler={ this.handleHistorySearchResult.bind(this) } />
-			} else {
-				inputView = <input.FugaziInputView
-								history={ this.props.history }
-								searchResult={ this.state.searchHistoryResult }
-								onQuery={ this.props.querier }
-								onExecute={ this.onExecute.bind(this) }
-								onSearchHistoryRequested={ this.switchToHistorySearch.bind(this) } />;
+	private handleHistorySearchResult(result: string): void {
+		this.setState({
+			searchHistoryMode: false,
+			searchHistoryResult: result
+		} as TerminalState);
+	}
+
+	private onExecute(input: string): void {
+		const result: commands.ExecutionResult = this.props.executer(input);
+
+		result.then(value => {
+			if (commandsHandler.isPromptData(value)) {
+				this.promptValueHandler = value.handlePromptValue;
+				this.setState({
+					promptMode: true
+				} as TerminalState);
 			}
+		});
 
-			return <article className="terminal">
-						<OutputView ref="output" />
-						<section className="inputs">
-							{ inputView }
-						</section>
-					</article>;
+		this.getOutput().addExecutionResult(input, result);
+	}
+
+	private getOutput(): output.OutputView {
+		return this.refs["output"] as output.OutputView;
+	}
+
+	private handlePassword(password: string) {
+		if (password != null) {
+			this.promptValueHandler(password);
 		}
+		this.promptValueHandler = null;
 
-		private switchToHistorySearch(): void {
-			this.setState({
-				searchHistoryMode: true
-			} as TerminalState);
-		}
-
-		private handleHistorySearchResult(result: string): void {
-			this.setState({
-				searchHistoryMode: false,
-				searchHistoryResult: result
-			} as TerminalState);
-		}
-
-		private onExecute(input: string): void {
-			const result: components.commands.ExecutionResult = this.props.executer(input);
-
-			result.then(value => {
-				if (components.commands.handler.isPromptData(value)) {
-					this.promptValueHandler = value.handlePromptValue;
-					this.setState({
-						promptMode: true
-					} as TerminalState);
-				}
-			});
-
-			this.getOutput().addExecutionResult(input, result);
-		}
-
-		private getOutput(): OutputView {
-			return this.refs["output"] as OutputView;
-		}
-
-		private handlePassword(password: string) {
-			if (password != null) {
-				this.promptValueHandler(password);
-			}
-			this.promptValueHandler = null;
-
-			this.setState({
-				promptMode: false
-			} as TerminalState);
-		}
+		this.setState({
+			promptMode: false
+		} as TerminalState);
 	}
 }
