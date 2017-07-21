@@ -9,10 +9,16 @@ module fugazi.view.renderers {
 	}
 
 	export interface RenderingComponentClass {
-		new(props: RenderingComponentProperties): RenderingComponent<RenderingComponentProperties, ViewState>;
+		new(props: RenderingComponentProperties, initialState: Partial<ViewState>): RenderingComponent<RenderingComponentProperties, ViewState>;
 	}
 
-	export class RenderingComponent<P extends RenderingComponentProperties, S extends ViewState> extends View<P, S> {}
+	export class RenderingComponent<P extends RenderingComponentProperties, S extends ViewState> extends View<P, S> {
+		constructor(props: P, initialState: Partial<S>) {
+			super(props);
+
+			this.state = initialState as S;
+		}
+	}
 
 	class AnyComponent extends RenderingComponent<RenderingComponentProperties, ViewState> {
 		public render(): JSX.Element {
@@ -168,20 +174,17 @@ module fugazi.view.renderers {
 	}
 
 	export abstract class CollectionComponent<T extends CollectionComponentState> extends RenderingComponent<RenderingComponentProperties, T> {
-		public constructor(props: RenderingComponentProperties) {
-			super(props);
-
-			let genericsConstraint = components.registry.get(components.ComponentType.Constraint, "generics") as components.types.constraints.Constraint;
-
-			this.state = {
+		public constructor(props: RenderingComponentProperties, initialState: Partial<T> = {}) {
+			const genericsConstraint = components.registry.get(components.ComponentType.Constraint, "generics") as components.types.constraints.Constraint;
+			initialState = Object.assign({
 				fold: FoldState.Collapsed
-			} as T;
+			}, initialState);
 
 			if (props.type instanceof components.types.ConstrainedType) {
-				this.setState({
-					generics : (props.type as components.types.ConstrainedType).getConstraintParamValue(genericsConstraint, "type")
-				});
+				initialState.generics = (props.type as components.types.ConstrainedType).getConstraintParamValue(genericsConstraint, "type");
 			}
+
+			super(props, initialState);
 		}
 
 		public componentDidUpdate(prevProps: RenderingComponentProperties, prevState: T) {
@@ -284,9 +287,8 @@ module fugazi.view.renderers {
 
 	export class MapComponent extends CollectionComponent<MapComponentState> {
 		constructor(props: RenderingComponentProperties) {
-			super(props);
-
-			let structConstraint = components.registry.get(components.ComponentType.Constraint, "struct") as components.types.constraints.Constraint;
+			const structConstraint = components.registry.get(components.ComponentType.Constraint, "struct") as components.types.constraints.Constraint;
+			const initialState = {} as MapComponentState;
 
 			let fieldsList: collections.Map<components.types.Type>[];
 
@@ -295,16 +297,14 @@ module fugazi.view.renderers {
 			}
 
 			if (fieldsList && fieldsList.length > 0) {
-				this.setState({
-					isStruct : true,
-					fields : collections.map<components.types.Type>()
-				});
-				fieldsList.forEach(map => this.state.fields.extend(map));
+				initialState.isStruct = true;
+				initialState.fields = collections.map<components.types.Type>();
+				fieldsList.forEach(map => initialState.fields.extend(map));
 			} else {
-				this.setState({
-					isStruct: false
-				});
+				initialState.isStruct = false;
 			}
+
+			super(props, initialState);
 		}
 
 		protected showSize(): boolean {

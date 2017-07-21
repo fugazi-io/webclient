@@ -59,7 +59,9 @@ namespace fugazi.view.input {
 			this.prompt = prompt;
 			this.className = ["input", className];
 			this.keymap = collections.map<() => void>();
-			this.state = {value: this.props.value || ""} as any;
+			this.state = {
+				value: this.props.value || ""
+			} as S;
 		}
 
 		public componentDidMount(): void {
@@ -254,7 +256,7 @@ namespace fugazi.view.input {
 				message: null,
 				suggestions: this.props.suggestions,
 				focus: "input"
-			} as any;
+			} as S;
 
 		}
 
@@ -330,13 +332,13 @@ namespace fugazi.view.input {
 		private element: HTMLElement;
 		private isFocused: boolean;
 
-		public constructor(props: SuggestionPanelProperties, className: string, prompt?: string) {
+		public constructor(props: SuggestionPanelProperties) {
 			super(props);
 
 			this.key = utils.generateId();
 			this.state = {
 				selected: -1
-			} as any;
+			} as SuggestionPanelState;
 		}
 
 		public render(): JSX.Element {
@@ -446,7 +448,7 @@ namespace fugazi.view.input {
 			super(props, "bgtext " + className, prompt);
 			this.state = {
 				backgroundText: this.props.backgroundText || ""
-			} as any;
+			} as S;
 		}
 
 		protected getContainerElements(): JSX.Element[] {
