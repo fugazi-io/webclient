@@ -27,14 +27,12 @@ namespace fugazi.view.input {
 
 		constructor(props: FugaziInputProperties) {
 			super(props, "fugazi", props.prompt || DEFAULT_FUGAZI_PROMPT);
-		}
 
-		public componentWillMount(){
 			this.addKeyMapping(false, true, false, "R", this.onShowSearch.bind(this));
-			if (this.props.searchResult && this.props.searchResult.length > 0 ) {
-				this.setState({
-					value : this.props.searchResult
-				});
+			if (this.props.searchResult && this.props.searchResult.length > 0) {
+				this.state = {
+					value: this.props.searchResult
+				} as any;
 			}
 		}
 
@@ -58,7 +56,7 @@ namespace fugazi.view.input {
 		protected onArrowUpPressed(): boolean {
 			this.history.previous();
 			this.updateSuggestions(this.getValue(), this.getValue().length).then(() => {
-				setTimeout(() => { this.setCaretPosition(this.getValue().length); }, 5);
+				setTimeout(() => {this.setCaretPosition(this.getValue().length);}, 5);
 			});
 			return false;
 		}
@@ -66,7 +64,7 @@ namespace fugazi.view.input {
 		protected onArrowDownPressed(): boolean {
 			this.history.next();
 			this.updateSuggestions(this.getValue(), this.getValue().length).then(() => {
-				setTimeout(() => { this.setCaretPosition(this.getValue().length); }, 5);
+				setTimeout(() => {this.setCaretPosition(this.getValue().length);}, 5);
 			});
 
 			return false;
@@ -158,7 +156,7 @@ namespace fugazi.view.input {
 		render(): JSX.Element {
 			let elements: JSX.Element[] = [];
 			let className = this.props.selected ? "selected" : undefined;
-			
+
 			elements.push(<span key="__command-path__" className="path">{ this.props.statement.getCommand().getPath().parent().toString() }</span>);
 			this.props.statement.getRule().getTokens().forEach(token => {
 				elements.push(StatementSuggestionItem.getElementFor(token));

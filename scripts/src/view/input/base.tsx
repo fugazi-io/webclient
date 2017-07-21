@@ -17,7 +17,7 @@ namespace fugazi.view.input {
 				<article className="input password">
 					<div className="container">
 						<div className="inputbox">
-							<input type="password" onKeyDown={ this.onKeyDown.bind(this) } ref={ input => this.input = input } />
+							<input type="password" onKeyDown={ this.onKeyDown.bind(this) } ref={ input => this.input = input }/>
 						</div>
 					</div>
 				</article>
@@ -36,15 +36,16 @@ namespace fugazi.view.input {
 	export interface InputViewConstructor {
 		new(props: InputProperties): InputView<InputProperties, InputState>;
 	}
-	
+
 	export interface InputProperties extends ViewProperties {
 		value?: string;
 	}
-	
+
 	export interface InputState extends ViewState {
 		value?: string;
 	}
-	
+
+
 	export abstract class InputView<P extends InputProperties, S extends InputState> extends View<P, S> {
 		private prompt: string;
 		private className: string[];
@@ -55,14 +56,10 @@ namespace fugazi.view.input {
 		public constructor(props: P, className: string, prompt?: string) {
 			super(props);
 
-
 			this.prompt = prompt;
 			this.className = ["input", className];
 			this.keymap = collections.map<() => void>();
-		}
-
-		public componentWillMount() {
-			this.setState({value : this.props.value || ""});
+			this.state = {value: this.props.value || ""} as any;
 		}
 
 		public componentDidMount(): void {
@@ -73,8 +70,8 @@ namespace fugazi.view.input {
 
 		public render(): JSX.Element {
 			return <article className={ this.className.join(" ") }>
-						{ this.getInnerElements() }
-					</article>;
+				{ this.getInnerElements() }
+			</article>;
 		}
 
 		protected getPosition(): number {
@@ -105,17 +102,17 @@ namespace fugazi.view.input {
 		protected getContainerElements(): JSX.Element[] {
 			return [
 				<div key="inputbox" className="inputbox">
-					<input tabIndex={ - 1 } key="input" type="text" ref="inputbox" value={ this.state.value }
-						onFocus={ this.onFocus.bind(this) }
-						onBlur={ this.onBlur.bind(this) }
-						onChange={ this.onChange.bind(this) }
-						onCopy={ this.onCopy.bind(this) }
-						onCut={ this.onCut.bind(this) }
-						onPaste={ this.onPaste.bind(this) }
-						onKeyUp={ this.onKeyUp.bind(this) }
-						onKeyPress={ this.onKeyPress.bind(this) }
-						onKeyDown={ this.onKeyDown.bind(this) } />
-			</div>];
+					<input tabIndex={ -1 } key="input" type="text" ref="inputbox" value={ this.state.value }
+						   onFocus={ this.onFocus.bind(this) }
+						   onBlur={ this.onBlur.bind(this) }
+						   onChange={ this.onChange.bind(this) }
+						   onCopy={ this.onCopy.bind(this) }
+						   onCut={ this.onCut.bind(this) }
+						   onPaste={ this.onPaste.bind(this) }
+						   onKeyUp={ this.onKeyUp.bind(this) }
+						   onKeyPress={ this.onKeyPress.bind(this) }
+						   onKeyDown={ this.onKeyDown.bind(this) }/>
+				</div>];
 		}
 
 		protected addKeyMapping(alt: boolean, ctrl: boolean, shift: boolean, char: string, fn: () => void): void {
@@ -252,17 +249,15 @@ namespace fugazi.view.input {
 
 		public constructor(props: P, className: string, prompt?: string) {
 			super(props, "suggestible " + className, prompt);
+			this.state = {
+				showing: false,
+				message: null,
+				suggestions: this.props.suggestions,
+				focus: "input"
+			} as any;
 
 		}
 
-		public componentWillMount() {
-			this.setState({
-				showing : false,
-				message : null,
-				suggestions : this.props.suggestions,
-				focus : "input"
-			});
-		}
 		protected onTabPressed(): boolean {
 			let newState = !this.state.showing ?
 				{
@@ -286,7 +281,7 @@ namespace fugazi.view.input {
 		}
 
 		protected onEscapePressed(): boolean {
-			this.setState({ showing: false } as S, () => {
+			this.setState({showing: false} as S, () => {
 				this.inputbox.focus();
 				this.setCaretPosition(this.getValue().length)
 			});
@@ -306,7 +301,7 @@ namespace fugazi.view.input {
 				ref={ element => this.suggestionPanel = element }
 				onTabPressed={ this.onTabPressed.bind(this) }
 				onEscapePressed={ this.onEscapePressed.bind(this) }
-				onSuggestionItemPressed={ this.onSuggestionItemPressed.bind(this) } />);
+				onSuggestionItemPressed={ this.onSuggestionItemPressed.bind(this) }/>);
 
 			return elements;
 		}
@@ -335,11 +330,13 @@ namespace fugazi.view.input {
 		private element: HTMLElement;
 		private isFocused: boolean;
 
-		public componentWillMount() {
+		public constructor(props: SuggestionPanelProperties, className: string, prompt?: string) {
+			super(props);
+
 			this.key = utils.generateId();
-			this.setState({
+			this.state = {
 				selected: -1
-			});
+			} as any;
 		}
 
 		public render(): JSX.Element {
@@ -447,17 +444,14 @@ namespace fugazi.view.input {
 	export class BackgroundTextInput<P extends BackgroundTextInputProperties, S extends BackgroundTextInputState> extends InputView<P, S> {
 		public constructor(props: P, className: string, prompt?: string) {
 			super(props, "bgtext " + className, prompt);
-		}
-
-		componentWillMount(){
-			this.setState({
-				backgroundText : this.props.backgroundText || ""
-			});
+			this.state = {
+				backgroundText: this.props.backgroundText || ""
+			} as any;
 		}
 
 		protected getContainerElements(): JSX.Element[] {
 			let elements = super.getContainerElements();
-			elements.push(<div key="bgtextbox" className="bgtextbox"><BackgroundTextBox text={ this.state.backgroundText } /></div>);
+			elements.push(<div key="bgtextbox" className="bgtextbox"><BackgroundTextBox text={ this.state.backgroundText }/></div>);
 			return elements;
 		}
 	}
@@ -472,7 +466,7 @@ namespace fugazi.view.input {
 		}
 
 		public render(): JSX.Element {
-			return <input key="bgtextboxinput" type="text" value={ this.props.text } />
+			return <input key="bgtextboxinput" type="text" value={ this.props.text }/>
 		}
 	}
 
