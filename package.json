@@ -5,7 +5,9 @@
   "dependencies": {
     "lz-string": "1.4.4",
     "react": "15.6.1",
-    "react-dom": "15.6.1"
+    "react-dom": "15.6.1",
+    "perfect-scrollbar": "0.7.1",
+    "marked": "0.3.6"
   },
   "devDependencies": {
     "@types/google.analytics": "0.0.34",

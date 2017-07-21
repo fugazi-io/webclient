@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as marked from "marked";
 import * as output from "./output";
 import * as view from "./view";
 import * as collections from "../core/types.collections";
