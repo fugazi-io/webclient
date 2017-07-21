@@ -1,3 +1,6 @@
+import * as location from "./application.location";
+import * as bus from "./application.bus";
+
 /// <reference path="./storage.ts" />
 /// <reference path="../core/configuration.ts" />
 /// <reference path="../core/dom.ts" />
@@ -21,7 +24,7 @@ module fugazi.app {
 		Ready: "app.ready"
 	};
 
-	var context: ApplicationContext,
+	export var context: ApplicationContext,
 		mainView: view.MainView,
 		CONTEXT_ID_PARAMS: utils.GenerateIdParameters = {
 			min: 5,
@@ -117,100 +120,6 @@ module fugazi.app {
 			items.push(terminal);
 			return terminal;
 		}
-	}
-
-	export namespace bus {
-		const subscribers: collections.Map<EventHandler[]> = collections.map<EventHandler[]>();
-
-		export interface EventHandler {
-			(): void;
-		}
-
-		export function register(eventName: string, eventHandler: EventHandler): void {
-			var handlers: EventHandler[];
-
-			if (subscribers.has(eventName)) {
-				handlers = subscribers.get(eventName);
-			} else {
-				handlers = [];
-				subscribers.set(eventName, handlers);
-			}
-
-			handlers.push(eventHandler);
-		}
-
-		export function unregister(eventName: string, eventHandler: EventHandler): void {
-			if (subscribers.has(eventName)) {
-				subscribers.get(eventName).remove(eventHandler);
-			}
-		}
-
-		export function post(eventName: string) {
-			if (subscribers.has(eventName)) {
-				subscribers.get(eventName).forEach(handler => handler());
-			}
-		}
-	}
-
-	export namespace location {
-		let baseUrl: net.Url;
-
-		export function current(): net.Url {
-			return new net.Url(window.location.href);
-		}
-
-		export function base(): net.Url {
-			return baseUrl;
-		}
-		
-		export function currentScript(): net.Url {
-			return document.currentScript ? new net.Url((document.currentScript as HTMLScriptElement).src) : null;
-		}
-
-		export function scripts(scriptPath?: string): net.Url {
-			let url = new net.Url("./scripts/bin/", baseUrl);
-			
-			if (scriptPath) {
-				url = new net.Url(scriptPath, url);
-			}
-
-			return url;
-		}
-
-		export function modules(modulePath: string): net.Url;
-		export function modules(type: "js" | "json", modulePath?: string): net.Url;
-		export function modules() {
-			let url: net.Url,
-				base: string,
-				modulePath: string,
-				args = Array.from(arguments);
-
-			if (args[0].endsWith("js")) {
-				base = "./modules/scripts/bin/";
-			} else if (args[0].endsWith("json")) {
-				base = "./modules/jsons/";
-			} else {
-				throw new fugazi.Exception("module can only be js or json");
-			}
-
-			if (args.length === 2) {
-				modulePath = args[1];
-			} else if (args[0] !== "js" && args[0] !== "json") {
-				modulePath = args[0];
-			}
-
-			url = new net.Url(base, baseUrl);
-
-			if (modulePath) {
-				url = new net.Url(modulePath, url);
-			}
-
-			return url;
-		}
-
-		fugazi.dom.ready(() => {
-			baseUrl = current();
-		});
 	}
 
 	fugazi.dom.ready(kickstart);
