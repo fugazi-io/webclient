@@ -1,7 +1,7 @@
 import * as modules from "./modules";
 import * as modulesBuilder from "./modules.builder";
 import * as commands from "./commands";
-import * as application from "../app/application";
+import * as constants from "../app/constants";
 import * as applicationBus from "../app/application.bus";
 import * as semantics from "../app/semantics";
 import * as components from "./components";
@@ -493,7 +493,7 @@ function createCoreModule(parentPath: components.Path): modules.Module {
 }
 
 // init
-applicationBus.register(application.Events.Loaded, function (): void {
+applicationBus.register(constants.Events.Loaded, function (): void {
 	let ioModule: modules.Module = new modules.Module(),
 		fugaziModule: modules.Module = new modules.Module(),
 		coreModule: modules.Module;

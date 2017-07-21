@@ -3,6 +3,7 @@ import * as storage from "./storage";
 import * as statements from "./statements";
 import * as modules from "./modules";
 import * as viewTerminal from "../view/terminal";
+import * as constants from "./constants";
 import * as app from "./application";
 import * as collections from "../core/types.collections";
 import * as coreTypes from "../core/types";
@@ -238,7 +239,7 @@ function extractVariableName(input: string): string {
 }
 
 // init
-bus.register(app.Events.Ready, function (): void {
+bus.register(constants.Events.Ready, function (): void {
 	let coreCommands = {
 		name: "io.fugazi.terminal",
 		title: "Terminal Module",

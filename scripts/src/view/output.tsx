@@ -1,7 +1,7 @@
 import * as view from "./view";
 import * as renderers from "./renderers";
 import * as statements from "../app/statements";
-import * as app from "../app/application";
+import * as constants from "../app/constants";
 import * as logger from "../core/logger";
 import * as coreTypes from "../core/types";
 import * as commands from "../components/commands";
@@ -182,7 +182,7 @@ export class OutputView extends view.View<OutputProperties, OutputState> {
 
 		if (this.state.sayhello) {
 			blocks.unshift(
-				<li key="hello" className="hello version">fugazi version { app.version.code }</li>,
+				<li key="hello" className="hello version">fugazi version { constants.version.code }</li>,
 				<li key="repoLink" className="hello moreInfo">
 					run <span className="help-command">help</span> for more info or
 					check out the <a target="_blank" href="https://github.com/fugazi-io/webclient">GitHub repo</a>

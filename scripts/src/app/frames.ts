@@ -1,5 +1,5 @@
 import * as bus from "./application.bus";
-import * as app from "./application";
+import * as constants from "./constants";
 import * as applicationLocation from "./application.location";
 import * as proxyframeProtocol from "../proxyframe/protocol";
 import * as proxyframeGlobal from "../proxyframe/global";
@@ -287,7 +287,7 @@ export class ProxyFrame extends BaseFrame {
 }
 
 // init
-bus.register(app.Events.Loaded, function (): void {
+bus.register(constants.Events.Loaded, function (): void {
 	framesContainer = dom.create("div", {
 		id: "frames"
 	}, document.body) as HTMLDivElement;
