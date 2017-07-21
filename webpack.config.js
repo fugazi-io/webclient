@@ -3,10 +3,8 @@ const webpack = require('webpack');
 const {getIfUtils, removeEmpty} = require('webpack-config-utils');
 
 // variables
-const sourcePath = path.join(__dirname, 'src');
 const outPath = path.join(__dirname, 'dist');
 const assetsPath = path.join(__dirname, 'assets');
-const modulesPath = path.join(__dirname, 'node_modules');
 
 // plugins
 const HtmlWebpackPlugin = require('html-webpack-plugin');
