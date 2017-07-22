@@ -22,9 +22,9 @@ export class MainView extends view.View<MainProperties, MainState> implements te
 		this.state = {terminals: []};
 	}
 
-	public createTerminal(properties: terminal.TerminalProperties): Promise<terminal.TerminalView> {
-		const terminals: terminal.TerminalProperties[] = this.state.terminals.clone(),
-			future = new coreTypes.Future<terminal.TerminalView>();
+		public createTerminal(properties: terminal.TerminalProperties): Promise<terminal.TerminalView> {
+			const terminals: terminal.TerminalProperties[] = this.state.terminals.clone(),
+				future = new coreTypes.Future<terminal.TerminalView>();
 
 		terminals.push(properties);
 

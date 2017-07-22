@@ -380,13 +380,13 @@ class BasicAuthentication extends Authenticator {
 		}) as commandsDescriptor.LocalCommandDescriptor;
 	}
 
-	public authenticate(context: app.Context, username: string): handler.Result {
-		if (!username || username.trim().length === 0) {
-			return {
-				status: handler.ResultStatus.Failure,
-				error: "username is empty"
-			}; //as commands.handler.FailResult;
-		}
+		public authenticate(context: app.Context, username: string): handler.Result {
+			if (!username || username.trim().length === 0) {
+				return {
+					status: handler.ResultStatus.Failure,
+					error: "username is empty"
+				} ; //as commands.handler.FailResult;
+			}
 
 		this.username = username.trim();
 		return {
