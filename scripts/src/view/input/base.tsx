@@ -64,7 +64,9 @@ export abstract class InputView<P extends InputProperties, S extends InputState>
 		this.prompt = prompt;
 		this.className = ["input", className];
 		this.keymap = collections.map<() => void>();
-		this.state = {value: this.props.value || ""} as any;
+		this.state = {
+				value: this.props.value || ""
+			} as S;
 	}
 
 	public componentDidMount(): void {
@@ -278,7 +280,7 @@ export abstract class SuggestibleInputView<P extends SuggestibleInputProperties<
 			message: null,
 			suggestions: this.props.suggestions,
 			focus: "input"
-		} as any;
+		} as S;
 
 
 	}
@@ -355,12 +357,12 @@ class SuggestionPanel extends view.View<SuggestionPanelProperties, SuggestionPan
 	private element: HTMLElement;
 	private isFocused: boolean;
 
-	constructor(props: SuggestionPanelProperties, className: string, prompt?: string) {
+	constructor(props: SuggestionPanelProperties) {
 		super(props);
 		this.key = utils.generateId();
 		this.state = {
 			selected: -1
-		} as any;
+		} as SuggestionPanelState;
 	}
 
 	public render(): JSX.Element {
@@ -472,7 +474,7 @@ export class BackgroundTextInput<P extends BackgroundTextInputProperties, S exte
 
 		this.state = {
 			backgroundText: this.props.backgroundText || ""
-		}as any;
+		}as S;
 	}
 
 	protected getContainerElements(): JSX.Element[] {

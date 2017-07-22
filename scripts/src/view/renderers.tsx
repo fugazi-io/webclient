@@ -16,11 +16,14 @@ export interface RenderingComponentProperties extends view.ViewProperties {
 }
 
 export interface RenderingComponentClass {
-	new(props: RenderingComponentProperties): RenderingComponent<RenderingComponentProperties, view.ViewState>;
+	new(props: RenderingComponentProperties, initialState: Partial<ViewState>): RenderingComponent<RenderingComponentProperties, view.ViewState>;
 }
 
-export class RenderingComponent<P extends RenderingComponentProperties, S extends view.ViewState> extends view.View<P, S> {
-}
+	export class RenderingComponent<P extends RenderingComponentProperties, S extends view.ViewState> extends view.View<P, S> {constructor(props: P, initialState: Partial<S>) {
+			super(props);
+
+			this.state = initialState as S;
+		}}
 
 class AnyComponent extends RenderingComponent<RenderingComponentProperties, view.ViewState> {
 	public render(): JSX.Element {
@@ -175,22 +178,20 @@ export interface CollectionComponentState extends view.ViewState {
 	generics?: types.Type;
 }
 
-export abstract class CollectionComponent<T extends CollectionComponentState> extends RenderingComponent<RenderingComponentProperties, T> {
-	public constructor(props: RenderingComponentProperties) {
-		super(props);
+	export abstract class CollectionComponent<T extends CollectionComponentState> extends RenderingComponent<RenderingComponentProperties, T> {
+		public constructor(props: RenderingComponentProperties, initialState: Partial<T> = {}) {
+			const genericsConstraint = registry.get(components.ComponentType.Constraint, "generics") as constraints.Constraint;
 
-		let genericsConstraint = registry.get(components.ComponentType.Constraint, "generics") as constraints.Constraint;
+			initialState = Object.assign( {
+				fold: FoldState.Collapsed
+			} , initialState);
 
-		this.state = {
-			fold: FoldState.Collapsed
-		} as T;
+			if (props.type instanceof types.ConstrainedType) {
+				initialState.
+					generics = (props.type as types.ConstrainedType).getConstraintParamValue(genericsConstraint, "type");
+				}
 
-		if (props.type instanceof types.ConstrainedType) {
-			this.setState({
-				generics: (props.type as types.ConstrainedType).getConstraintParamValue(genericsConstraint, "type")
-			});
-		}
-	}
+		super(props, initialState);}
 
 	public componentDidUpdate(prevProps: RenderingComponentProperties, prevState: T) {
 		this.props.onStyleChange();
@@ -290,11 +291,9 @@ export interface MapComponentState extends CollectionComponentState {
 	fields?: collections.Map<types.Type>;
 }
 
-export class MapComponent extends CollectionComponent<MapComponentState> {
-	constructor(props: RenderingComponentProperties) {
-		super(props);
-
-		let structConstraint = registry.get(components.ComponentType.Constraint, "struct") as constraints.Constraint;
+	export class MapComponent extends CollectionComponent<MapComponentState> {
+		constructor(props: RenderingComponentProperties) {
+			const structConstraint = registry.get(components.ComponentType.Constraint, "struct") as constraints.Constraint;const initialState = {} as MapComponentState;
 
 		let fieldsList: collections.Map<types.Type>[];
 
@@ -302,18 +301,18 @@ export class MapComponent extends CollectionComponent<MapComponentState> {
 			fieldsList = (props.type as types.ConstrainedType).getConstraintParamValues(structConstraint, "fields");
 		}
 
-		if (fieldsList && fieldsList.length > 0) {
-			this.setState({
-				isStruct: true,
-				fields: collections.map<types.Type>()
-			});
-			fieldsList.forEach(map => this.state.fields.extend(map));
-		} else {
-			this.setState({
-				isStruct: false
-			});
-		}
-	}
+			if (fieldsList && fieldsList.length > 0) {
+				initialState.
+					isStruct = true;
+					initialState.fields = collections.map<types.Type>();
+
+				fieldsList.forEach(map => initialState.fields.extend(map));
+			} else {
+				initialState.
+					isStruct= false;
+				}
+
+		super(props, initialState);}
 
 	protected showSize(): boolean {
 		return !this.state.isStruct;

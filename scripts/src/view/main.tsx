@@ -89,12 +89,12 @@ class GitHubRibbon extends React.Component {
 			top: 0,
 			right: 0,
 			border: 0
-		};// as CSSProperties;
+		};
 
 		return (
 			<a target="_blank" href="https://github.com/fugazi-io/webclient">
 				<img
-					style={ style as any }
+					style={ style as React.CSSProperties }
 					alt="Go to GitHub repo page"
 					data-canonical-src={ `https://s3.amazonaws.com/github/ribbons/forkme_right_${ version.canonical }.png` }
 					src={ `https://camo.githubusercontent.com/${ version.src }` }
