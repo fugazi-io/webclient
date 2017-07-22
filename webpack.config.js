@@ -8,7 +8,6 @@ const assetsPath = path.join(__dirname, 'assets');
 
 // plugins
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const htmlTemplate = path.join(assetsPath, 'index.html');
 
@@ -31,49 +30,7 @@ module.exports = env => {
 		},
 		module: {
 			noParse: [/\.min\.js$/, /\.bundle\.js$/],
-			rules: [
-				/*{
-					test: /\.tsx?$/,
-					use: {
-						loader: 'ts-loader',
-						options: {
-							compilerOptions: {
-								"noEmit": false,
-								"sourceMap": true
-							}
-						}
-					}
-				}, */
-				{
-					test: /\.js$/,
-					use: ["source-map-loader"],
-					enforce: "pre"
-				}
-				/*
-				 , {
-				 test: /\.css$/,
-				 exclude: modulesPath,
-				 use: ExtractTextPlugin.extract({
-				 fallback: 'style-loader',
-				 use: [{
-				 loader: 'css-loader',
-				 query: {
-				 modules: true,
-				 sourceMap: isNotProd,
-				 importLoaders: 1,
-				 localIdentName: '[local]__[hash:base64:5]'
-				 }
-				 }, {
-				 loader: 'postcss-loader'
-				 }]
-				 })
-				 },
-				 // static assets
-				 {test: /\.html$/, use: 'html-loader'},
-				 {test: /\.png$/, use: 'url-loader?limit=10000'},
-				 {test: /\.jpg$/, use: 'file-loader'},
-				 */
-			]
+			rules: []
 		},
 		resolve: {
 			extensions: ['.ts', '.tsx', '.js'],
@@ -82,28 +39,8 @@ module.exports = env => {
 			mainFields: ['module', 'browser', 'main']
 		},
 		target: 'web',
-		plugins: removeEmpty([
-			/*
-			 new webpack.LoaderOptionsPlugin({
-			 options: {
-			 context: sourcePath,
-			 postcss: removeEmpty([
-			 require('postcss-import')({addDependencyTo: webpack}),
-			 require('postcss-url')(),
-			 require('autoprefixer'),
-			 require('postcss-reporter')(),
-			 ifNotProd(require('postcss-browser-reporter')()),
-			 ])
-			 }
-			 }),
-			 new ExtractTextPlugin({
-			 filename: 'styles.css',
-			 disable: isNotProd
-			 }),
-			 */
-			new HtmlWebpackPlugin({
-				template: htmlTemplate,
-			})
-		])
+		plugins: [new HtmlWebpackPlugin({
+			template: htmlTemplate,
+		})]
 	};
 };
