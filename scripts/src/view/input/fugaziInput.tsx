@@ -24,14 +24,14 @@ export interface FugaziInputProperties extends base.SuggestibleInputProperties<s
 export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProperties, base.SuggestibleInputState<statements.Statement>, statements.Statement> {
 	private history: History;
 
-		constructor(props: FugaziInputProperties) {
-			super(props, "fugazi", props.prompt || DEFAULT_FUGAZI_PROMPT);
-			this.addKeyMapping(false, true, false, "R", this.onShowSearch.bind(this));
+	constructor(props: FugaziInputProperties) {
+		super(props, "fugazi", props.prompt || DEFAULT_FUGAZI_PROMPT);
+		this.addKeyMapping(false, true, false, "R", this.onShowSearch.bind(this));
 
-			if (this.props.searchResult && this.props.searchResult.length > 0 ) {
-				this.state= {value : this.props.searchResult} as any;
-			}
+		if (this.props.searchResult && this.props.searchResult.length > 0) {
+			this.state = {value: this.props.searchResult} as any;
 		}
+	}
 
 	public componentDidMount(): void {
 		super.componentDidMount();
@@ -51,19 +51,23 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 		}
 	}
 
-		protected onArrowUpPressed(): boolean {
-			this.history.previous();
-			this.updateSuggestions(this.getValue(), this.getValue().length).then(() => {
-				setTimeout(() => { this.setCaretPosition(this.getValue().length); }, 5);
-			});
-			return false;
-		}
+	protected onArrowUpPressed(): boolean {
+		this.history.previous();
+		this.updateSuggestions(this.getValue(), this.getValue().length).then(() => {
+			setTimeout(() => {
+				this.setCaretPosition(this.getValue().length);
+			}, 5);
+		});
+		return false;
+	}
 
-		protected onArrowDownPressed(): boolean {
-			this.history.next();
-			this.updateSuggestions(this.getValue(), this.getValue().length).then(() => {
-				setTimeout(() => { this.setCaretPosition(this.getValue().length); }, 5);
-			});
+	protected onArrowDownPressed(): boolean {
+		this.history.next();
+		this.updateSuggestions(this.getValue(), this.getValue().length).then(() => {
+			setTimeout(() => {
+				this.setCaretPosition(this.getValue().length);
+			}, 5);
+		});
 
 		return false;
 	}
@@ -161,17 +165,17 @@ class StatementSuggestionItem extends view.View<StatementSuggestionItemPropertie
 			elements.push(StatementSuggestionItem.getElementFor(token));
 		});
 
-			return (
-				<li
+		return (
+			<li
 
-					className={ className }
-					onMouseEnter={ () => this.props.handler.onEnter(this.props.index) }
-					onMouseLeave={ () => this.props.handler.onLeave(this.props.index) }
-					onClick={ () => this.props.handler.onClick(this.props.index) }>
-					{ elements }
-				</li>
-			);
-		}
+				className={ className }
+				onMouseEnter={ () => this.props.handler.onEnter(this.props.index) }
+				onMouseLeave={ () => this.props.handler.onLeave(this.props.index) }
+				onClick={ () => this.props.handler.onClick(this.props.index) }>
+				{ elements }
+			</li>
+		);
+	}
 
 	private static getElementFor(token: syntax.RuleToken): JSX.Element {
 		if (token.getTokenType() == syntax.TokenType.Keyword) {

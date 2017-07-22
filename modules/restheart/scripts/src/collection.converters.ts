@@ -17,7 +17,7 @@ type Collection = {
 	}[];
 }
 
-(function(): void {
+(function (): void {
 	fugazi.loaded({
 		name: "restheart.collections",
 		converters: {
@@ -25,7 +25,7 @@ type Collection = {
 				title: "converts RawCollections to Collections",
 				input: "RawCollections",
 				output: "Collections",
-				converter: function(response: { _embedded: { _id: string }[] }): string[] {
+				converter: function (response: { _embedded: { _id: string }[] }): string[] {
 					return response._embedded.map(db => db._id);
 				}
 			},
@@ -33,21 +33,21 @@ type Collection = {
 				title: "converts RawCollection to Collection",
 				input: "RawCollection",
 				output: "Collection",
-				converter: function(response: RawCollection): Collection {
+				converter: function (response: RawCollection): Collection {
 					return {
 						_id: response._id,
 						documents: response._embedded.map(rawDocument => {
 							const document = Object.assign({}, rawDocument) as any;
 							document._id = `ObjectId("${ rawDocument._id.$oid }")`;
 							/*const document = {
-								_id: `ObjectId("${ rawDocument._id.$oid }")`
-							};
+							 _id: `ObjectId("${ rawDocument._id.$oid }")`
+							 };
 
-							Object.keys(rawDocument).forEach(name => {
-								if (name !== "_id") {
-									document[name] = rawDocument[name];
-								}
-							});*/
+							 Object.keys(rawDocument).forEach(name => {
+							 if (name !== "_id") {
+							 document[name] = rawDocument[name];
+							 }
+							 });*/
 
 							return document;
 						})

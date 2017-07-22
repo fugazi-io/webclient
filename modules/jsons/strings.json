@@ -1,6 +1,6 @@
 {
-	"name": "io.fugazi.strings",
-	"title": "Strings",
-	"description": "common utils to deal with strings",
-	"constraints": "../scripts/bin/base/strings.js"
+  "name": "io.fugazi.strings",
+  "title": "Strings",
+  "description": "common utils to deal with strings",
+  "constraints": "../scripts/bin/base/strings.js"
 }

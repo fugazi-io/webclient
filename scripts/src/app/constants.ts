@@ -1,4 +1,3 @@
-
 export const version = {
 	code: "1.0.16",
 	name: "The Argument",

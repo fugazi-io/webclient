@@ -1,164 +1,164 @@
 {
-	"name": "restheart",
-	"title": "RESTHeart API for MongoDB",
-	"description": "An API for accessing mongodb instances",
-	"remote": {
-		"origin": "http://0.0.0.0:8085",
-		"base": "/",
-		"auth": "basic"
-	},
-	"types": {
-		"RawIdObject": {
-			"title": "Mongo raw object with id",
-			"type": {
-				"_id": "string"
-			}
-		},
-		"RawOIdObject": {
-			"title": "Mongo raw object with oid",
-			"type": {
-				"_id": {
-					"$oid": "string"
-				}
-			}
-		},
-		"IdObject": {
-			"title": "Mongo object with id",
-			"type": {
-				"_id": "string"
-			}
-		}
-	},
-	"modules": {
-		"databases": {
-			"title": "Databases",
-			"types": {
-				"RawDatabases": {
-					"title": "RESTHeart database response",
-					"type": {
-						"_embedded": "list<RawIdObject>",
-						"_size": "numbers.integer",
-						"_returned": "numbers.integer",
-						"_total_pages": "numbers.integer"
-					}
-				},
-				"Databases": {
-					"type": "list<string>"
-				},
-				"RawDatabase": {
-					"base": "RawIdObject",
-					"type": {
-						"_embedded": "list<RawIdObject>",
-						"_size": "numbers.integer",
-						"_returned": "numbers.integer",
-						"_total_pages": "numbers.integer"
-					}
-				},
-				"Database": {
-					"base": "IdObject",
-					"type": {
-						"collections": "list<string>"
-					}
-				}
-			},
-			"commands": [
-				{
-					"name": "list",
-					"title": "List databases",
-					"returns": "Databases",
-					"convert": {
-						"from": "RawDatabases",
-						"converter": "RawDatabases2Databases"
-					},
-					"syntax": "list dbs",
-					"handler": {
-						"endpoint": "/",
-						"method": "GET"
-					}
-				},
-				{
-					"name": "get",
-					"title": "Get a database",
-					"returns": "Database",
-					"convert": {
-						"from": "RawDatabase",
-						"converter": "RawDatabase2Database"
-					},
-					"syntax": "get db (dbname string)",
-					"handler": {
-						"endpoint": "/{ dbname }",
-						"method": "GET"
-					}
-				},
-				"scripts/bin/db.commands.js"
-			],
-			"converters": "scripts/bin/db.converters.js"
-		},
-		"collections": {
-			"title": "Collections",
-			"types": {
-				"RawCollections": {
-					"title": "RESTHeart collections response",
-					"type": {
-						"_id": "string",
-						"_embedded": "list<RawIdObject>",
-						"_size": "numbers.integer",
-						"_returned": "numbers.integer",
-						"_total_pages": "numbers.integer"
-					}
-				},
-				"Collections": {
-					"type": "list<string>"
-				},
-				"RawCollection": {
-					"base": "RawIdObject",
-					"type": {
-						"_embedded": "list<map>",
-						"_returned": "numbers.integer"
-					}
-				},
-				"Collection": {
-					"base": "IdObject",
-					"type": {
-						"documents": "list<map>"
-					}
-				}
-			},
-			"lookup": {
-				"dbname": "module:default.db"
-			},
-			"commands": {
-				"list": {
-					"title": "List collections",
-					"returns": "Collections",
-					"convert": {
-						"from": "RawCollections",
-						"converter": "RawCollections2Collections"
-					},
-					"syntax": "list collections in (dbname string)",
-					"handler": {
-						"endpoint": "/{ dbname }",
-						"method": "GET"
-					}
-				},
-				"get": {
-					"title": "Get collection",
-					"returns": "Collection",
-					"convert": {
-						"from": "RawCollection",
-						"converter": "RawCollection2Collection"
-					},
-					"syntax": [
-						"get collection (collectionname string)",
-						"get collection (collectionname string) in (dbname string)"
-					],
-					"handler": {
-						"endpoint": "/{ dbname }/{ collectionname }",
-						"method": "GET"
-					}
-				}
-			},
-			"converters": "scripts/bin/collection.converters.js"
-		}
-	}
+  "name": "restheart",
+  "title": "RESTHeart API for MongoDB",
+  "description": "An API for accessing mongodb instances",
+  "remote": {
+    "origin": "http://0.0.0.0:8085",
+    "base": "/",
+    "auth": "basic"
+  },
+  "types": {
+    "RawIdObject": {
+      "title": "Mongo raw object with id",
+      "type": {
+        "_id": "string"
+      }
+    },
+    "RawOIdObject": {
+      "title": "Mongo raw object with oid",
+      "type": {
+        "_id": {
+          "$oid": "string"
+        }
+      }
+    },
+    "IdObject": {
+      "title": "Mongo object with id",
+      "type": {
+        "_id": "string"
+      }
+    }
+  },
+  "modules": {
+    "databases": {
+      "title": "Databases",
+      "types": {
+        "RawDatabases": {
+          "title": "RESTHeart database response",
+          "type": {
+            "_embedded": "list<RawIdObject>",
+            "_size": "numbers.integer",
+            "_returned": "numbers.integer",
+            "_total_pages": "numbers.integer"
+          }
+        },
+        "Databases": {
+          "type": "list<string>"
+        },
+        "RawDatabase": {
+          "base": "RawIdObject",
+          "type": {
+            "_embedded": "list<RawIdObject>",
+            "_size": "numbers.integer",
+            "_returned": "numbers.integer",
+            "_total_pages": "numbers.integer"
+          }
+        },
+        "Database": {
+          "base": "IdObject",
+          "type": {
+            "collections": "list<string>"
+          }
+        }
+      },
+      "commands": [
+        {
+          "name": "list",
+          "title": "List databases",
+          "returns": "Databases",
+          "convert": {
+            "from": "RawDatabases",
+            "converter": "RawDatabases2Databases"
+          },
+          "syntax": "list dbs",
+          "handler": {
+            "endpoint": "/",
+            "method": "GET"
+          }
+        },
+        {
+          "name": "get",
+          "title": "Get a database",
+          "returns": "Database",
+          "convert": {
+            "from": "RawDatabase",
+            "converter": "RawDatabase2Database"
+          },
+          "syntax": "get db (dbname string)",
+          "handler": {
+            "endpoint": "/{ dbname }",
+            "method": "GET"
+          }
+        },
+        "scripts/bin/db.commands.js"
+      ],
+      "converters": "scripts/bin/db.converters.js"
+    },
+    "collections": {
+      "title": "Collections",
+      "types": {
+        "RawCollections": {
+          "title": "RESTHeart collections response",
+          "type": {
+            "_id": "string",
+            "_embedded": "list<RawIdObject>",
+            "_size": "numbers.integer",
+            "_returned": "numbers.integer",
+            "_total_pages": "numbers.integer"
+          }
+        },
+        "Collections": {
+          "type": "list<string>"
+        },
+        "RawCollection": {
+          "base": "RawIdObject",
+          "type": {
+            "_embedded": "list<map>",
+            "_returned": "numbers.integer"
+          }
+        },
+        "Collection": {
+          "base": "IdObject",
+          "type": {
+            "documents": "list<map>"
+          }
+        }
+      },
+      "lookup": {
+        "dbname": "module:default.db"
+      },
+      "commands": {
+        "list": {
+          "title": "List collections",
+          "returns": "Collections",
+          "convert": {
+            "from": "RawCollections",
+            "converter": "RawCollections2Collections"
+          },
+          "syntax": "list collections in (dbname string)",
+          "handler": {
+            "endpoint": "/{ dbname }",
+            "method": "GET"
+          }
+        },
+        "get": {
+          "title": "Get collection",
+          "returns": "Collection",
+          "convert": {
+            "from": "RawCollection",
+            "converter": "RawCollection2Collection"
+          },
+          "syntax": [
+            "get collection (collectionname string)",
+            "get collection (collectionname string) in (dbname string)"
+          ],
+          "handler": {
+            "endpoint": "/{ dbname }/{ collectionname }",
+            "method": "GET"
+          }
+        }
+      },
+      "converters": "scripts/bin/collection.converters.js"
+    }
+  }
 }

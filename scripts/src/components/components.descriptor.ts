@@ -46,7 +46,7 @@ export class ExistingLoader<T extends Descriptor> extends BaseLoader<T> {
 		this.aDescriptor = aDescriptor;
 	}
 
-	then(fn: (aDescriptor: T) => void | T): Loader<T> {
+	then(fn: (aDescriptor: T) => any | T): Loader<T> {
 		let result = fn(this.aDescriptor);
 
 		if (coreTypes.isPlainObject(result) && coreTypes.is((<T> result).name, String)) {
@@ -69,7 +69,7 @@ export class FailedLoader extends BaseLoader<Descriptor> {
 		this.error = error;
 	}
 
-	then(fn: (aDescriptor: Descriptor) => void): Loader<Descriptor> {
+	then(fn: (aDescriptor: Descriptor) => any): Loader<Descriptor> {
 		return this;
 	}
 

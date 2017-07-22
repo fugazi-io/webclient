@@ -1,4 +1,4 @@
-(function(): void {
+(function (): void {
 	fugazi.loaded({
 		name: "io.fugazi",
 		converters: {
@@ -6,7 +6,7 @@
 				title: "converts string to boolean",
 				input: "string",
 				output: "boolean",
-				converter: function(input: string): boolean {
+				converter: function (input: string): boolean {
 					if (input.test(/^true$/i)) {
 						return true;
 					}
@@ -22,7 +22,7 @@
 				title: "converts string to number",
 				input: "string",
 				output: "number",
-				converter: function(input: string): number {
+				converter: function (input: string): number {
 					return parseFloat(input);
 				}
 			}

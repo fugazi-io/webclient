@@ -1,6 +1,6 @@
 import {Descriptor, HttpMethod, Map, ModuleContext, RequestProperties} from "../../../../scripts/bin/app/modules.api";
 
-(function(): void {
+(function (): void {
 	interface HttpResponse {
 		status: number;
 		data: any;
@@ -40,33 +40,33 @@ import {Descriptor, HttpMethod, Map, ModuleContext, RequestProperties} from "../
 
 	let httpRequestByMethodSyntax = (method: string) => {
 		return [
-				`${ method } (url url)`,
+			`${ method } (url url)`,
 
-				`${ method } (url url) (data string)`,
-				`${ method } (url url) (data map)`,
+			`${ method } (url url) (data string)`,
+			`${ method } (url url) (data map)`,
 
-				`${ method } (url url) (data string) (contentType contentType)`,
-				`${ method } (url url) (data map) (contentType contentType)`,
+			`${ method } (url url) (data string) (contentType contentType)`,
+			`${ method } (url url) (data map) (contentType contentType)`,
 
-				`${ method } (url url) (data string) (headers map)`,
-				`${ method } (url url) (data map) (headers map)`,
+			`${ method } (url url) (data string) (headers map)`,
+			`${ method } (url url) (data map) (headers map)`,
 
-				`${ method } (url url) (data string) (timeout number[numbers.integer])`,
-				`${ method } (url url) (data map) (timeout number[numbers.integer])`,
+			`${ method } (url url) (data string) (timeout number[numbers.integer])`,
+			`${ method } (url url) (data map) (timeout number[numbers.integer])`,
 
-				`${ method } (url url) (data string) (contentType contentType) (headers map)`,
-				`${ method } (url url) (data map) (contentType contentType) (headers map)`,
+			`${ method } (url url) (data string) (contentType contentType) (headers map)`,
+			`${ method } (url url) (data map) (contentType contentType) (headers map)`,
 
-				`${ method } (url url) (data string) (contentType contentType) (timeout number[numbers.integer])`,
-				`${ method } (url url) (data map) (contentType contentType) (timeout number[numbers.integer])`,
+			`${ method } (url url) (data string) (contentType contentType) (timeout number[numbers.integer])`,
+			`${ method } (url url) (data map) (contentType contentType) (timeout number[numbers.integer])`,
 
-				`${ method } (url url) (data string) (headers map) (timeout number[numbers.integer])`,
-				`${ method } (url url) (data map) (headers map) (timeout number[numbers.integer])`,
+			`${ method } (url url) (data string) (headers map) (timeout number[numbers.integer])`,
+			`${ method } (url url) (data map) (headers map) (timeout number[numbers.integer])`,
 
-				`${ method } (url url) (data string) (contentType contentType) (headers map) (timeout number[numbers.integer])`,
-				`${ method } (url url) (data map) (contentType contentType) (headers map) (timeout number[numbers.integer])`
-			];
-		};
+			`${ method } (url url) (data string) (contentType contentType) (headers map) (timeout number[numbers.integer])`,
+			`${ method } (url url) (data map) (contentType contentType) (headers map) (timeout number[numbers.integer])`
+		];
+	};
 
 	fugazi.loaded(<Descriptor> {
 		name: "io.fugazi.net.http",

@@ -1,89 +1,89 @@
 {
-	"name": "io.fugazi.help",
-	"title": "Help commands",
-	"remote": {
-		"base": "modules/markdown/help/"
-	},
-	"commands": {
-		"help": {
-			"title": "General help",
-			"syntax": "help",
-			"returns": "ui.markdown",
-			"handler": {
-				"endpoint": "help.md"
-			}
-		},
-		"commands": {
-			"title": "Commands help",
-			"syntax": "help commands",
-			"returns": "ui.markdown",
-			"handler": {
-				"endpoint": "commands.md"
-			}
-		},
-		"constraints": {
-			"title": "Type constraints help",
-			"syntax": "help constraints",
-			"returns": "ui.markdown",
-			"handler": {
-				"endpoint": "constraints.md"
-			}
-		},
-		"converters": {
-			"title": "Type converters help",
-			"syntax": "help converters",
-			"returns": "ui.markdown",
-			"handler": {
-				"endpoint": "converters.md"
-			}
-		},
-		"history": {
-			"title": "Commands history help",
-			"syntax": "help history",
-			"returns": "ui.markdown",
-			"handler": {
-				"endpoint": "history.md"
-			}
-		},
-		"search": {
-			"title": "Commands search help",
-			"syntax": "help search",
-			"returns": "ui.markdown",
-			"handler": {
-				"endpoint": "search.md"
-			}
-		},
-		"suggestions": {
-			"title": "Commands suggestions help",
-			"syntax": "help suggestions",
-			"returns": "ui.markdown",
-			"handler": {
-				"endpoint": "suggestions.md"
-			}
-		},
-		"syntax": {
-			"title": "Command syntax help",
-			"syntax": "help syntax",
-			"returns": "ui.markdown",
-			"handler": {
-				"endpoint": "syntax.md"
-			}
-		},
-		"types": {
-			"title": "Types help",
-			"syntax": "help types",
-			"returns": "ui.markdown",
-			"handler": {
-				"endpoint": "types.md"
-			}
-		},
-		"vars": {
-			"title": "Variables help",
-			"syntax": "help vars",
-			"returns": "ui.markdown",
-			"handler": {
-				"endpoint": "vars.md"
-			}
-		}
-	}
+  "name": "io.fugazi.help",
+  "title": "Help commands",
+  "remote": {
+    "base": "modules/markdown/help/"
+  },
+  "commands": {
+    "help": {
+      "title": "General help",
+      "syntax": "help",
+      "returns": "ui.markdown",
+      "handler": {
+        "endpoint": "help.md"
+      }
+    },
+    "commands": {
+      "title": "Commands help",
+      "syntax": "help commands",
+      "returns": "ui.markdown",
+      "handler": {
+        "endpoint": "commands.md"
+      }
+    },
+    "constraints": {
+      "title": "Type constraints help",
+      "syntax": "help constraints",
+      "returns": "ui.markdown",
+      "handler": {
+        "endpoint": "constraints.md"
+      }
+    },
+    "converters": {
+      "title": "Type converters help",
+      "syntax": "help converters",
+      "returns": "ui.markdown",
+      "handler": {
+        "endpoint": "converters.md"
+      }
+    },
+    "history": {
+      "title": "Commands history help",
+      "syntax": "help history",
+      "returns": "ui.markdown",
+      "handler": {
+        "endpoint": "history.md"
+      }
+    },
+    "search": {
+      "title": "Commands search help",
+      "syntax": "help search",
+      "returns": "ui.markdown",
+      "handler": {
+        "endpoint": "search.md"
+      }
+    },
+    "suggestions": {
+      "title": "Commands suggestions help",
+      "syntax": "help suggestions",
+      "returns": "ui.markdown",
+      "handler": {
+        "endpoint": "suggestions.md"
+      }
+    },
+    "syntax": {
+      "title": "Command syntax help",
+      "syntax": "help syntax",
+      "returns": "ui.markdown",
+      "handler": {
+        "endpoint": "syntax.md"
+      }
+    },
+    "types": {
+      "title": "Types help",
+      "syntax": "help types",
+      "returns": "ui.markdown",
+      "handler": {
+        "endpoint": "types.md"
+      }
+    },
+    "vars": {
+      "title": "Variables help",
+      "syntax": "help vars",
+      "returns": "ui.markdown",
+      "handler": {
+        "endpoint": "vars.md"
+      }
+    }
+  }
 }

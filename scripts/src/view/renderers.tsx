@@ -185,24 +185,26 @@ export abstract class CollectionComponent<T extends CollectionComponentState> ex
 			fold: FoldState.Collapsed
 		} as T;
 
-			if (props.type instanceof types.ConstrainedType) {
-				this.setState({generics : (props.type as types.ConstrainedType).getConstraintParamValue(genericsConstraint, "type")
+		if (props.type instanceof types.ConstrainedType) {
+			this.setState({
+				generics: (props.type as types.ConstrainedType).getConstraintParamValue(genericsConstraint, "type")
 			});
-		}}
+		}
+	}
 
 	public componentDidUpdate(prevProps: RenderingComponentProperties, prevState: T) {
 		this.props.onStyleChange();
 	}
 
-		/**
-		 * @override
-		 */
-		public render(): JSX.Element {
-			let fold: FoldState = this.state.fold;
-		letpaths: components.Path[],
-				collectionSizeElement,
-				className = "typedValue collection " + FoldState[fold].toLowerCase(),
-				iconClassName = "icon fold fa " + (this.state.fold === FoldState.Collapsed ? "fa-chevron-right" : "fa-chevron-down");
+	/**
+	 * @override
+	 */
+	public render(): JSX.Element {
+		let fold: FoldState = this.state.fold;
+		let paths: components.Path[],
+			collectionSizeElement,
+			className = "typedValue collection " + FoldState[fold].toLowerCase(),
+			iconClassName = "icon fold fa " + (this.state.fold === FoldState.Collapsed ? "fa-chevron-right" : "fa-chevron-down");
 
 		if (this.props.type instanceof types.ConstrainedType) {
 			paths = (this.props.type as types.ConstrainedType).getHierarchicPaths().reverse();
@@ -300,14 +302,18 @@ export class MapComponent extends CollectionComponent<MapComponentState> {
 			fieldsList = (props.type as types.ConstrainedType).getConstraintParamValues(structConstraint, "fields");
 		}
 
-			if (fieldsList && fieldsList.length > 0) {
-				this.setState({isStruct : true,
-				fields : collections.map<types.Type>()
-			});	fieldsList.forEach(map => this.state.fields.extend(map));
-			} else {
-				this.setState({isStruct : false
+		if (fieldsList && fieldsList.length > 0) {
+			this.setState({
+				isStruct: true,
+				fields: collections.map<types.Type>()
 			});
-		}}
+			fieldsList.forEach(map => this.state.fields.extend(map));
+		} else {
+			this.setState({
+				isStruct: false
+			});
+		}
+	}
 
 	protected showSize(): boolean {
 		return !this.state.isStruct;

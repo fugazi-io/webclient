@@ -38,22 +38,22 @@ export class PasswordInputView extends view.View<PasswordInputViewProperties, vi
 	}
 }
 
-	export interface InputViewConstructor {
-		new(props: InputProperties): InputView<InputProperties, InputState>;
-	}
-	
-	export interface InputProperties extends view.ViewProperties {
-		value?: string;
-	}
+export interface InputViewConstructor {
+	new(props: InputProperties): InputView<InputProperties, InputState>;
+}
 
-	export interface InputState extends view.ViewState {
-		value?: string;
-	}
+export interface InputProperties extends view.ViewProperties {
+	value?: string;
+}
 
-	export abstract class InputView<P extends InputProperties, S extends InputState> extends view.View<P, S> {
-		private prompt: string;
-		private className: string[];
-		private keymap: collections.Map<() => void>;
+export interface InputState extends view.ViewState {
+	value?: string;
+}
+
+export abstract class InputView<P extends InputProperties, S extends InputState> extends view.View<P, S> {
+	private prompt: string;
+	private className: string[];
+	private keymap: collections.Map<() => void>;
 
 	protected inputbox: HTMLInputElement;
 
@@ -61,11 +61,11 @@ export class PasswordInputView extends view.View<PasswordInputViewProperties, vi
 		super(props);
 
 
-
-			this.prompt = prompt;
-			this.className = ["input", className];
-			this.keymap = collections.map<() => void>();
-		this.state = {value: this.props.value || ""} as any;}
+		this.prompt = prompt;
+		this.className = ["input", className];
+		this.keymap = collections.map<() => void>();
+		this.state = {value: this.props.value || ""} as any;
+	}
 
 	public componentDidMount(): void {
 		this.inputbox = ReactDOM.findDOMNode<HTMLInputElement>(this.refs["inputbox"] as React.ClassicComponent<any, any>);
@@ -73,11 +73,11 @@ export class PasswordInputView extends view.View<PasswordInputViewProperties, vi
 		this.setCaretPosition(this.getValue().length);
 	}
 
-		public render(): JSX.Element {
-			return <article className={ this.className.join(" ") }>
-						{ this.getInnerElements() }
-					</article>;
-		}
+	public render(): JSX.Element {
+		return <article className={ this.className.join(" ") }>
+			{ this.getInnerElements() }
+		</article>;
+	}
 
 	protected getPosition(): number {
 		return this.inputbox.selectionStart;
@@ -105,21 +105,21 @@ export class PasswordInputView extends view.View<PasswordInputViewProperties, vi
 		return elements;
 	}
 
-		protected getContainerElements(): JSX.Element[] {
-			return [
-				<div key="inputbox" className="inputbox">
-					<input tabIndex={ - 1 } key="input" type="text" ref="inputbox" value={ this.state.value }
-						onFocus={ this.onFocus.bind(this) }
-						onBlur={ this.onBlur.bind(this) }
-						onChange={ this.onChange.bind(this) }
-						onCopy={ this.onCopy.bind(this) }
-						onCut={ this.onCut.bind(this) }
-						onPaste={ this.onPaste.bind(this) }
-						onKeyUp={ this.onKeyUp.bind(this) }
-						onKeyPress={ this.onKeyPress.bind(this) }
-						onKeyDown={ this.onKeyDown.bind(this) } />
+	protected getContainerElements(): JSX.Element[] {
+		return [
+			<div key="inputbox" className="inputbox">
+				<input tabIndex={ -1 } key="input" type="text" ref="inputbox" value={ this.state.value }
+					   onFocus={ this.onFocus.bind(this) }
+					   onBlur={ this.onBlur.bind(this) }
+					   onChange={ this.onChange.bind(this) }
+					   onCopy={ this.onCopy.bind(this) }
+					   onCut={ this.onCut.bind(this) }
+					   onPaste={ this.onPaste.bind(this) }
+					   onKeyUp={ this.onKeyUp.bind(this) }
+					   onKeyPress={ this.onKeyPress.bind(this) }
+					   onKeyDown={ this.onKeyDown.bind(this) }/>
 			</div>];
-		}
+	}
 
 	protected addKeyMapping(alt: boolean, ctrl: boolean, shift: boolean, char: string, fn: () => void): void {
 		let key = "";
@@ -271,8 +271,9 @@ export type ItemRenderer<T> = (item: T, index: number, handler: ItemRendererMous
 export abstract class SuggestibleInputView<P extends SuggestibleInputProperties<T>, S extends SuggestibleInputState<T>, T> extends InputView<P, S> {
 	private suggestionPanel: SuggestionPanel;
 
-		public constructor(props: P, className: string, prompt?: string) {
-			super(props, "suggestible " + className, prompt);this.state = {
+	public constructor(props: P, className: string, prompt?: string) {
+		super(props, "suggestible " + className, prompt);
+		this.state = {
 			showing: false,
 			message: null,
 			suggestions: this.props.suggestions,
@@ -280,7 +281,7 @@ export abstract class SuggestibleInputView<P extends SuggestibleInputProperties<
 		} as any;
 
 
-		}
+	}
 
 	protected onTabPressed(): boolean {
 		let newState = !this.state.showing ?
@@ -354,12 +355,12 @@ class SuggestionPanel extends view.View<SuggestionPanelProperties, SuggestionPan
 	private element: HTMLElement;
 	private isFocused: boolean;
 
-		publicconstructor(props: SuggestionPanelProperties, className: string, prompt?: string) {
-			super(props);
-
-			this.key = utils.generateId();
-			this.state= {selected : -1
-		}as any;
+	constructor(props: SuggestionPanelProperties, className: string, prompt?: string) {
+		super(props);
+		this.key = utils.generateId();
+		this.state = {
+			selected: -1
+		} as any;
 	}
 
 	public render(): JSX.Element {
@@ -465,11 +466,12 @@ export interface BackgroundTextInputState extends InputState {
 	backgroundText: string;
 }
 
-	export class BackgroundTextInput<P extends BackgroundTextInputProperties, S extends BackgroundTextInputState> extends InputView<P, S> {
-		public constructor(props: P, className: string, prompt?: string) {
-			super(props, "bgtext " + className, prompt);
+export class BackgroundTextInput<P extends BackgroundTextInputProperties, S extends BackgroundTextInputState> extends InputView<P, S> {
+	public constructor(props: P, className: string, prompt?: string) {
+		super(props, "bgtext " + className, prompt);
 
-			this.state= {backgroundText : this. props.backgroundText || ""
+		this.state = {
+			backgroundText: this.props.backgroundText || ""
 		}as any;
 	}
 

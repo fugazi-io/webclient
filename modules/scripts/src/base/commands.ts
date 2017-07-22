@@ -1,7 +1,7 @@
 import {Component, Descriptor, Map, ModuleContext} from "../../../../scripts/bin/app/modules.api";
 
 
-(function(): void {
+(function (): void {
 	let echoExamples = "#### Examples:\n";
 	echoExamples += "```fugazi-command\n// command\necho hey\n//output\n\"hey\"\n```\n\n";
 	echoExamples += "```fugazi-command\n// command\necho [1, 2, hey]\n// output\nlist [\n\t1\n\t2\n\t\"hey\"\n]```\n\n";
@@ -39,7 +39,7 @@ import {Component, Descriptor, Map, ModuleContext} from "../../../../scripts/bin
 					method: "append",
 					markdown: echoExamples
 				},
-				handler: function(context: ModuleContext, value: any) {
+				handler: function (context: ModuleContext, value: any) {
 					return value;
 				}
 			},
@@ -55,7 +55,7 @@ import {Component, Descriptor, Map, ModuleContext} from "../../../../scripts/bin
 					method: "append",
 					markdown: manExamples
 				},
-				handler: function(context: ModuleContext, value: string) {
+				handler: function (context: ModuleContext, value: string) {
 					let components: Component[];
 
 					if (value.indexOf(".") > 0) {
@@ -87,7 +87,7 @@ import {Component, Descriptor, Map, ModuleContext} from "../../../../scripts/bin
 				title: "show fugazi client version",
 				syntax: "version",
 				returns: "ui.message",
-				handler: function(context: ModuleContext) {
+				handler: function (context: ModuleContext) {
 					return fugazi.version.toString();
 				}
 			},
@@ -102,7 +102,7 @@ import {Component, Descriptor, Map, ModuleContext} from "../../../../scripts/bin
 				],
 				returns: "any",
 				parametersForm: "map",
-				handler: function(context: ModuleContext, params: Map<any>) {
+				handler: function (context: ModuleContext, params: Map<any>) {
 					let index: string | [string] | number | [number] = params.get("index");
 					let value: any[] | Map<any> = params.get("value");
 
@@ -156,7 +156,7 @@ import {Component, Descriptor, Map, ModuleContext} from "../../../../scripts/bin
 				],
 				returns: "any",
 				parametersForm: "arguments",
-				handler: function(context: ModuleContext, value: string) {
+				handler: function (context: ModuleContext, value: string) {
 					try {
 						return jsonToFugazi(JSON.parse(value));
 					} catch (e) {
@@ -172,7 +172,7 @@ import {Component, Descriptor, Map, ModuleContext} from "../../../../scripts/bin
 				],
 				returns: "string",
 				parametersForm: "arguments",
-				handler: function(context: ModuleContext, value: any) {
+				handler: function (context: ModuleContext, value: any) {
 					return JSON.stringify(fugaziToJson(value));
 				}
 			}

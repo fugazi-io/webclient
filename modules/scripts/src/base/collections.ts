@@ -1,6 +1,6 @@
 import {BoundConstraintValidator, Descriptor, Map} from "../../../../scripts/bin/app/modules.api";
 
-(function(): void {
+(function (): void {
 	fugazi.loaded(<Descriptor> {
 		name: "io.fugazi.collections",
 		constraints: [
@@ -9,8 +9,8 @@ import {BoundConstraintValidator, Descriptor, Map} from "../../../../scripts/bin
 				title: "Maximum Size",
 				types: ["list", "map"],
 				params: ["max"],
-				validator: function(max: number): BoundConstraintValidator {
-					return function(value: Array<any> | Map<any>): boolean {
+				validator: function (max: number): BoundConstraintValidator {
+					return function (value: Array<any> | Map<any>): boolean {
 						return (fugazi.is(value, Array) && (<Array<any>> value).length <= max)
 							|| (fugazi.is(value, fugazi.collections.Map) && (<Map<any>> value).size() <= max);
 					}
@@ -21,8 +21,8 @@ import {BoundConstraintValidator, Descriptor, Map} from "../../../../scripts/bin
 				title: "Minimum Size",
 				types: ["list", "map"],
 				params: ["min"],
-				validator: function(min: number): BoundConstraintValidator {
-					return function(value: Array<any> | Map<any>): boolean {
+				validator: function (min: number): BoundConstraintValidator {
+					return function (value: Array<any> | Map<any>): boolean {
 						return (fugazi.is(value, Array) && (<Array<any>> value).length >= min)
 							|| (fugazi.is(value, fugazi.collections.Map) && (<Map<any>> value).size() >= min);
 					}
@@ -33,8 +33,8 @@ import {BoundConstraintValidator, Descriptor, Map} from "../../../../scripts/bin
 				title: "Exact Size",
 				types: ["list", "map"],
 				params: ["size"],
-				validator: function(size: number): BoundConstraintValidator {
-					return function(value: Array<any> | Map<any>): boolean {
+				validator: function (size: number): BoundConstraintValidator {
+					return function (value: Array<any> | Map<any>): boolean {
 						return (fugazi.is(value, Array) && (<Array<any>> value).length === size)
 							|| (fugazi.is(value, fugazi.collections.Map) && (<Map<any>> value).size() === size);
 					}

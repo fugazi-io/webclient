@@ -1,6 +1,6 @@
 import {ModuleContext} from "../../../../scripts/bin/app/modules.api";
 
-(function(): void {
+(function (): void {
 	fugazi.loaded({
 		name: "restheart.databases",
 		commands: {

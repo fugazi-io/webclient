@@ -1,7 +1,7 @@
 import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/modules.api";
 
 
-(function(): void {
+(function (): void {
 	fugazi.loaded(<Descriptor> {
 		name: "io.fugazi.numbers",
 		constraints: [

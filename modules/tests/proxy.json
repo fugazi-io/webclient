@@ -1,21 +1,21 @@
 {
-	"name": "tests.proxy",
-	"title": "Remote command via proxy test",
-	"remote": {
-		"origin": "http://127.0.0.1:8080/",
-		"base": "tests/",
-		"proxy": "tests/proxyframe.html",
-		"auth": "basic"
-	},
-	"commands": {
-		"proxytest": {
-			"title": "proxy test",
-			"syntax": "test proxy",
-			"returns": "ui.message",
-			"handler": {
-				"endpoint": "mycommand.txt?dummy=3",
-				"method": "get"
-			}
-		}
-	}
+  "name": "tests.proxy",
+  "title": "Remote command via proxy test",
+  "remote": {
+    "origin": "http://127.0.0.1:8080/",
+    "base": "tests/",
+    "proxy": "tests/proxyframe.html",
+    "auth": "basic"
+  },
+  "commands": {
+    "proxytest": {
+      "title": "proxy test",
+      "syntax": "test proxy",
+      "returns": "ui.message",
+      "handler": {
+        "endpoint": "mycommand.txt?dummy=3",
+        "method": "get"
+      }
+    }
+  }
 }

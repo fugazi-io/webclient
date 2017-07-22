@@ -1,7 +1,7 @@
 import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/modules.api";
 
 
-(function(): void {
+(function (): void {
 	fugazi.loaded(<Descriptor> {
 		name: "io.fugazi.strings",
 		constraints: [
@@ -10,12 +10,12 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 				title: "Maximum Length",
 				types: ["string"],
 				params: ["max"],
-				validator: function(max: number): BoundConstraintValidator {
+				validator: function (max: number): BoundConstraintValidator {
 					if (typeof max === "string") {
 						max = parseFloat(max);
 					}
 
-					return function(value: string): boolean {
+					return function (value: string): boolean {
 						return value.length <= max;
 					}
 				}
@@ -25,12 +25,12 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 				title: "Minimum Length",
 				types: ["string"],
 				params: ["min"],
-				validator: function(min: number): BoundConstraintValidator {
+				validator: function (min: number): BoundConstraintValidator {
 					if (typeof min === "string") {
 						min = parseFloat(min);
 					}
 
-					return function(value: string): boolean {
+					return function (value: string): boolean {
 						return value.length >= min;
 					}
 				}
@@ -40,12 +40,12 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 				title: "Exact Length",
 				types: ["string"],
 				params: ["length"],
-				validator: function(length: number | string): BoundConstraintValidator {
+				validator: function (length: number | string): BoundConstraintValidator {
 					if (typeof length === "string") {
 						length = parseFloat(length);
 					}
 
-					return function(value: string): boolean {
+					return function (value: string): boolean {
 						return value.length === length;
 					}
 				}
@@ -55,7 +55,7 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 				title: "Length Between",
 				types: ["string"],
 				params: ["min", "max"],
-				validator: function(min: number | string, max: number | string): BoundConstraintValidator {
+				validator: function (min: number | string, max: number | string): BoundConstraintValidator {
 					if (typeof min === "string") {
 						min = parseFloat(min);
 					}
@@ -63,7 +63,7 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 						max = parseFloat(max);
 					}
 
-					return function(value: string): boolean {
+					return function (value: string): boolean {
 						return value.length >= min && value.length <= max;
 					}
 				}
@@ -73,10 +73,10 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 				title: "RegEx",
 				types: ["string"],
 				params: ["pattern", "flags"],
-				validator: function(pattern: string, flags?: string): BoundConstraintValidator {
+				validator: function (pattern: string, flags?: string): BoundConstraintValidator {
 					var regex = new RegExp(pattern, flags);
 
-					return function(value: string): boolean {
+					return function (value: string): boolean {
 						return regex.test(value);
 					}
 				}
