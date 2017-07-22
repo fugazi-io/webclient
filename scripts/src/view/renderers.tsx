@@ -16,12 +16,11 @@ export interface RenderingComponentProperties extends view.ViewProperties {
 }
 
 export interface RenderingComponentClass {
-	new(props: RenderingComponentProperties, initialState: Partial<ViewState>): RenderingComponent<RenderingComponentProperties, view.ViewState>;
+	new(props: RenderingComponentProperties, initialState: Partial<view.ViewState>): RenderingComponent<RenderingComponentProperties, view.ViewState>;
 }
 
 	export class RenderingComponent<P extends RenderingComponentProperties, S extends view.ViewState> extends view.View<P, S> {constructor(props: P, initialState: Partial<S>) {
 			super(props);
-
 			this.state = initialState as S;
 		}}
 
