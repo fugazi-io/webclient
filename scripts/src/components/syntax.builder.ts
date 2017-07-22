@@ -6,6 +6,8 @@ import * as componentsBuilder from "./components.builder";
 import * as syntax from "./syntax";
 import * as descriptor from "./syntax.descriptor";
 
+import * as typesDescriptor from "./types.descriptor";
+import * as typesBuilder from "./types.builder";
 export function create(rule: string, parent: componentsBuilder.Builder<components.Component>): componentsBuilder.Builder<syntax.SyntaxRule> {
 	var anonymousDescriptor: descriptor.Descriptor = <descriptor.Descriptor> componentsBuilder.createAnonymousDescriptor(components.ComponentType.SyntaxRule);
 	anonymousDescriptor.rule = rule;
@@ -107,14 +109,14 @@ class SyntaxRuleBuilder extends componentsBuilder.BaseBuilder<syntax.SyntaxRule,
 		type = this.parser.rule.substring(this.parser.index, endPos);
 		this.parser.index = endPos + 1;
 
-		anonymous = types.descriptor.isAnonymousDefinition(<types.TextualDefinition> type);
+		anonymous = typesDescriptor.isAnonymousDefinition(<types.TextualDefinition> type);
 		if (anonymous) {
 			this.innerBuilderCreated();
 		}
 
 		this.parser.parts.push({
 			name: name,
-			type: anonymous ? types.builder.create(<string> type, this) : type
+			type: anonymous ? typesBuilder.create(<string> type, this) : type
 		});
 	}
 

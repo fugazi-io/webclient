@@ -4,6 +4,8 @@ import * as modules from "./modules";
 import * as components from "./components";
 import * as componentsBuilder from "./components.builder";
 import * as componentsDescriptor from "./components.descriptor";
+import * as typesDescriptor from "./types.descriptor";
+import * as typesBuilder from "./types.builder";
 import * as types from "./types";
 import * as syntax from "./syntax";
 import * as converters from "./converters";
@@ -36,9 +38,9 @@ class CommandBuilder<T extends commands.Command> extends componentsBuilder.BaseB
 		this.syntaxBuilders = [];
 
 		if (this.componentDescriptor.returns != null
-			&& (typeof this.componentDescriptor.returns === "string" && types.descriptor.isAnonymousDefinition(this.componentDescriptor.returns))
+			&& (typeof this.componentDescriptor.returns === "string" && typesDescriptor.isAnonymousDefinition(this.componentDescriptor.returns))
 			|| coreTypes.isPlainObject(this.componentDescriptor.returns)) {
-			this.returnType = types.builder.create(<string> this.componentDescriptor.returns, this);
+			this.returnType = typesBuilder.create(<string> this.componentDescriptor.returns, this);
 			this.innerBuilderCreated();
 		} else {
 			this.returnType = this.componentDescriptor.returns as string || "void";

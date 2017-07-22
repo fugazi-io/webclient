@@ -17,6 +17,8 @@ import * as commands from "./commands";
 import * as modules from "./modules";
 import * as descriptor from "./modules.descriptor";
 
+import * as typesDescriptor from "./types.descriptor";
+import * as typesBuilder from "./types.builder";
 function breakDescriptorWithPath(moduleDescriptor: descriptor.Descriptor) {
 	let result: descriptor.Descriptor,
 		path: string[] = moduleDescriptor.name.split(".");
@@ -426,14 +428,14 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 				builder: <Builder> create(this.createInnerUrl(<string> this.componentDescriptor.types))
 			});
 		} else if (this.componentDescriptor.types instanceof Array) {
-			(<descriptor.InnerComponentsArrayCollection<types.descriptor.Descriptor>> this.componentDescriptor.types).forEach(current => {
+			(<descriptor.InnerComponentsArrayCollection<typesDescriptor.Descriptor>> this.componentDescriptor.types).forEach(current => {
 				if (typeof current === "string") { // url
 					this.innerTypeModuleRemoteBuilders.push({
 						path: this.getPath().clone(),
 						builder: <Builder> create(this.createInnerUrl(current))
 					});
 				} else { // descriptor
-					this.innerTypesBuilders.set(current.name, types.builder.create(current, this));
+					this.innerTypesBuilders.set(current.name, typesBuilder.create(current, this));
 				}
 			});
 		} else if (coreTypes.isPlainObject(this.componentDescriptor.types)) {
@@ -448,7 +450,7 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 					});
 				} else { // descriptor
 					typeDescriptor.name = typeName;
-					this.innerTypesBuilders.set(typeName, types.builder.create(typeDescriptor, this));
+					this.innerTypesBuilders.set(typeName, typesBuilder.create(typeDescriptor, this));
 				}
 			});
 		} else {

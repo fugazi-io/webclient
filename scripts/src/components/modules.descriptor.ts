@@ -8,8 +8,8 @@ import * as constraintsDescriptor from "./constraints.descriptor";
 import * as convertersDescriptor from "./converters.descriptor";
 import * as componentsDescriptor from "./components.descriptor";
 import * as commandsDescriptor from "./commands.descriptor";
-import * as types from "./types";
 
+import * as typesDescriptor from "./types.descriptor";
 var loadingScriptModules: collections.Map<ScriptLoader> = collections.map<ScriptLoader>();
 
 /**
@@ -52,7 +52,7 @@ export interface Descriptor extends componentsDescriptor.Descriptor {
 	remote?: RemoteDescriptor;
 	lookup?: { [name: string]: string };
 	modules?: InnerModulesCollection;
-	types?: string | InnerComponentsCollection<types.descriptor.Descriptor>;
+	types?: string | InnerComponentsCollection<typesDescriptor.Descriptor>;
 	commands?: string | InnerComponentsCollection<commandsDescriptor.Descriptor>;
 	converters?: string | InnerComponentsCollection<convertersDescriptor.Descriptor>;
 	constraints?: string | InnerComponentsCollection<constraintsDescriptor.Descriptor>;

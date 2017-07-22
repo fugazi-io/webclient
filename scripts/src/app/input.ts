@@ -8,7 +8,7 @@ export interface Range {
 	length: number;
 }
 
-class RangeImpl implements Range {
+export class RangeImpl implements Range {
 	private startIndex: number;
 	private endIndex: number;
 
