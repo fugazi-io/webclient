@@ -3,13 +3,13 @@ const webpack = require('webpack');
 const {getIfUtils, removeEmpty} = require('webpack-config-utils');
 
 // variables
-const outPath = path.join(__dirname, 'dist');
+const outPath = path.join(__dirname);
 const assetsPath = path.join(__dirname, 'assets');
 
 // plugins
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const htmlTemplate = path.join(assetsPath, 'index.html');
+const htmlTemplate = path.join(assetsPath, 'template.html');
 
 module.exports = env => {
 

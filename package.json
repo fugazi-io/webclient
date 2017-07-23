@@ -27,17 +27,18 @@
   },
   "types": "./scripts/bin/",
   "scripts": {
-    "clean": "rimraf scripts/bin modules/scripts/bin  modules/restheart/scripts/bin",
+    "clean": "rimraf scripts/bin modules/scripts/bin modules/restheart/scripts/bin",
     "transpile-core": "tsc -p scripts",
     "transpile-modules": "tsc -p modules/scripts",
-    "transpile": "run-s transpile-core transpile-modules",
+    "transpile": "run-s clean transpile-core transpile-modules",
     "transpile-core-watch": "npm run transpile-core -- --watch",
     "transpile-modules-watch": "npm run transpile-modules -- --watch",
     "transpile-watch": "run-p transpile-core-watch transpile-modules-watch",
     "serve": "webpack-dev-server --no-info --colors --port 3330",
-    "dev": "npm-run-all clean transpile -p transpile-watch serve",
+    "dev": "npm-run-all transpile -p transpile-watch serve",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --env.prod --progress --colors"
+    "bundle": "webpack --env.prod --progress --colors",
+    "build": "run-s transpile bundle"
   },
   "repository": {
     "type": "git",

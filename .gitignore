@@ -5,4 +5,5 @@
 node_modules
 **/scripts/bin
 npm-debug.log
-dist
+index.html
+*.bundle.js
