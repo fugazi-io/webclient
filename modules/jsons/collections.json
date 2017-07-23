@@ -1,6 +1,6 @@
 {
-  "name": "io.fugazi.collections",
-  "title": "Collections",
-  "description": "common utils to deal with collections",
-  "constraints": "../scripts/bin/base/collections.js"
+	"name": "io.fugazi.collections",
+	"title": "Collections",
+	"description": "common utils to deal with collections",
+	"constraints": "../scripts/bin/base/collections.js"
 }

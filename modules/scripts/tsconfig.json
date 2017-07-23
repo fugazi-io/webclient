@@ -1,7 +1,7 @@
 {
-  "extends": "../../tsconfig.common.json",
-  "compilerOptions": {
-    "outDir": "bin",
-    "rootDir": "src"
-  }
+	"extends": "../../tsconfig.common.json",
+	"compilerOptions": {
+		"outDir": "bin",
+		"rootDir": "src"
+	}
 }

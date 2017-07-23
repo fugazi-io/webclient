@@ -65,8 +65,8 @@ export abstract class InputView<P extends InputProperties, S extends InputState>
 		this.className = ["input", className];
 		this.keymap = collections.map<() => void>();
 		this.state = {
-				value: this.props.value || ""
-			} as S;
+			value: this.props.value || ""
+		} as S;
 	}
 
 	public componentDidMount(): void {

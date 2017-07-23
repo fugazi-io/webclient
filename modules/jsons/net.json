@@ -1,40 +1,40 @@
 {
-  "name": "io.fugazi.net",
-  "title": "Network module",
-  "description": "common utils to deal with networking",
-  "types": [
-    {
-      "name": "email",
-      "title": "Email",
-      "type": "string[strings.regex '\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b' i]"
-    },
-    {
-      "name": "url",
-      "title": "Url",
-      "type": "string[strings.regex '^(https?|ftp):\/\/[^\\s/$.?#].[^\\s]*$' i]"
-    }
-  ],
-  "modules": {
-    "http": {
-      "title": "Http module",
-      "types": {
-        "method": {
-          "title": "Http Method",
-          "type": "string[enum ignoreCase GET POST DELETE PUT]"
-        },
-        "contentType": {
-          "title": "Content Type",
-          "type": "string[enum ignoreCase multipart urlEncoded json]"
-        },
-        "response": {
-          "title": "Http Response",
-          "type": {
-            "status": "number[numbers.integer]",
-            "data": "any"
-          }
-        }
-      },
-      "commands": "../scripts/bin/base/net.http.js"
-    }
-  }
+	"name": "io.fugazi.net",
+	"title": "Network module",
+	"description": "common utils to deal with networking",
+	"types": [
+		{
+			"name": "email",
+			"title": "Email",
+			"type": "string[strings.regex '\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b' i]"
+		},
+		{
+			"name": "url",
+			"title": "Url",
+			"type": "string[strings.regex '^(https?|ftp):\/\/[^\\s/$.?#].[^\\s]*$' i]"
+		}
+	],
+	"modules": {
+		"http": {
+			"title": "Http module",
+			"types": {
+				"method": {
+					"title": "Http Method",
+					"type": "string[enum ignoreCase GET POST DELETE PUT]"
+				},
+				"contentType": {
+					"title": "Content Type",
+					"type": "string[enum ignoreCase multipart urlEncoded json]"
+				},
+				"response": {
+					"title": "Http Response",
+					"type": {
+						"status": "number[numbers.integer]",
+						"data": "any"
+					}
+				}
+			},
+			"commands": "../scripts/bin/base/net.http.js"
+		}
+	}
 }
