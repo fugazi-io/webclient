@@ -5,7 +5,7 @@ import * as converters from "../components/converters";
 import * as types from "../components/types";
 
 
-var context: ApplicationContext;
+let context: ApplicationContext;
 export function getContext() {
 	return context;
 }
@@ -13,7 +13,7 @@ export function setContext(newContext: ApplicationContext) {
 	context = newContext;
 }
 
-var mainView: viewMain.MainView;
+let mainView: viewMain.MainView;
 export function getMainView() {
 	return mainView;
 }
