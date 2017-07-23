@@ -1,4 +1,4 @@
-import {Component, Descriptor, Map, ModuleContext} from "../../../../scripts/bin/app/modules.api";
+import {Component, Descriptor, FugaziMap, ModuleContext} from "../../../../scripts/bin/app/modules.api";
 
 
 (function (): void {
@@ -18,7 +18,7 @@ import {Component, Descriptor, Map, ModuleContext} from "../../../../scripts/bin
 	}
 
 	function fugaziToJson(value: any): any {
-		if (value instanceof fugazi.collections.Map) {
+		if (value instanceof fugazi.collections.FugaziMap) {
 			return value.asObject();
 		} else if (fugazi.is(value, Array)) {
 			return value.map(v => fugaziToJson(v));
@@ -102,15 +102,15 @@ import {Component, Descriptor, Map, ModuleContext} from "../../../../scripts/bin
 				],
 				returns: "any",
 				parametersForm: "map",
-				handler: function (context: ModuleContext, params: Map<any>) {
+				handler: function (context: ModuleContext, params: FugaziMap<any>) {
 					let index: string | [string] | number | [number] = params.get("index");
-					let value: any[] | Map<any> = params.get("value");
+					let value: any[] | FugaziMap<any> = params.get("value");
 
 					if (fugazi.isPlainObject(value)) {
 						value = fugazi.collections.map(value);
 					}
 
-					if ((typeof index === "string" || (index instanceof Array && typeof index[0] === "string")) && value instanceof fugazi.collections.Map) {
+					if ((typeof index === "string" || (index instanceof Array && typeof index[0] === "string")) && value instanceof fugazi.collections.FugaziMap) {
 						if (index instanceof Array) {
 							index = index.join(".");
 						}
@@ -123,7 +123,7 @@ import {Component, Descriptor, Map, ModuleContext} from "../../../../scripts/bin
 						if (path.length > 1) {
 							let result: any = value;
 
-							while (result instanceof fugazi.collections.Map && !path.empty() && result.has(path.first())) {
+							while (result instanceof fugazi.collections.FugaziMap && !path.empty() && result.has(path.first())) {
 								result = result.get(path.remove(0));
 							}
 

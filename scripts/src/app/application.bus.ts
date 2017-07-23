@@ -1,6 +1,6 @@
 import * as collections from "../core/types.collections";
 
-const subscribers: collections.Map<EventHandler[]> = collections.map<EventHandler[]>();
+const subscribers: collections.FugaziMap<EventHandler[]> = collections.map<EventHandler[]>();
 
 export interface EventHandler {
 	(): void;

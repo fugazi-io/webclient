@@ -9,9 +9,9 @@ import * as collections from "../core/types.collections";
 import * as coreTypes from "../core/types";
 import * as net from "../core/net";
 
-let remoteProxies = collections.map() as collections.Map<Frame>,
-	pendingLoaders = collections.map() as collections.Map<Loader>,
-	pendingRequests = collections.map() as collections.Map<coreTypes.Future<ProxyHttpResponse>>,
+let remoteProxies = collections.map() as collections.FugaziMap<Frame>,
+	pendingLoaders = collections.map() as collections.FugaziMap<Loader>,
+	pendingRequests = collections.map() as collections.FugaziMap<coreTypes.Future<ProxyHttpResponse>>,
 	framesContainer: HTMLDivElement;
 
 window.addEventListener("message", envelope => {
@@ -223,7 +223,7 @@ class ProxyHttpResponse implements net.HttpResponse {
 		}
 	}
 
-	public getDataAsMap<T>(): collections.Map<T> {
+	public getDataAsMap<T>(): collections.FugaziMap<T> {
 		return collections.map<T>(this.getDataAsJson());
 	}
 }
@@ -276,7 +276,7 @@ export class ProxyFrame extends BaseFrame {
 				method: properties.method,
 				url: properties.url.toString(),
 				headers: properties.headers,
-				data: data instanceof collections.Map ? data.asObject() : data
+				data: data instanceof collections.FugaziMap ? data.asObject() : data
 			};
 
 		const messageId = this.message(proxyframeProtocol.MessageTypes.ProxyFrameExecuteCommandRequest, message);

@@ -22,14 +22,14 @@ export interface RemoteProxyHandshakeMessage {
 export interface RemoteProxyExecuteCommandRequest {
 	method: net.HttpMethod;
 	url: string;
-	headers: collections.Map<string> | types.PlainObject<string>;
+	headers: collections.FugaziMap<string> | types.PlainObject<string>;
 	data?: string | types.PlainObject<any>;
 }
 
 export interface RemoteProxyExecuteCommandResponse {
 	requestId: string;
 	statusCode: number;
-	headers: collections.Map<string> | types.PlainObject<string>;
+	headers: collections.FugaziMap<string> | types.PlainObject<string>;
 	contentType: string,
 	httpStatus: number,
 	httpStatusText: string,

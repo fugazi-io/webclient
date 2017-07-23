@@ -45,7 +45,7 @@ export function stringToHttpMethod(str: string): HttpMethod {
 	return null;
 }
 
-export class QueryString extends collections.Map<string> {
+export class QueryString extends collections.FugaziMap<string> {
 	constructor(str: string) {
 		super();
 
@@ -272,7 +272,7 @@ export interface RequestProperties {
 	contentType?: ContentType;
 	timeout?: number;
 	cors?: boolean;
-	headers?: collections.Map<string> | types.PlainObject<string>;
+	headers?: collections.FugaziMap<string> | types.PlainObject<string>;
 }
 
 export interface HttpBase {
@@ -285,7 +285,7 @@ export interface HttpBase {
 
 export type ResponseHandler = (response: HttpResponse) => void;
 
-export type RequestData = string | types.PlainObject<any> | collections.Map<any>;
+export type RequestData = string | types.PlainObject<any> | collections.FugaziMap<any>;
 
 export interface HttpRequest extends HttpBase {
 	getContentType(): ContentType;
@@ -306,8 +306,8 @@ export interface HttpResponse extends HttpBase {
 	guessData(): any;
 	getDataAsJson(): any;
 	getDataAsJson<T>(): T;
-	getDataAsMap(): collections.Map<any>;
-	getDataAsMap<T>(): collections.Map<T>;
+	getDataAsMap(): collections.FugaziMap<any>;
+	getDataAsMap<T>(): collections.FugaziMap<T>;
 }
 
 export function http(properties: RequestProperties): HttpRequest {
@@ -405,7 +405,7 @@ class HttpRequestObject extends HttpObject implements HttpRequest {
 	protected url: Url;
 	protected timeout: number;
 	protected method: HttpMethod;
-	protected headers: collections.Map<string>;
+	protected headers: collections.FugaziMap<string>;
 	protected future: types.Future<HttpResponse>;
 
 	constructor(properties: RequestProperties) {
@@ -451,7 +451,7 @@ class HttpRequestObject extends HttpObject implements HttpRequest {
 		return this.url.toString();
 	}
 
-	public send(data?: string | types.PlainObject<any> | collections.Map<any>): types.Future<HttpResponse> {
+	public send(data?: string | types.PlainObject<any> | collections.FugaziMap<any>): types.Future<HttpResponse> {
 		if (types.isPlainObject(data)) {
 			data = collections.map<any>(<types.PlainObject<any>> data);
 		}
@@ -459,7 +459,7 @@ class HttpRequestObject extends HttpObject implements HttpRequest {
 		this.open(data);
 		this.processHeaders();
 		this.xhr.onreadystatechange = this.handler.bind(this);
-		this.processDataAndSend(<string | collections.Map<any>> data);
+		this.processDataAndSend(<string | collections.FugaziMap<any>> data);
 
 		if (this.timeout) {
 			setTimeout(function (): void {
@@ -487,12 +487,12 @@ class HttpRequestObject extends HttpObject implements HttpRequest {
 		return this;
 	}
 
-	protected open(data?: string | types.PlainObject<any> | collections.Map<any>): void {
+	protected open(data?: string | types.PlainObject<any> | collections.FugaziMap<any>): void {
 		console.log(`${ httpMethodToString(this.method) } | ${ this.url.toString() }`);
 		this.xhr.open(httpMethodToString(this.method), this.url.toString(), true);
 	}
 
-	protected processDataAndSend(data?: string | collections.Map<any>): void {
+	protected processDataAndSend(data?: string | collections.FugaziMap<any>): void {
 		this.xhr.send();
 	}
 
@@ -521,7 +521,7 @@ class HttpRequestObject extends HttpObject implements HttpRequest {
 	}
 }
 
-function mapToQueryString(map: collections.Map<any>): string {
+function mapToQueryString(map: collections.FugaziMap<any>): string {
 	var querystring: string = "";
 
 	map.forEach(<collections.KeyValueIteratorCallback<any>> function (value: any, key: string): void {
@@ -535,7 +535,7 @@ class HttpGetRequestObject extends HttpRequestObject {
 	/**
 	 * @Override
 	 */
-	protected open(data?: string | types.PlainObject<any> | collections.Map<any>): void {
+	protected open(data?: string | types.PlainObject<any> | collections.FugaziMap<any>): void {
 		let params;
 
 		if (!data) {
@@ -546,7 +546,7 @@ class HttpGetRequestObject extends HttpRequestObject {
 		if (typeof data === "string") {
 			params = new QueryString(data);
 
-		} else if (data instanceof collections.Map) {
+		} else if (data instanceof collections.FugaziMap) {
 			params = data;
 		} else {
 			params = collections.map<any>(data);
@@ -561,7 +561,7 @@ class HttpPostRequestObject extends HttpRequestObject {
 	/**
 	 * @Override
 	 */
-	protected processDataAndSend(data?: string | collections.Map<any>): void {
+	protected processDataAndSend(data?: string | collections.FugaziMap<any>): void {
 		var processed: any;
 
 		if (!data) {
@@ -570,11 +570,11 @@ class HttpPostRequestObject extends HttpRequestObject {
 			processed = data.toString();
 		} else if (this.getContentType() === ContentTypes.Form.Multipart) {
 			processed = new FormData();
-			(<collections.Map<any>> data).forEach(<collections.KeyValueIteratorCallback<any>> function (value: any, key: string): void {
+			(<collections.FugaziMap<any>> data).forEach(<collections.KeyValueIteratorCallback<any>> function (value: any, key: string): void {
 				(<FormData> processed).append(key, value);
 			});
 		} else if (this.getContentType() === ContentTypes.Form.UrlEncoded) {
-			processed = mapToQueryString(<collections.Map<any>> data);
+			processed = mapToQueryString(<collections.FugaziMap<any>> data);
 		} else {
 			processed = data.toString();
 		}
@@ -631,7 +631,7 @@ class HttpResponseObject extends HttpObject implements HttpResponse {
 	/**
 	 * @override
 	 */
-	public getDataAsMap<T>(): collections.Map<T> {
+	public getDataAsMap<T>(): collections.FugaziMap<T> {
 		return collections.map<T>(this.getDataAsJson());
 	}
 }

@@ -1,4 +1,4 @@
-import {Descriptor, HttpMethod, Map, ModuleContext, RequestProperties} from "../../../../scripts/bin/app/modules.api";
+import {Descriptor, HttpMethod, FugaziMap, ModuleContext, RequestProperties} from "../../../../scripts/bin/app/modules.api";
 
 (function (): void {
 	interface HttpResponse {
@@ -6,9 +6,9 @@ import {Descriptor, HttpMethod, Map, ModuleContext, RequestProperties} from "../
 		data: any;
 	}
 
-	function httpRequest(context: ModuleContext, params: Map<any>): Promise<HttpResponse> {
+	function httpRequest(context: ModuleContext, params: FugaziMap<any>): Promise<HttpResponse> {
 		let future = new fugazi.Future<HttpResponse>(),
-			data: string | Map<any> = params.get("data"),
+			data: string | FugaziMap<any> = params.get("data"),
 			props: RequestProperties = {
 				cors: true,
 				url: params.get("url"),
@@ -33,7 +33,7 @@ import {Descriptor, HttpMethod, Map, ModuleContext, RequestProperties} from "../
 		return future.asPromise();
 	}
 
-	function httpRequestByMethod(method: HttpMethod, context: ModuleContext, params: Map<any>) {
+	function httpRequestByMethod(method: HttpMethod, context: ModuleContext, params: FugaziMap<any>) {
 		params.set("method", fugazi.net.httpMethodToString(method));
 		return httpRequest(context, params);
 	}

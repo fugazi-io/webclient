@@ -24,11 +24,11 @@ export interface Properties {
 }
 
 export abstract class BaseTerminalContext extends app.BaseContext<app.ApplicationContext> {
-	private moduleToRemoteId: collections.Map<string>;
+	private moduleToRemoteId: collections.FugaziMap<string>;
 
 	constructor(parent: app.ApplicationContext, id?: string) {
 		super(parent, id);
-		this.moduleToRemoteId = new collections.Map<string>();
+		this.moduleToRemoteId = new collections.FugaziMap<string>();
 	}
 
 	public setRemoteSource(modulePath: components.Path, remoteId: string): void {
@@ -134,7 +134,7 @@ export class Terminal {
 	private context: TerminalContext;
 	private contextProvider: ContextProvider;
 	private modules: Map<string, LoadedModule>;
-	private variables: collections.Map<app.Variable>;
+	private variables: collections.FugaziMap<app.Variable>;
 
 	constructor(properties: Properties, applicationContext: app.ApplicationContext, viewFactory: viewTerminal.TerminalFactory) {
 		this.properties = properties;

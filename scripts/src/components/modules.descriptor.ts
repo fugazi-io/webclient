@@ -10,7 +10,7 @@ import * as componentsDescriptor from "./components.descriptor";
 import * as commandsDescriptor from "./commands.descriptor";
 
 import * as typesDescriptor from "./types.descriptor";
-var loadingScriptModules: collections.Map<ScriptLoader> = collections.map<ScriptLoader>();
+var loadingScriptModules: collections.FugaziMap<ScriptLoader> = collections.map<ScriptLoader>();
 
 /**
  * Called by a loaded (script) component

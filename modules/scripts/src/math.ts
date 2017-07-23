@@ -1,4 +1,4 @@
-import {Descriptor, Map, ModuleContext} from "../../../scripts/bin/app/modules.api";
+import {Descriptor, FugaziMap, ModuleContext} from "../../../scripts/bin/app/modules.api";
 
 (function (): void {
 	fugazi.loaded(<Descriptor> {
@@ -24,7 +24,7 @@ import {Descriptor, Map, ModuleContext} from "../../../scripts/bin/app/modules.a
 					"add (a number) (b number)",
 					"add (numbers list<number>)"
 				],
-				handler: function (context: ModuleContext, params: Map<any>): number {
+				handler: function (context: ModuleContext, params: FugaziMap<any>): number {
 					if (params.has("a") && params.has("b")) {
 						return params.get("a") + params.get("b");
 					}
@@ -43,7 +43,7 @@ import {Descriptor, Map, ModuleContext} from "../../../scripts/bin/app/modules.a
 					"sub (a number) (b number)",
 					"sub (numbers list<number>)"
 				],
-				handler: function (context: ModuleContext, params: Map<any>): number {
+				handler: function (context: ModuleContext, params: FugaziMap<any>): number {
 					if (params.has("a") && params.has("b")) {
 						return params.get("a") - params.get("b");
 					}
@@ -62,7 +62,7 @@ import {Descriptor, Map, ModuleContext} from "../../../scripts/bin/app/modules.a
 					"mul (a number) (b number)",
 					"mul (numbers list<number>)"
 				],
-				handler: function (context: ModuleContext, params: Map<any>): number {
+				handler: function (context: ModuleContext, params: FugaziMap<any>): number {
 					if (params.has("a") && params.has("b")) {
 						return params.get("a") * params.get("b");
 					}
@@ -81,7 +81,7 @@ import {Descriptor, Map, ModuleContext} from "../../../scripts/bin/app/modules.a
 					"div (a number) (b number)",
 					"div (numbers list<number>)"
 				],
-				handler: function (context: ModuleContext, params: Map<any>): number {
+				handler: function (context: ModuleContext, params: FugaziMap<any>): number {
 					if (params.has("a") && params.has("b")) {
 						return params.get("a") / params.get("b");
 					}

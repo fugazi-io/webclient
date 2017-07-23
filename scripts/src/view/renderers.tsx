@@ -30,7 +30,7 @@ class AnyComponent extends RenderingComponent<RenderingComponentProperties, view
 	public render(): JSX.Element {
 		var value: string;
 
-		if (coreTypes.is(this.props.value, collections.Map)) {
+		if (coreTypes.is(this.props.value, collections.FugaziMap)) {
 			value = JSON.stringify(this.props.value.asObject());
 		} else if (coreTypes.is(this.props.value, String)) {
 			value = this.props.value;
@@ -289,7 +289,7 @@ export class ListComponent extends CollectionComponent<CollectionComponentState>
 
 export interface MapComponentState extends CollectionComponentState {
 	isStruct: boolean;
-	fields?: collections.Map<types.Type>;
+	fields?: collections.FugaziMap<types.Type>;
 }
 
 export class MapComponent extends CollectionComponent<MapComponentState> {
@@ -297,7 +297,7 @@ export class MapComponent extends CollectionComponent<MapComponentState> {
 		const structConstraint = registry.get(components.ComponentType.Constraint, "struct") as constraints.Constraint;
 		const initialState = {} as MapComponentState;
 
-		let fieldsList: collections.Map<types.Type>[];
+		let fieldsList: collections.FugaziMap<types.Type>[];
 
 		if (props.type instanceof types.ConstrainedType) {
 			fieldsList = (props.type as types.ConstrainedType).getConstraintParamValues(structConstraint, "fields");
@@ -320,7 +320,7 @@ export class MapComponent extends CollectionComponent<MapComponentState> {
 	}
 
 	protected getChildren(): JSX.Element[] {
-		let values: collections.Map<any> = coreTypes.isPlainObject(this.props.value) ? collections.map(this.props.value, true) : this.props.value;
+		let values: collections.FugaziMap<any> = coreTypes.isPlainObject(this.props.value) ? collections.map(this.props.value, true) : this.props.value;
 
 		if (this.state.isStruct) {
 			return this.childrenFromStruct(values);
@@ -330,14 +330,14 @@ export class MapComponent extends CollectionComponent<MapComponentState> {
 	}
 
 	protected getItemsCount(): number {
-		return this.props.value instanceof collections.Map ? this.props.value.size() : Object.keys(this.props.value).length;
+		return this.props.value instanceof collections.FugaziMap ? this.props.value.size() : Object.keys(this.props.value).length;
 	}
 
 	protected getBracket(direction: "open" | "close"): string {
 		return direction === "open" ? "{" : "}";
 	}
 
-	private childrenFromMap(values: collections.Map<any>): JSX.Element[] {
+	private childrenFromMap(values: collections.FugaziMap<any>): JSX.Element[] {
 		let children: JSX.Element[] = [];
 
 		values.keys().forEach(childName => {
@@ -361,7 +361,7 @@ export class MapComponent extends CollectionComponent<MapComponentState> {
 		return children;
 	}
 
-	private childrenFromStruct(values: collections.Map<any>): JSX.Element[] {
+	private childrenFromStruct(values: collections.FugaziMap<any>): JSX.Element[] {
 		let children: JSX.Element[] = [];
 
 		values.keys().forEach(childName => {
@@ -441,7 +441,7 @@ function getTypeForValue(value: any): types.Type {
 
 	if (coreTypes.is(value, String)) {
 		name = "string";
-	} else if (coreTypes.is(value, collections.Map) || coreTypes.isPlainObject(value)) {
+	} else if (coreTypes.is(value, collections.FugaziMap) || coreTypes.isPlainObject(value)) {
 		name = "map";
 	} else if (coreTypes.is(value, Array)) {
 		name = "list";

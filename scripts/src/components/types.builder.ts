@@ -140,8 +140,8 @@ class TextualBuilder extends TypeBuilder<types.TextualDefinition> {
 }
 
 class StructBuilder extends TypeBuilder<types.StructDefinition> {
-	private fieldsReferences: collections.Map<string>;
-	private fieldsBuilders: collections.Map<TypeBuilder<types.Definition>>;
+	private fieldsReferences: collections.FugaziMap<string>;
+	private fieldsBuilders: collections.FugaziMap<TypeBuilder<types.Definition>>;
 
 	constructor(loader: componentsDescriptor.Loader<descriptor.Descriptor>, parent?: componentsBuilder.Builder<components.Component>) {
 		super(types.ReducedConstrainedType, loader, parent);
@@ -181,7 +181,7 @@ class StructBuilder extends TypeBuilder<types.StructDefinition> {
 	}
 
 	protected concreteAssociate(): void {
-		let fields: collections.Map<types.Type> = collections.map<types.Type>(),
+		let fields: collections.FugaziMap<types.Type> = collections.map<types.Type>(),
 			constraint: constraints.Constraint = <constraints.Constraint> this.resolve(components.ComponentType.Constraint, "struct");
 
 		super.concreteAssociate();

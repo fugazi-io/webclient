@@ -153,7 +153,7 @@ export interface Hashable {
 	hash(): string;
 }
 
-export class Map<T> {
+export class FugaziMap<T> {
 	private items: { [key: string]: T };
 	private count: number;
 
@@ -230,8 +230,8 @@ export class Map<T> {
 		var obj: any = {};
 
 		this.forEach(<KeyValueIteratorCallback<any>> function (value: any, key: string): void {
-			if (is(value, Map)) {
-				obj[key] = (<Map<any>> value).asObject();
+			if (is(value, FugaziMap)) {
+				obj[key] = (<FugaziMap<any>> value).asObject();
 			} else {
 				obj[key] = this.get(key);
 			}
@@ -280,8 +280,8 @@ export class Map<T> {
 	 * Shallow copy of this map
 	 * @returns {Map<t>}
 	 */
-	public clone(): Map<T> {
-		var cloned: Map<T> = new Map<T>();
+	public clone(): FugaziMap<T> {
+		var cloned: FugaziMap<T> = new FugaziMap<T>();
 
 		Object.keys(this.items).forEach(name => cloned.set(name, this.get(name)));
 
@@ -293,7 +293,7 @@ export class Map<T> {
 	}
 
 	public extend(obj: PlainObject<T>): void;
-	public extend(map: Map<T>): void;
+	public extend(map: FugaziMap<T>): void;
 	public extend(obj: any): void {
 		var iterator: Iterator<KeyValueEntry<T>>,
 			entry: KeyValueEntry<T>;
@@ -311,7 +311,7 @@ export class Map<T> {
 	}
 
 	public defaults(obj: PlainObject<T>): void;
-	public defaults(map: Map<T>): void;
+	public defaults(map: FugaziMap<T>): void;
 	public defaults(obj: any): void {
 		var iterator: Iterator<KeyValueEntry<T>>,
 			entry: KeyValueEntry<T>;
@@ -341,7 +341,7 @@ export class MapEntry<K extends Hashable, V> {
 	}
 }
 
-export class EntryMap<K extends Hashable, V> extends Map<MapEntry<K, V>> {
+export class EntryMap<K extends Hashable, V> extends FugaziMap<MapEntry<K, V>> {
 	hasEntry(key: K): boolean {
 		return this.has(key.hash());
 	}
@@ -400,8 +400,8 @@ export class MapIterator<T> implements Iterator<KeyValueEntry<T>> {
 	}
 }
 
-export function map<T>(obj?: PlainObject<any> | Map<T>, recursive?: boolean): Map<T> {
-	let result: Map<T> = new Map<T>();
+export function map<T>(obj?: PlainObject<any> | FugaziMap<T>, recursive?: boolean): FugaziMap<T> {
+	let result: FugaziMap<T> = new FugaziMap<T>();
 
 	if (isNothing(obj)) {
 		return result;
@@ -411,10 +411,10 @@ export function map<T>(obj?: PlainObject<any> | Map<T>, recursive?: boolean): Ma
 		recursive = false;
 	}
 
-	(obj instanceof Map ? obj.keys() : Object.keys(obj)).forEach(key => {
-		let value: T = obj instanceof Map ? obj.get(key) : obj[key];
+	(obj instanceof FugaziMap ? obj.keys() : Object.keys(obj)).forEach(key => {
+		let value: T = obj instanceof FugaziMap ? obj.get(key) : obj[key];
 
-		if (recursive && (isPlainObject(value) || is(value, Map))) {
+		if (recursive && (isPlainObject(value) || is(value, FugaziMap))) {
 			result.set(key, <any> map(value, true));
 		} else {
 			result.set(key, value);

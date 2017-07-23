@@ -1,4 +1,4 @@
-import {BoundConstraintValidator, Descriptor, Map} from "../../../../scripts/bin/app/modules.api";
+import {BoundConstraintValidator, Descriptor, FugaziMap} from "../../../../scripts/bin/app/modules.api";
 
 (function (): void {
 	fugazi.loaded(<Descriptor> {
@@ -10,9 +10,9 @@ import {BoundConstraintValidator, Descriptor, Map} from "../../../../scripts/bin
 				types: ["list", "map"],
 				params: ["max"],
 				validator: function (max: number): BoundConstraintValidator {
-					return function (value: Array<any> | Map<any>): boolean {
+					return function (value: Array<any> | FugaziMap<any>): boolean {
 						return (fugazi.is(value, Array) && (<Array<any>> value).length <= max)
-							|| (fugazi.is(value, fugazi.collections.Map) && (<Map<any>> value).size() <= max);
+							|| (fugazi.is(value, fugazi.collections.FugaziMap) && (<FugaziMap<any>> value).size() <= max);
 					}
 				}
 			},
@@ -22,9 +22,9 @@ import {BoundConstraintValidator, Descriptor, Map} from "../../../../scripts/bin
 				types: ["list", "map"],
 				params: ["min"],
 				validator: function (min: number): BoundConstraintValidator {
-					return function (value: Array<any> | Map<any>): boolean {
+					return function (value: Array<any> | FugaziMap<any>): boolean {
 						return (fugazi.is(value, Array) && (<Array<any>> value).length >= min)
-							|| (fugazi.is(value, fugazi.collections.Map) && (<Map<any>> value).size() >= min);
+							|| (fugazi.is(value, fugazi.collections.FugaziMap) && (<FugaziMap<any>> value).size() >= min);
 					}
 				}
 			},
@@ -34,9 +34,9 @@ import {BoundConstraintValidator, Descriptor, Map} from "../../../../scripts/bin
 				types: ["list", "map"],
 				params: ["size"],
 				validator: function (size: number): BoundConstraintValidator {
-					return function (value: Array<any> | Map<any>): boolean {
+					return function (value: Array<any> | FugaziMap<any>): boolean {
 						return (fugazi.is(value, Array) && (<Array<any>> value).length === size)
-							|| (fugazi.is(value, fugazi.collections.Map) && (<Map<any>> value).size() === size);
+							|| (fugazi.is(value, fugazi.collections.FugaziMap) && (<FugaziMap<any>> value).size() === size);
 					}
 				}
 			}

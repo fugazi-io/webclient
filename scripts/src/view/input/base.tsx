@@ -53,7 +53,7 @@ export interface InputState extends view.ViewState {
 export abstract class InputView<P extends InputProperties, S extends InputState> extends view.View<P, S> {
 	private prompt: string;
 	private className: string[];
-	private keymap: collections.Map<() => void>;
+	private keymap: collections.FugaziMap<() => void>;
 
 	protected inputbox: HTMLInputElement;
 

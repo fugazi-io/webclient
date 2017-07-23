@@ -246,8 +246,8 @@ export class WordsListParameter extends ListParameter {
 	}
 }
 
-export class MapParameter extends CompoundParameter<collections.EntryMap<Parameter<any>, Parameter<any>>, collections.Map<any>> {
-	public getParameterValues(): collections.Map<any> {
+export class MapParameter extends CompoundParameter<collections.EntryMap<Parameter<any>, Parameter<any>>, collections.FugaziMap<any>> {
+	public getParameterValues(): collections.FugaziMap<any> {
 		let values = collections.map<any>();
 
 		this.expressionValue.forEach((entry, key) => {

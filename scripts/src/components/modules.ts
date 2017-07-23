@@ -76,11 +76,11 @@ export class Parameters {
 export class Module extends components.Component {
 	private remote: Remote;
 	private params: Parameters;
-	private modules: collections.Map<Module>;
-	private types: collections.Map<types.Type>;
-	private commands: collections.Map<commands.Command>;
-	private converters: collections.Map<converters.Converter>;
-	private constraints: collections.Map<constraints.Constraint>;
+	private modules: collections.FugaziMap<Module>;
+	private types: collections.FugaziMap<types.Type>;
+	private commands: collections.FugaziMap<commands.Command>;
+	private converters: collections.FugaziMap<converters.Converter>;
+	private constraints: collections.FugaziMap<constraints.Constraint>;
 
 	constructor() {
 		super(components.ComponentType.Module);
@@ -411,7 +411,7 @@ class BasicAuthentication extends Authenticator {
 			options.headers = {};
 		}
 
-		if (coreTypes.is(options.headers, collections.Map)) {
+		if (coreTypes.is(options.headers, collections.FugaziMap)) {
 			options.headers.set("Authorization", value);
 		} else {
 			options.headers["Authorization"] = value;

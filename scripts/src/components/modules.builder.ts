@@ -82,11 +82,11 @@ interface RemoteBuilderInfo {
 }
 
 export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descriptor.Descriptor> {
-	private innerModuleBuilders: collections.Map<componentsBuilder.Builder<modules.Module>>;
-	private innerTypesBuilders: collections.Map<componentsBuilder.Builder<types.Type>>;
-	private innerCommandsBuilders: collections.Map<componentsBuilder.Builder<commands.Command>>;
-	private innerConvertersBuilders: collections.Map<componentsBuilder.Builder<converters.Converter>>;
-	private innerConstraintBuilders: collections.Map<componentsBuilder.Builder<constraints.Constraint>>;
+	private innerModuleBuilders: collections.FugaziMap<componentsBuilder.Builder<modules.Module>>;
+	private innerTypesBuilders: collections.FugaziMap<componentsBuilder.Builder<types.Type>>;
+	private innerCommandsBuilders: collections.FugaziMap<componentsBuilder.Builder<commands.Command>>;
+	private innerConvertersBuilders: collections.FugaziMap<componentsBuilder.Builder<converters.Converter>>;
+	private innerConstraintBuilders: collections.FugaziMap<componentsBuilder.Builder<constraints.Constraint>>;
 
 	private innerModuleRemoteBuilders: Array<RemoteBuilderInfo>;
 	private innerTypeModuleRemoteBuilders: Array<RemoteBuilderInfo>;
@@ -104,7 +104,7 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 
 	public resolve<C2 extends components.Component>(type: components.ComponentType, name: string): C2 {
 		var path: string[] = name.split("."),
-			collection: collections.Map<componentsBuilder.Builder<components.Component>> = null;
+			collection: collections.FugaziMap<componentsBuilder.Builder<components.Component>> = null;
 
 		if (path.length > 1) {
 			if (this.getName() === path.first()) {

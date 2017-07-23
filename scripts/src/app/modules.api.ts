@@ -6,7 +6,7 @@ export {PrivilegedModuleContext} from "./modules";
 export {LoadProperties} from "../components/registry";
 export {Module} from "../components/modules";
 export {Descriptor} from "../components/modules.descriptor";
-export {Map} from "../core/types.collections";
+export {FugaziMap} from "../core/types.collections";
 export {ModuleContext} from "../app/modules";
 export {BoundConstraintValidator} from "../components/constraints";
 export {Component} from "../components/components";

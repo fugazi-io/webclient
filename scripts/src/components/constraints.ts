@@ -97,7 +97,7 @@ class Binder {
 
 	private counter: number;
 	private definition: string;
-	private quoted: collections.Map<string>;
+	private quoted: collections.FugaziMap<string>;
 	private typeBuilder: builder.Builder<types.Type>;
 
 	constructor(definition: string, typeBuilder: builder.Builder<types.Type>) {

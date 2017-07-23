@@ -13,8 +13,8 @@ import * as net from "../core/net";
 import * as collections from "../core/types.collections";
 
 
-var index: collections.Map<modules.Module> = collections.map<modules.Module>(),
-	defaultConverters: collections.Map<converters.Converter> = collections.map<converters.Converter>();
+var index: collections.FugaziMap<modules.Module> = collections.map<modules.Module>(),
+	defaultConverters: collections.FugaziMap<converters.Converter> = collections.map<converters.Converter>();
 
 export class ModuleAssociationException extends coreTypes.Exception {
 }
@@ -180,7 +180,7 @@ export function guessType(value: any): types.Type {
 		return getType("list");
 	}
 
-	if (coreTypes.isPlainObject(value) || value instanceof collections.Map) {
+	if (coreTypes.isPlainObject(value) || value instanceof collections.FugaziMap) {
 		return getType("map");
 	}
 
@@ -418,7 +418,7 @@ function createCoreModule(parentPath: components.Path): modules.Module {
 		"map",
 		"Map",
 		value => {
-			return coreTypes.is(value, collections.Map) || coreTypes.isPlainObject(value);
+			return coreTypes.is(value, collections.FugaziMap) || coreTypes.isPlainObject(value);
 		}
 	);
 	coreModule.addType(mapType);
@@ -430,9 +430,9 @@ function createCoreModule(parentPath: components.Path): modules.Module {
 		"Struct",
 		[mapType],
 		["fields"],
-		function (fields: collections.Map<types.Type>): constraints.BoundConstraintValidator {
-			return function (map: collections.Map<any> | coreTypes.PlainObject<any>): boolean {
-				if (map instanceof collections.Map) {
+		function (fields: collections.FugaziMap<types.Type>): constraints.BoundConstraintValidator {
+			return function (map: collections.FugaziMap<any> | coreTypes.PlainObject<any>): boolean {
+				if (map instanceof collections.FugaziMap) {
 					return map.size() === fields.size() && map.keys().every(key => fields.has(key) && fields.get(key).validate(map.get(key)));
 				} else {
 					return Object.keys(map).length == fields.size() && Object.keys(map).every(key => fields.has(key) && fields.get(key).validate(map[key]));
@@ -448,11 +448,11 @@ function createCoreModule(parentPath: components.Path): modules.Module {
 		[listType, mapType],
 		["type"],
 		function (type: types.Type): constraints.BoundConstraintValidator {
-			return function (collection: any[] | collections.Map<any>): boolean {
+			return function (collection: any[] | collections.FugaziMap<any>): boolean {
 				if (coreTypes.is(collection, Array)) {
 					return (<any[]> collection).every(item => type.validate(item));
 				} else if (coreTypes.is(collection, Array)) {
-					return (<collections.Map<any>> collection).values().every(item => type.validate(item));
+					return (<collections.FugaziMap<any>> collection).values().every(item => type.validate(item));
 				} else {
 					return false;
 				}

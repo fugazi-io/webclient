@@ -73,7 +73,7 @@ class ExecutionResultAny extends ExecutionResult {
 
 export class ExecutionParameters {
 	private names: string[];
-	private values: collections.Map<any>;
+	private values: collections.FugaziMap<any>;
 
 	public constructor() {
 		this.names = [];
@@ -101,7 +101,7 @@ export class ExecutionParameters {
 		return this.values.asObject();
 	}
 
-	public asMap(): collections.Map<any> {
+	public asMap(): collections.FugaziMap<any> {
 		return this.values.clone();
 	}
 }
@@ -288,7 +288,7 @@ export class LocalCommand extends Command {
 
 interface PreparedEndpointParams {
 	endpoint: string,
-	params: collections.Map<any>
+	params: collections.FugaziMap<any>
 }
 
 export const ENDPOINT_ARGUMENTS_REGEX = /(\{\s*([a-z0-9]+)\s*\})/gi;
@@ -346,7 +346,7 @@ export class RemoteCommand extends Command {
 			url: new net.Url(endpointParams.endpoint, remote.base(remoteSourceId))
 		} as net.RequestProperties;
 
-		if (coreTypes.isPlainObject(data) || coreTypes.is(data, collections.Map)) {
+		if (coreTypes.isPlainObject(data) || coreTypes.is(data, collections.FugaziMap)) {
 			props.contentType = net.ContentTypes.Json;
 		}
 

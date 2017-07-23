@@ -66,7 +66,7 @@ export type ModulesApi =
 		registry: typeof registry;
 	};
 
-const modulesApi = {
+const modulesApi: ModulesApi = {
 	...coreTypes,
 	...constants,
 	loaded: loaded,
