@@ -7,7 +7,8 @@
  */
 
 namespace fugazi.channels {
-	let myChannelId: string,
+	let initialized = false,
+		myChannelId: string,
 		parentChannelId: string | null = null,
 		parentChannelOrigin: string | null = null;
 
@@ -51,6 +52,10 @@ namespace fugazi.channels {
 	}
 
 	export function init(): void {
+		if (initialized) {
+			return;
+		}
+
 		if (!opener && parent === window) { // main document
 			myChannelId = utils.generateId({ max: 15, min: 8 });
 		} else { // iframe or dialog
@@ -62,6 +67,7 @@ namespace fugazi.channels {
 		}
 
 		WINDOW_MESSAGE_LISTENER.start();
+		initialized = true;
 	}
 
 	const CHANNELS = new Map<string, Channel>();
@@ -178,6 +184,7 @@ namespace fugazi.channels {
 				message
 			};
 
+			console.log(document.domain, this.dispatcher);
 			this.dispatcher.postMessage(JSON.stringify(envelop), this.domain);
 			return message.id;
 		}
@@ -253,6 +260,17 @@ namespace fugazi.channels {
 		export class OpenerChannel extends ParentChannel {
 			constructor() {
 				super(window.opener);
+			}
+		}
+
+		export namespace oAuth2 {
+			const createOAuth2MessageType = createDialogMessageType.bind(null, "oAuth2");
+			export namespace MessageTypes {
+				export const OAuth2AuthenticationResponse = createOAuth2MessageType("authentication", "response") as string;
+			}
+
+			export type OAuth2AuthenticationResponsePayload = {
+				status: "success" | "failure";
 			}
 		}
 	}

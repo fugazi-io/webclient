@@ -1,5 +1,6 @@
 /// <reference path="../../lib/analytics.d.ts" />
 /// <reference path="../app/application.ts" />
+/// <reference path="../app/dialogs.ts" />
 /// <reference path="components.ts" />
 /// <reference path="registry.ts" />
 /// <reference path="syntax.ts" />
@@ -171,7 +172,9 @@ namespace fugazi.components.commands {
 		public executeLater(context: app.modules.ModuleContext): Executer {
 			let executionResult = this.returnType.is("any") ? new ExecutionResultAny(this.returnType, this.asynced) : new ExecutionResult(this.returnType, this.asynced),
 				executer = new Executer(executionResult, params => {
-					this.invokeHandler(context, params).then(this.handleHandlerResult.bind(this, "then", executionResult), this.handleHandlerResult.bind(this, "catch", executionResult));
+					this.invokeHandler(context, params)
+						.then(this.handleHandlerResult.bind(this, "then", executionResult, () => this.invokeHandler(context, params)))
+						.catch(this.handleHandlerResult.bind(this, "catch", executionResult, null));
 				});
 
 			return executer;
@@ -185,7 +188,7 @@ namespace fugazi.components.commands {
 
 		protected abstract invokeHandler(context: app.modules.ModuleContext, params: ExecutionParameters): Promise<handler.Result>;
 
-		protected handleHandlerResult(cbType: "then" | "catch", executionResult: ExecutionResult, result: handler.Result): void {
+		protected handleHandlerResult(cbType: "then" | "catch", executionResult: ExecutionResult, reInvoke: () => Promise<handler.Result>, result: handler.Result): void {
 			if (!handler.isHandlerResult(result)) {
 				result = cbType === "then" ? {
 						status: handler.ResultStatus.Success,
@@ -219,7 +222,22 @@ namespace fugazi.components.commands {
 			} else if (handler.isFailureHandlerResult(result)) {
 				executionResult.reject(new fugazi.Exception(result.error));
 			} else if (handler.isOAuth2HandlerResult(result)) {
+				app.dialogs.OAuth2DialogChannel.from(new net.Url(result.authorizationUri)).then(channel => {
+					const listener = (message: channels.ChannelMessage<channels.dialogs.oAuth2.OAuth2AuthenticationResponsePayload>)=> {
+						channel.unregister(channels.dialogs.oAuth2.MessageTypes.OAuth2AuthenticationResponse, listener);
 
+						if (message.payload.status === "success") {
+							reInvoke()
+								.then(newResult => this.handleHandlerResult(cbType, executionResult, () => Promise.reject("authentication failure"), newResult))
+								.catch(error => executionResult.reject(error instanceof Error ? error : new fugazi.Exception(error)));
+						} else if (message.payload.status === "failure") {
+							executionResult.reject(new fugazi.Exception("authentication failure"));
+						}
+					};
+					channel.register(channels.dialogs.oAuth2.MessageTypes.OAuth2AuthenticationResponse, listener);
+				}).catch(error => {
+					executionResult.reject(error instanceof Error ? error : new fugazi.Exception(error));
+				});
 			} else {
 				executionResult.reject(new fugazi.Exception("Unknown protocol error"));
 			}

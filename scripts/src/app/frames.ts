@@ -2,7 +2,7 @@
 /// <reference path="../core/net.ts" />
 /// <reference path="../core/types.ts" />
 /// <reference path="../core/utils.ts" />
-/// <reference path="../app/application.ts" />
+/// <reference path="./application.ts" />
 /// <reference path="../components/commands.ts" />
 /// <reference path="../channels/protocol.ts" />
 

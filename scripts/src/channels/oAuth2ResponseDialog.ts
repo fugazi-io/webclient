@@ -5,6 +5,10 @@
  */
 
 namespace fugazi.channels.dialogs.oAuth2Response {
+	channels.init();
+
 	const channel = new dialogs.OpenerChannel();
-	channel.sendMessage(MessageTypes.CloseDialog);
+	channel.register(channels.MessageTypes.HandshakeAck, () => {
+		channel.sendMessage(MessageTypes.CloseDialog);
+	});
 }
