@@ -19,7 +19,7 @@ Matches a quoted string or any single word that isn't a boolean or a number.
 Matches one or more values which can be of any other type.  
 A list can be generic: `list<string>`, if the generic constraint isn't set `any` is assumed.
 
-#### Map
+#### FugaziMap
 Matches one or more key/values.  
 The key can only be a string, but the value can be of any other type.  
 A map can be generic: `map<string>`, if the generic constraint isn't set `any` is assumed.

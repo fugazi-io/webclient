@@ -1,9 +1,0 @@
-{
-	"compilerOptions": {
-		"target": "ES6",
-		"removeComments": true,
-		"sourceMap": true,
-		"outDir": "bin",
-		"rootDir": "src"
-	}
-}

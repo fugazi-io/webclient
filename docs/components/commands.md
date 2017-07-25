@@ -116,7 +116,7 @@ The arguments are received as a javascript array in the order of parameter defin
 * **arguments:**  
 The arguments are received as regular javascript function arguments in the order of parameter definitions in the syntax rule
 * **map:**  
-The arguments are received as a `fugazi.collections.Map` which stores them by their parameter names
+The arguments are received as a `fugazi.collections.FugaziMap` which stores them by their parameter names
 * **struct:**:  
 The arguments are received as regular javascript object, similar to `map` but with a different implementation
 
@@ -155,7 +155,7 @@ Asynced command with `parametersForm = "map"`
 		syntax: "(a number) + (b number)",
 		returns: "number",
 		parametersForm: "map",
-		handler: (context: fugazi.app.modules.ModuleContext, args: fugazi.collections.Map<number>): Promise<fugazi.components.commands.handler.Result> => {
+		handler: (context: fugazi.app.modules.ModuleContext, args: fugazi.collections.FugaziMap<number>): Promise<fugazi.components.commands.handler.Result> => {
 			return new Promise(resolve => {
 				resolve({
 					status: fugazi.components.commands.handler.ResultStatus.Success,
