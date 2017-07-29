@@ -22,11 +22,17 @@ namespace fugazi.app.dialogs {
 		}
 
 		public static from<T>(this: { new(id: string, source: net.Url, element: Window): T }, source: net.Url): Promise<T> {
-			const id = utils.generateId({ max: 15, min: 8 });
+			/*const id = utils.generateId({ max: 15, min: 8 });
 			const features = "menubar=no,location=yes,resizable=yes,scrollbars=yes,status=yes,height=200,width=200";
 			let redirectUri = new net.Url(decodeURIComponent(source.getParam("redirect_uri")));
 			redirectUri = channels.createUrlWithData(redirectUri, id);
 			source.addParam("redirect_uri", redirectUri.toString(), true);
+			const element = window.open(source.toString(), "Authenticate", features);
+			return Promise.resolve(new this(id, source, element));*/
+
+			const id = utils.generateId({ max: 15, min: 8 });
+			const features = "menubar=no,location=yes,resizable=yes,scrollbars=yes,status=yes,height=200,width=200";
+			source.addParam("state", JSON.stringify(channels.createUrlData(id)), true);
 			const element = window.open(source.toString(), "Authenticate", features);
 			return Promise.resolve(new this(id, source, element));
 		}

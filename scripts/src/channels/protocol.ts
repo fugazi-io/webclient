@@ -19,7 +19,7 @@ namespace fugazi.channels {
 		scriptsBase: string; // used to load the scripts in the html files
 	}
 
-	function extractUrlData(): ChannelUrlData | null {
+	function getDataFromUrlHash(): ChannelUrlData | null {
 		let hash = document.location.hash;
 		if (hash === "") {
 			return null;
@@ -29,13 +29,60 @@ namespace fugazi.channels {
 			hash = hash.substring(1);
 		}
 
-		const data = JSON.parse(decodeURIComponent(hash));
+		try {
+			return JSON.parse(decodeURIComponent(hash));
+		} catch (e) {
+			return null;
+		}
+	}
 
-		if (!data.channelId || !data.parentId || !data.parentOrigin) {
-			throw new Exception("invalid channel url");
+	function getDataFromStateUrlParam(): ChannelUrlData | null {
+		let data = window.location.search
+			.substring(1)
+			.split("&")
+			.map(item => item.split("="))
+			.find(item => item[0] === "state");
+
+		if (!data || data.length !== 2) {
+			return null;
 		}
 
-		return data;
+		try {
+			return JSON.parse(decodeURIComponent(data[1]));
+		} catch (e) { // in case the data was encoded twice
+			try {
+				return JSON.parse(decodeURIComponent(decodeURIComponent(data[1])));
+			} catch (e) {
+				return null;
+			}
+		}
+	}
+
+	function validateUrlData(data: ChannelUrlData | null): boolean {
+		return data && typeof data.channelId === "string" && typeof data.parentId === "string" && typeof data.parentOrigin === "string" ;
+	}
+
+	function extractUrlData(): ChannelUrlData | null {
+		let data = getDataFromUrlHash();
+		if (validateUrlData(data)) {
+			return data;
+		}
+
+		data = getDataFromStateUrlParam();
+		if (validateUrlData(data)) {
+			return data;
+		}
+
+		return null;
+	}
+
+	export function createUrlData(channelId: string): ChannelUrlData {
+		return {
+			channelId: channelId,
+			parentId: myChannelId,
+			parentOrigin: window.location.origin,
+			scriptsBase: new net.Url("scripts/bin", app.location.base()).toString()
+		};
 	}
 
 	export function createUrlWithData(url: net.Url, channelId: string): net.Url {
