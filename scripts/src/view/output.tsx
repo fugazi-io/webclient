@@ -182,7 +182,7 @@ module fugazi.view {
 					<li key="hello" className="hello version">fugazi version { app.version.code }</li>,
 					<li key="repoLink" className="hello moreInfo">
 						run <span className="help-command">help</span> for more info or
-						check out the <a target="_blank" href="https://github.com/fugazi-io/webclient">GitHub repo</a>
+						read <a target="_blank" href="https://fugazi-io.github.io/docs/#/?id=fugaziio">the documentation</a>
 					</li>,
 					<li key="helpUs" className="hello help">
 						we'd love to get your feedback, so if something isn't clear or not working find us in <a target="_blank" href="https://gitter.im/fugazi-io/Lobby">our gitter</a>
