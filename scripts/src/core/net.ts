@@ -456,7 +456,7 @@ class HttpRequestObject extends HttpObject implements HttpRequest {
 			data = collections.map<any>(<types.PlainObject<any>> data);
 		}
 
-		this.open(data);
+		this.open();
 		this.processHeaders();
 		this.xhr.onreadystatechange = this.handler.bind(this);
 		this.processDataAndSend(<string | collections.FugaziMap<any>> data);
@@ -487,8 +487,7 @@ class HttpRequestObject extends HttpObject implements HttpRequest {
 		return this;
 	}
 
-	protected open(data?: string | types.PlainObject<any> | collections.FugaziMap<any>): void {
-		console.log(`${ httpMethodToString(this.method) } | ${ this.url.toString() }`);
+	protected open(): void {
 		this.xhr.open(httpMethodToString(this.method), this.url.toString(), true);
 	}
 
@@ -497,7 +496,7 @@ class HttpRequestObject extends HttpObject implements HttpRequest {
 	}
 
 	private handler(event: Event): void {
-		var response: HttpResponseObject;
+		let response: HttpResponseObject;
 
 		if (this.xhr.readyState === 4) {
 			this.statusCode = this.xhr.status;
@@ -539,8 +538,8 @@ class HttpGetRequestObject extends HttpRequestObject {
 		let params;
 
 		if (!data) {
-			super.open(null);
-			return
+			super.open();
+			return;
 		}
 
 		if (typeof data === "string") {
@@ -562,7 +561,7 @@ class HttpPostRequestObject extends HttpRequestObject {
 	 * @Override
 	 */
 	protected processDataAndSend(data?: string | collections.FugaziMap<any>): void {
-		var processed: any;
+		let processed: any;
 
 		if (!data) {
 			processed = null;
