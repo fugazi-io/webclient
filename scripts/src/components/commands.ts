@@ -222,7 +222,7 @@ export abstract class Command extends components.Component {
 	}
 
 	protected validateResultValue(result: any): boolean {
-		return this.returnType.validate(handler.isHandlerResult(result) ? result.value : result);
+		return result === null || this.returnType.validate(handler.isHandlerResult(result) ? result.value : result);
 	}
 
 	private knownConvertResult(value: any): any {
