@@ -413,7 +413,9 @@ export function getRenderer(type: types.Type, value?: any): Renderer {
 		}
 	}
 
-	if (renderingType.is(registry.getType("void"))) {
+	if (value === null) {
+		componentClass = AnyComponent;
+	} else if (renderingType.is(registry.getType("void"))) {
 		componentClass = VoidComponent;
 	} else if (renderingType.is(registry.getType("boolean")) || renderingType.is(registry.getType("number"))) {
 		componentClass = PrimitiveComponent;
