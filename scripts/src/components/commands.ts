@@ -135,6 +135,10 @@ function getHandlerErrorMessage(error: any): string {
 		return error.message;
 	}
 
+	if (fugazi.isPlainObject(error)) {
+		return JSON.stringify(error);
+	}
+
 	return error.toString();
 }
 
