@@ -253,6 +253,10 @@ export var ContentTypes: ContentTypeEnum = {
 	},
 	None: null,
 	fromString: function (contentType: string): ContentType {
+		if (!contentType) {
+			return ContentTypes.None;
+		}
+
 		for (let i = 0; i < CONTENT_TYPES.length; i++) {
 			if (contentType.toLowerCase().includes(CONTENT_TYPES[i].toString().toLowerCase())) {
 				return CONTENT_TYPES[i];
