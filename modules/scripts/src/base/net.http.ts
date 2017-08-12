@@ -1,4 +1,4 @@
-import {Descriptor, HttpMethod, FugaziMap, ModuleContext, RequestProperties} from "../../../../scripts/bin/app/modules.api";
+import { Descriptor, HttpMethod, FugaziMap, ModuleContext, RequestProperties } from "../../../../scripts/bin/app/modules.api";
 
 (function (): void {
 	interface HttpResponse {

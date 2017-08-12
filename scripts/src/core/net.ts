@@ -6,9 +6,8 @@ const HEADERS = {
 	ContentType: "Content-Type"
 };
 
-var DEFAULT_CONTENT_TYPE: ContentType;
-var DEFAULT_METHOD: HttpMethod;
-var CONTENT_TYPES: ContentType[];
+let DEFAULT_CONTENT_TYPE: ContentType;
+let CONTENT_TYPES: ContentType[];
 
 export enum HttpMethod {
 	Delete,
@@ -18,7 +17,7 @@ export enum HttpMethod {
 	Put,
 }
 
-DEFAULT_METHOD = HttpMethod.Get;
+const DEFAULT_METHOD = HttpMethod.Get;
 
 export function httpMethodToString(method: HttpMethod): string {
 	return HttpMethod[method].toUpperCase();
@@ -223,12 +222,13 @@ export interface FormContentTypeEnum {
 export interface ContentTypeEnum {
 	Text: ContentType,
 	Json: ContentType,
+	File: ContentType,
 	Form: FormContentTypeEnum,
 	None: ContentType,
 	fromString: (contentType: string) => ContentType
 }
 
-export var ContentTypes: ContentTypeEnum = {
+export const ContentTypes: ContentTypeEnum = {
 	Text: {
 		toString: function () {
 			return "text/plain";
@@ -237,6 +237,11 @@ export var ContentTypes: ContentTypeEnum = {
 	Json: {
 		toString: function () {
 			return "application/json";
+		}
+	},
+	File: {
+		toString: function () {
+			return "application/octet-stream";
 		}
 	},
 	Form: {
@@ -268,7 +273,13 @@ export var ContentTypes: ContentTypeEnum = {
 }
 
 DEFAULT_CONTENT_TYPE = ContentTypes.Form.UrlEncoded;
-CONTENT_TYPES = [ContentTypes.Text, ContentTypes.Json, ContentTypes.Form.Multipart, ContentTypes.Form.UrlEncoded];
+CONTENT_TYPES = [
+	ContentTypes.Text,
+	ContentTypes.Json,
+	ContentTypes.File,
+	ContentTypes.Form.Multipart,
+	ContentTypes.Form.UrlEncoded
+];
 
 export interface RequestProperties {
 	url: string | Url | URL;
@@ -503,6 +514,15 @@ class HttpRequestObject extends HttpObject implements HttpRequest {
 		let response: HttpResponseObject;
 
 		if (this.xhr.readyState === 4) {
+			if (ContentTypes.fromString(this.xhr.getResponseHeader("Content-Type")) === ContentTypes.File) {
+				debugger;
+				console.log("FILE!!!!");
+				this.future.resolve(null);
+				return;
+			} else {
+				console.log("HERE: ", this.xhr.getResponseHeader("Content-Type"));
+			}
+
 			this.statusCode = this.xhr.status;
 			response = new HttpResponseObject(this.xhr, this.statusCode);
 
