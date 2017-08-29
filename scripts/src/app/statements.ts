@@ -67,9 +67,7 @@ export class ParameterPart extends StatementPart<syntax.Parameter> {
 	}
 }
 
-export class InnerStatementPart extends ParameterPart {
-
-}
+export class InnerStatementPart extends ParameterPart {}
 
 export abstract class Statement {
 	protected parts: StatementPart<syntax.RuleToken>[];
