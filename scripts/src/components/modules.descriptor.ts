@@ -8,9 +8,9 @@ import * as constraintsDescriptor from "./constraints.descriptor";
 import * as convertersDescriptor from "./converters.descriptor";
 import * as componentsDescriptor from "./components.descriptor";
 import * as commandsDescriptor from "./commands.descriptor";
-
 import * as typesDescriptor from "./types.descriptor";
-var loadingScriptModules: collections.FugaziMap<ScriptLoader> = collections.map<ScriptLoader>();
+
+const loadingScriptModules: collections.FugaziMap<ScriptLoader> = collections.map<ScriptLoader>();
 
 /**
  * Called by a loaded (script) component
@@ -29,23 +29,17 @@ export function loaded(moduleDescriptor: Descriptor): void {
 	loadingScriptModules.remove(name).loadedCalled(moduleDescriptor);
 }
 
-export interface InnerComponentsCollection<T extends componentsDescriptor.Descriptor> {
-}
+export interface InnerComponentsCollection<T extends componentsDescriptor.Descriptor> {}
 
-export interface InnerComponentsArrayCollection<T extends componentsDescriptor.Descriptor> extends InnerComponentsCollection<T>, Array<string | T> {
-}
+export interface InnerComponentsArrayCollection<T extends componentsDescriptor.Descriptor> extends InnerComponentsCollection<T>, Array<string | T> {}
 
-export interface InnerComponentsObjectCollection<T extends componentsDescriptor.Descriptor> extends InnerComponentsCollection<T>, coreTypes.PlainObject<string | T> {
-}
+export interface InnerComponentsObjectCollection<T extends componentsDescriptor.Descriptor> extends InnerComponentsCollection<T>, coreTypes.PlainObject<string | T> {}
 
-export interface InnerModulesCollection {
-}
+export interface InnerModulesCollection {}
 
-export interface InnerModulesArrayCollection extends InnerModulesCollection, Array<Descriptor | string> {
-}
+export interface InnerModulesArrayCollection extends InnerModulesCollection, Array<Descriptor | string> {}
 
-export interface InnerModulesObjectCollection extends InnerModulesCollection, coreTypes.PlainObject<Descriptor | string> {
-}
+export interface InnerModulesObjectCollection extends InnerModulesCollection, coreTypes.PlainObject<Descriptor | string> {}
 
 export interface Descriptor extends componentsDescriptor.Descriptor {
 	basePath?: string; // set when building

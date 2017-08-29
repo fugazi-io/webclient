@@ -1,7 +1,7 @@
 import "../core/polyfill";
 import * as location from "./application.location";
 import * as bus from "./application.bus";
-import {ApplicationContext, setContext, setMainView} from "./application";
+import { ApplicationContext, setContext, setMainView } from "./application";
 import * as storage from "./storage";
 import * as terminal from "./terminal";
 import * as terminals from "./application.terminals";
@@ -11,7 +11,7 @@ import * as dom from "../core/dom";
 import * as registry from "../components/registry";
 import * as handler from "../components/commands.handler";
 import * as constants from "./constants";
-import {loaded} from "../components/modules.descriptor";
+import { loaded } from "../components/modules.descriptor";
 import * as net from "../core/net";
 import * as coreTypes from "../core/types";
 import * as collections from "../core/types.collections";

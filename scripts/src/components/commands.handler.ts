@@ -38,8 +38,7 @@ export enum PassedParametersForm {
 	Map
 }
 
-export interface Handler extends Function {
-}
+export interface Handler extends Function {}
 
 export interface SyncedHandler extends Handler {
 	(context: appModules.ModuleContext, ...params: any[]): Result | any;
@@ -48,4 +47,3 @@ export interface SyncedHandler extends Handler {
 export interface AsyncedHandler extends Handler {
 	(context: appModules.ModuleContext, ...params: any[]): Promise<Result>;
 }
-
