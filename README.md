@@ -3,6 +3,9 @@
 A web based terminal application for executing local and remote commands.  
 The latest version of the terminal can be found here: http://fugazi.io.  
 
+Here's a short introduction video:  
+[![short introduction](https://img.youtube.com/vi/lKf1rhJdonI/0.jpg)](https://www.youtube.com/watch?v=lKf1rhJdonI)
+
 Documentation can be found here: https://fugazi-io.github.io.  
 You can contact us here: https://gitter.im/fugazi-io/Lobby.
 
