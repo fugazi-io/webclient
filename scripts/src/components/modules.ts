@@ -440,7 +440,7 @@ namespace fugazi.components.modules {
 		proxied(): boolean;
 		authenticator(): Authenticator;
 		base(originName?: string): net.Url | null;
-		frame(originName?: string): app.frames.ProxyFrame;
+		frame(originName?: string): app.frames.ProxyFrameChannel;
 	}
 
 	export class RemoteSource implements Remote {
@@ -451,7 +451,7 @@ namespace fugazi.components.modules {
 		private _default: string;
 		private _authenticator: Authenticator;
 		private _origins: Map<string, net.Url>;
-		private _frames: Map<string, app.frames.ProxyFrame>;
+		private _frames: Map<string, app.frames.ProxyFrameChannel>;
 
 		constructor(desc: descriptor.SourceRemoteDescriptor) {
 			this._base = desc.base;
@@ -513,8 +513,8 @@ namespace fugazi.components.modules {
 			this._origins.forEach((origin, name) => {
 				const url = new net.Url(this._proxy, origin);
 
-				app.frames.create(url).then((frame: app.frames.ProxyFrame) => {
-					this._frames.set(name, frame);
+				app.frames.ProxyFrameChannel.from(url).then(channel => {
+					this._frames.set(name, channel);
 					resolved();
 				}).catch(rejected.bind(null, name, url));
 			});
