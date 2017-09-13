@@ -1,8 +1,8 @@
 import * as bus from "./application.bus";
 import * as constants from "./constants";
 import * as applicationLocation from "./application.location";
-import * as proxyframeProtocol from "../proxyframe/protocol";
-import * as proxyframeGlobal from "../proxyframe/global";
+import * as proxyframeProtocol from "../channels/protocol";
+import * as proxyframeGlobal from "../channels/global";
 import * as utils from "../core/utils";
 import * as dom from "../core/dom";
 import * as collections from "../core/types.collections";

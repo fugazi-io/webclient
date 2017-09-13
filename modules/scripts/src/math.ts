@@ -1,7 +1,7 @@
-import { Descriptor, FugaziMap, ModuleContext } from "../../../scripts/bin/app/modules.api";
+import { FugaziMap, ModuleContext } from "../../../scripts/bin/app/modules.api";
 
 (function (): void {
-	fugazi.loaded(<Descriptor> {
+	fugazi.loaded({
 		name: "samples.math",
 		title: "Math Sample Module",
 		types: {
@@ -118,7 +118,7 @@ import { Descriptor, FugaziMap, ModuleContext } from "../../../scripts/bin/app/m
 					"fib (a integer)"
 				],
 				handler: function (context: ModuleContext, a: number): number {
-					var result: number,
+					let result: number,
 						cache: number[] = [],
 						fn = index => {
 							if (fugazi.is(cache[index], Number)) {

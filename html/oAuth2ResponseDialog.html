@@ -5,13 +5,21 @@
 	<meta charset="utf-8">
 	<script>
 		function getParams() {
-			let data = window.location.hash;
+			let data = window.location.search
+				.substring(1)
+				.split("&")
+				.map(item => item.split("="))
+				.find(item => item[0] === "state");
 
-			if (data.charAt(0) === "#") {
-				data = data.substring(1);
+			if (!data || data.length !== 2) {
+				return null;
 			}
 
-			return JSON.parse(decodeURIComponent(data));
+			try {
+				return JSON.parse(decodeURIComponent(data[1]));
+			} catch (e) { // in case the data was encoded twice
+				return JSON.parse(decodeURIComponent(decodeURIComponent(data[1])));
+			}
 		}
 
 		function joinUrl(base, path) {
@@ -30,7 +38,7 @@
 			"core/net",
 			"core/utils",
 			"channels/protocol",
-			"channels/proxyframe"
+			"channels/oAuth2ResponseDialog"
 		].forEach(path => {
 			let url = joinUrl(window.proxyData.scriptsBase, path);
 
