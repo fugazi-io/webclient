@@ -35,6 +35,7 @@
 		"transpile-modules-watch": "npm run transpile-modules -- --watch",
 		"transpile-watch": "run-p transpile-core-watch transpile-modules-watch",
 		"serve": "webpack-dev-server --no-info --colors --port 3330",
+		"serve-public": "webpack-dev-server --no-info --colors --port 3330 --host 0.0.0.0",
 		"dev": "npm-run-all transpile -p transpile-watch serve",
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"bundle": "webpack --env.prod --progress --colors",
