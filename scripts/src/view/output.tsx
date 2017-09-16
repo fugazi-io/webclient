@@ -9,7 +9,8 @@ import * as commands from "../components/commands";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as Ps from "perfect-scrollbar";
-var history: Array<OutputItemInfo> = [];
+
+let history: Array<OutputItemInfo> = [];
 
 export interface OutputItemInfo {
 }
