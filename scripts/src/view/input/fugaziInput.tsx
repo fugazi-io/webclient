@@ -140,10 +140,11 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 			});
 	}
 
-	private onShowSearch(): void {
+	private onShowSearch(): boolean {
 		this.history.mark();
 		this.history.update();
 		this.props.onSearchHistoryRequested();
+		return true;
 	}
 }
 
