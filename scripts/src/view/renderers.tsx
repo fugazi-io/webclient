@@ -28,7 +28,7 @@ export class RenderingComponent<P extends RenderingComponentProperties, S extend
 
 class AnyComponent extends RenderingComponent<RenderingComponentProperties, view.ViewState> {
 	public render(): JSX.Element {
-		var value: string;
+		let value: string;
 
 		if (coreTypes.is(this.props.value, collections.FugaziMap)) {
 			value = JSON.stringify(this.props.value.asObject());
@@ -266,7 +266,7 @@ export class ListComponent extends CollectionComponent<CollectionComponentState>
 
 		values.forEach((value, index) => {
 			childType = this.state.generics || getTypeForValue(value);
-			childRenderer = getRenderer(childType);
+			childRenderer = getRenderer(childType, value);
 
 			children.push(<li key={ index.toString() } className="item clearfix">{ childRenderer.render({
 				onStyleChange: this.props.onStyleChange,
@@ -343,7 +343,7 @@ export class MapComponent extends CollectionComponent<MapComponentState> {
 		values.keys().forEach(childName => {
 			let childValue = values.get(childName),
 				childType = this.state.generics || getTypeForValue(childValue),
-				childRenderer = getRenderer(childType);
+				childRenderer = getRenderer(childType, childValue);
 
 			children.push(<li key={ childName } className="item clearfix">
 				<div className="item_key">{ childName }</div>
@@ -367,7 +367,7 @@ export class MapComponent extends CollectionComponent<MapComponentState> {
 		values.keys().forEach(childName => {
 			let childValue = values.get(childName);
 			let childType = this.state.fields.get(childName);
-			let childRenderer = getRenderer(childType);
+			let childRenderer = getRenderer(childType, childValue);
 
 			children.push(<li key={ childName } className="item clearfix">
 				<div className="item_key">{ childName }</div>
