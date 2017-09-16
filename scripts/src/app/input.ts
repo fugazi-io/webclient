@@ -2,7 +2,7 @@ import * as coreTypes from "../core/types";
 import * as collections from "../core/types.collections";
 import * as utils from "../core/utils";
 
-export {parse} from "./input.parser";
+export { parse } from "./input.parser";
 
 export interface Range {
 	start: number;
@@ -225,6 +225,10 @@ export class ListParameter extends CompoundParameter<Parameter<any>[], any[]> {
 				return param.getParameterValues();
 			}
 
+			if (param instanceof WordParameter) {
+				return param.guess().value;
+			}
+
 			return param.value;
 		});
 	}
@@ -248,11 +252,13 @@ export class WordsListParameter extends ListParameter {
 
 export class MapParameter extends CompoundParameter<collections.EntryMap<Parameter<any>, Parameter<any>>, collections.FugaziMap<any>> {
 	public getParameterValues(): collections.FugaziMap<any> {
-		let values = collections.map<any>();
+		const values = collections.map<any>();
 
-		this.expressionValue.forEach((entry, key) => {
+		this.expressionValue.forEach(entry => {
 			if (entry.value instanceof CompoundParameter) {
 				values.set(entry.key.value.toString(), (<CompoundParameter<any, any>> entry.value).getParameterValues());
+			} else if (entry.value instanceof WordParameter) {
+				values.set(entry.key.value.toString(), entry.value.guess().value);
 			} else {
 				values.set(entry.key.value.toString(), entry.value.value);
 			}
@@ -264,7 +270,7 @@ export class MapParameter extends CompoundParameter<collections.EntryMap<Paramet
 
 export class WordsMapParameter extends MapParameter {
 	public normalize(): MapParameter {
-		let map = new collections.EntryMap<Parameter<any>, Parameter<any>>();
+		const map = new collections.EntryMap<Parameter<any>, Parameter<any>>();
 
 		this.value.forEach(entry => {
 			let key, value;
@@ -277,6 +283,8 @@ export class WordsMapParameter extends MapParameter {
 
 			if (entry.value instanceof WordParameter) {
 				value = entry.value.guess();
+			} else if (entry.value instanceof WordsMapParameter) {
+				value = entry.value.normalize();
 			} else {
 				value = entry.value;
 			}
