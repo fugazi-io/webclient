@@ -1,4 +1,3 @@
-import * as collections from "../../core/types.collections";
 import * as utils from "../../core/utils";
 import * as coreTypes from "../../core/types";
 import * as view from "../view";
@@ -53,7 +52,7 @@ export interface InputState extends view.ViewState {
 export abstract class InputView<P extends InputProperties, S extends InputState> extends view.View<P, S> {
 	private prompt: string;
 	private className: string[];
-	private keymap: collections.FugaziMap<() => void>;
+	private keymap: Map<string, () => boolean>;
 
 	protected inputbox: HTMLInputElement;
 
@@ -63,7 +62,7 @@ export abstract class InputView<P extends InputProperties, S extends InputState>
 
 		this.prompt = prompt;
 		this.className = ["input", className];
-		this.keymap = collections.map<() => void>();
+		this.keymap = new Map<string, () => boolean>();
 		this.state = {
 			value: this.props.value || ""
 		} as S;
@@ -123,7 +122,7 @@ export abstract class InputView<P extends InputProperties, S extends InputState>
 			</div>];
 	}
 
-	protected addKeyMapping(alt: boolean, ctrl: boolean, shift: boolean, char: string, fn: () => void): void {
+	protected addKeyMapping(alt: boolean, ctrl: boolean, shift: boolean, char: string, fn: () => boolean): void {
 		let key = "";
 
 		if (alt) {
@@ -174,7 +173,7 @@ export abstract class InputView<P extends InputProperties, S extends InputState>
 
 			let key = createEventSequenceKey(event);
 			if (this.keymap.has(key)) {
-				this.keymap.get(key)();
+				stopPropagation = this.keymap.get(key)();
 			}
 		} else {
 			switch (event.key) {
