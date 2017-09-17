@@ -30,7 +30,7 @@ import {
 	}
 
 	function moduleToStruct(aModule: Module): ModuleStruct {
-		var struct: ModuleStruct = <ModuleStruct> componentToStruct(aModule);
+		const struct = componentToStruct(aModule) as ModuleStruct;
 
 		struct.modules = aModule.getModules().map(moduleToStruct);
 		struct.types = aModule.getTypes().map(componentToStruct);

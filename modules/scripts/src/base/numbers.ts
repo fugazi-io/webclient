@@ -1,7 +1,7 @@
-import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/modules.api";
+import { BoundConstraintValidator, Descriptor } from "../../../../scripts/bin/app/modules.api";
 
 
-(function (): void {
+(function(): void {
 	fugazi.loaded(<Descriptor> {
 		name: "io.fugazi.numbers",
 		constraints: [
@@ -10,8 +10,8 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 				title: "Integer",
 				types: ["number"],
 				params: [],
-				validator: function (): BoundConstraintValidator {
-					return function (value: number): boolean {
+				validator: function(): BoundConstraintValidator {
+					return function(value: number): boolean {
 						return fugazi.isInteger(value);
 					}
 				}
@@ -21,8 +21,8 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 				title: "Float",
 				types: ["number"],
 				params: [],
-				validator: function (): BoundConstraintValidator {
-					return function (value: number): boolean {
+				validator: function(): BoundConstraintValidator {
+					return function(value: number): boolean {
 						return fugazi.isFloat(value);
 					}
 				}
@@ -37,7 +37,7 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 						max = parseFloat(max);
 					}
 
-					return function (value: number): boolean {
+					return function(value: number): boolean {
 						return value <= max;
 					}
 				}
@@ -47,12 +47,12 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 				title: "Minimum Value",
 				types: ["number"],
 				params: ["min"],
-				validator: function (min: number | string): BoundConstraintValidator {
+				validator: function(min: number | string): BoundConstraintValidator {
 					if (typeof min === "string") {
 						min = parseFloat(min);
 					}
 
-					return function (value: number): boolean {
+					return function(value: number): boolean {
 						return value >= min;
 					}
 				}
@@ -62,7 +62,7 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 				title: "Between Values",
 				types: ["number"],
 				params: ["min", "max"],
-				validator: function (min: number | string, max: number | string): BoundConstraintValidator {
+				validator: function(min: number | string, max: number | string): BoundConstraintValidator {
 					if (typeof min === "string") {
 						min = parseFloat(min);
 					}
@@ -70,7 +70,7 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 						max = parseFloat(max);
 					}
 
-					return function (value: number): boolean {
+					return function(value: number): boolean {
 						return value >= min && value <= max;
 					}
 				}
@@ -80,8 +80,8 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 				title: "Positive Value",
 				types: ["number"],
 				params: [],
-				validator: function (): BoundConstraintValidator {
-					return function (value: number): boolean {
+				validator: function(): BoundConstraintValidator {
+					return function(value: number): boolean {
 						return value >= 0;
 					}
 				}
@@ -91,8 +91,8 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 				title: "Negative Value",
 				types: ["number"],
 				params: [],
-				validator: function (): BoundConstraintValidator {
-					return function (value: number): boolean {
+				validator: function(): BoundConstraintValidator {
+					return function(value: number): boolean {
 						return value < 0;
 					}
 				}
@@ -102,8 +102,8 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 				title: "Even Value",
 				types: ["number"],
 				params: [],
-				validator: function (): BoundConstraintValidator {
-					return function (value: number): boolean {
+				validator: function(): BoundConstraintValidator {
+					return function(value: number): boolean {
 						return value % 2 === 0;
 					}
 				}
@@ -113,8 +113,8 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 				title: "Odd Value",
 				types: ["number"],
 				params: [],
-				validator: function (): BoundConstraintValidator {
-					return function (value: number): boolean {
+				validator: function(): BoundConstraintValidator {
+					return function(value: number): boolean {
 						return value % 2 === 1;
 					}
 				}
@@ -124,12 +124,12 @@ import {BoundConstraintValidator, Descriptor} from "../../../../scripts/bin/app/
 				title: "Divided By Value",
 				types: ["number"],
 				params: ["divisor"],
-				validator: function (divisor: number | string): BoundConstraintValidator {
+				validator: function(divisor: number | string): BoundConstraintValidator {
 					if (typeof divisor === "string") {
 						divisor = parseFloat(divisor);
 					}
 
-					return function (value: number): boolean {
+					return function(value: number): boolean {
 						return value % (divisor as number) === 0;
 					}
 				}

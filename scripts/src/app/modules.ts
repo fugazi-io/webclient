@@ -31,14 +31,14 @@ export class BaseModuleContext<Parent extends terminal.BaseTerminalContext> exte
 
 export type DefaultModuleContext = BaseModuleContext<terminal.BaseTerminalContext>;
 
-export class ModuleContext extends BaseModuleContext<terminal.RestrictedTerminalContext> {
-}
+export class ModuleContext extends BaseModuleContext<terminal.RestrictedTerminalContext> {}
 
-export class PrivilegedModuleContext extends BaseModuleContext<terminal.TerminalContext> {
-}
+export class PrivilegedModuleContext extends BaseModuleContext<terminal.TerminalContext> {}
 
-/*export function createContext(parent: terminal.TerminalContext): PrivilegedModuleContext;
- export function createContext(parent: terminal.RestrictedTerminalContext): RestrictedModuleContext;
- export function createContext<Parent extends terminal.BaseTerminalContext>(parent: Parent) {
- return new ModuleContext(parent);
- }*/
+/*
+export function createContext(parent: terminal.TerminalContext): PrivilegedModuleContext;
+	export function createContext(parent: terminal.RestrictedTerminalContext): RestrictedModuleContext;
+	export function createContext<Parent extends terminal.BaseTerminalContext>(parent: Parent) {
+	return new ModuleContext(parent);
+}
+*/

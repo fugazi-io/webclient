@@ -1,12 +1,14 @@
-(function (): void {
-	fugazi.loaded({
+import { Descriptor } from "../../../../scripts/bin/app/modules.api";
+
+(function(): void {
+	fugazi.loaded(<Descriptor> {
 		name: "io.fugazi",
 		converters: {
 			string2boolean: {
 				title: "converts string to boolean",
 				input: "string",
 				output: "boolean",
-				converter: function (input: string): boolean {
+				converter: function(input: string): boolean {
 					if (input.test(/^true$/i)) {
 						return true;
 					}
@@ -22,7 +24,7 @@
 				title: "converts string to number",
 				input: "string",
 				output: "number",
-				converter: function (input: string): number {
+				converter: function(input: string): number {
 					return parseFloat(input);
 				}
 			}

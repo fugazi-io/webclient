@@ -1,6 +1,6 @@
 import { Descriptor, HttpMethod, FugaziMap, ModuleContext, RequestProperties } from "../../../../scripts/bin/app/modules.api";
 
-(function (): void {
+(function(): void {
 	interface HttpResponse {
 		status: number;
 		data: any;

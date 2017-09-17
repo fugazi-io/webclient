@@ -4,7 +4,6 @@ import * as registry from "../components/registry";
 import * as converters from "../components/converters";
 import * as types from "../components/types";
 
-
 let context: ApplicationContext;
 export function getContext() {
 	return context;
@@ -72,6 +71,4 @@ export abstract class BaseContext<T extends Context> implements Context {
 	}
 }
 
-export class ApplicationContext extends BaseContext<null> {
-}
-
+export class ApplicationContext extends BaseContext<null> {}
