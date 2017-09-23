@@ -1,5 +1,6 @@
 import * as syntax from "../../components/syntax";
 import * as statements from "../../app/statements";
+import * as input from "../../app/input";
 import * as terminal from "../terminal";
 import * as view from "../view";
 import * as base from "./base";
@@ -116,13 +117,27 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 	}
 
 	protected onSuggestionItemPressed(item: statements.Statement): void {
-		let newValue: string = "",
+		let oldValueWords: string[] = this.getValue().split(" "),
+			expressionsIterator = (item.getExpression() as input.CommandExpression).getExpressions().getIterator(),
+			newValue: string = "",
 			haveStoppedForParameter = false,
-			iterator = item.getRule().getTokens().getIterator();
-		while (iterator.hasNext()) {
-			let token: syntax.RuleToken = iterator.next();
-			if (token.getTokenType() == syntax.TokenType.Keyword) {
+			toeknIterator = item.getRule().getTokens().getIterator();
+
+		while (toeknIterator.hasNext()) {
+			const token = toeknIterator.next();
+			// by taking the value from the token we fix keyword typos
+			if (token.getTokenType() === syntax.TokenType.Keyword) {
 				newValue += `${(token as syntax.Keyword).getWord()} `;
+				expressionsIterator.next();
+			// taking the parameter as given
+			// but if not Complete, we cannot farther automatically complete
+			} else if (expressionsIterator.hasNext()) {
+				let currentExpression = expressionsIterator.next();
+				newValue += currentExpression.input + " ";
+				if (currentExpression.state != input.ExpressionState.Complete) {
+					break;
+				}
+			// in this case we need a parameter, but cannot complete it from the input, so we stop
 			} else {
 				haveStoppedForParameter = true;
 				break;
@@ -130,7 +145,9 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 		}
 
 		this.setState({
+				// add (in practice, keep) space before parameter input
 				value: haveStoppedForParameter ? newValue : newValue.trimRight(),
+				showing: false,
 				focus: "input"
 			} as any,
 			() => {
