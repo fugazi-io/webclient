@@ -190,19 +190,19 @@ export abstract class Command extends components.Component {
 	protected abstract invokeHandler(context: appModules.ModuleContext, params: ExecutionParameters): Promise<handler.Result>;
 
 	protected handleHandlerResult(cbType: "then" | "catch", executionResult: ExecutionResult, result: handler.Result): void {
-		if (!handler.isHandlerResult(result)) {
+		if (!handler.isResult(result)) {
 			result = cbType === "then" ? {
 				status: handler.ResultStatus.Success,
 				value: result
-			} : {
+			} as handler.SuccessResult : {
 				status: handler.ResultStatus.Failure,
 				error: getHandlerErrorMessage(result)
-			};
+			} as handler.FailureResult;
 		}
 
-		if (result.status === handler.ResultStatus.Prompt) {
-			executionResult.resolve((result as handler.PromptResult).prompt);
-		} else if (result.status === handler.ResultStatus.Success) {
+		if (handler.isPromptResult(result)) {
+			executionResult.resolve(result);
+		} else if (handler.isSuccessResult(result)) {
 			if (this.convert) {
 				try {
 					result.value = this.knownConvertResult(result.value);
@@ -220,13 +220,15 @@ export abstract class Command extends components.Component {
 			} catch (e) {
 				executionResult.reject(e);
 			}
-		} else {
+		} else if (handler.isFailureResult(result)) {
 			executionResult.reject(new coreTypes.Exception(result.error));
+		} else {
+			executionResult.reject(new coreTypes.Exception("something went wrong"));
 		}
 	}
 
 	protected validateResultValue(result: any): boolean {
-		return result === null || this.returnType.validate(handler.isHandlerResult(result) ? result.value : result);
+		return result === null || this.returnType.validate(handler.isSuccessResult(result) ? result.value : result);
 	}
 
 	private knownConvertResult(value: any): any {

@@ -320,7 +320,7 @@ class ResultView extends view.View<ResultViewProperties, ResultViewState> {
 	private success(value: any): void {
 		this.setState({
 			status: "success",
-			value: handler.isPromptData(value) ? value.message : value
+			value: handler.isPromptResult(value) ? value.message : value
 		});
 	}
 

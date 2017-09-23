@@ -33,7 +33,7 @@ export interface TerminalState extends view.ViewState {
 }
 
 export class TerminalView extends view.View<TerminalProperties, TerminalState> {
-	private promptValueHandler: (value: string) => void;
+	private promptResult: commandsHandler.PromptResult;
 
 	public constructor(props: TerminalProperties) {
 		super(props);
@@ -52,18 +52,22 @@ export class TerminalView extends view.View<TerminalProperties, TerminalState> {
 		let inputView: JSX.Element;
 
 		if (this.state.promptMode) {
-			inputView = <baseInput.PasswordInputView handler={ this.handlePassword.bind(this) }/>
+			const type = this.promptResult.type === "password" ? "password" : "text";
+			inputView = <baseInput.PromptInputView
+				type={ type }
+				message={ this.promptResult.message }
+				handler={ this.handlePassword.bind(this) } />
 		} else if (this.state.searchHistoryMode) {
 			inputView = <fugaziInput.SearchHistoryInputView
 				history={ this.props.history }
-				resultHandler={ this.handleHistorySearchResult.bind(this) }/>
+				resultHandler={ this.handleHistorySearchResult.bind(this) } />
 		} else {
 			inputView = <fugaziInput.FugaziInputView
 				history={ this.props.history }
 				searchResult={ this.state.searchHistoryResult }
 				onQuery={ this.props.querier }
 				onExecute={ this.onExecute.bind(this) }
-				onSearchHistoryRequested={ this.switchToHistorySearch.bind(this) }/>;
+				onSearchHistoryRequested={ this.switchToHistorySearch.bind(this) } />;
 		}
 
 		return <article className="terminal">
@@ -91,8 +95,9 @@ export class TerminalView extends view.View<TerminalProperties, TerminalState> {
 		const result: commands.ExecutionResult = this.props.executer(input);
 
 		result.then(value => {
-			if (commandsHandler.isPromptData(value)) {
-				this.promptValueHandler = value.handlePromptValue;
+			if (commandsHandler.isPromptResult(value)) {
+				this.promptResult = value;
+
 				this.setState({
 					promptMode: true
 				} as TerminalState);
@@ -108,9 +113,9 @@ export class TerminalView extends view.View<TerminalProperties, TerminalState> {
 
 	private handlePassword(password: string) {
 		if (password != null) {
-			this.promptValueHandler(password);
+			this.promptResult.handler(password);
 		}
-		this.promptValueHandler = null;
+		this.promptResult = null;
 
 		this.setState({
 			promptMode: false

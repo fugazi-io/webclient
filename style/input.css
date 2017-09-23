@@ -37,6 +37,19 @@ main#ui article.terminal section.inputs .suggestible.input .suggestionPanel {
 	border-top-right-radius: 5px;
 }
 
+main#ui article.terminal section.inputs .prompt.input > .container {
+	display: flex;
+}
+
+main#ui article.terminal section.inputs .prompt.input > .container > .message {
+	color: #7b7b7b;
+	padding-right: 10px;
+}
+
+main#ui article.terminal section.inputs .prompt.input > .container > .inputbox {
+	flex-grow: 1;
+}
+
 main#ui article.terminal section.inputs .bgtext.input .inputbox {
 	position: relative;
 	z-index: 10;

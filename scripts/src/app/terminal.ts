@@ -290,7 +290,7 @@ bus.register(constants.Events.Ready, function (): void {
 						return {
 							status: handler.ResultStatus.Failure,
 							error: "can't guess type"
-						}
+						} as handler.FailureResult
 					}
 
 					context.getParent().storeVariable(name, type, value);
@@ -313,18 +313,18 @@ bus.register(constants.Events.Ready, function (): void {
 						return {
 							status: handler.ResultStatus.Failure,
 							error: `No such module '${moduleName}'`
-						}
+						} as handler.FailureResult
 					} else if (coreTypes.isNothing(theModule.getRemote().base(source))) {
 						return {
 							status: handler.ResultStatus.Failure,
 							error: `Module '${moduleName}' has no remote description for '${ source}'`
-						}
+						} as handler.FailureResult
 					} else {
 						context.getParent().setRemoteSource(theModule.getPath(), source);
 						return {
 							status: handler.ResultStatus.Success,
 							value: `set '${moduleName}' to work with remote source '${source}'`
-						}
+						} as handler.SuccessResult
 					}
 				}
 			}
