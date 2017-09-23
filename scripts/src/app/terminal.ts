@@ -204,13 +204,8 @@ export class Terminal {
 		try {
 			let session = statements.createStatementsSession(command, this.contextProvider),
 				executableStatement = session.getExecutable();
+			result = executableStatement.execute();
 
-			if (!coreTypes.isNull(executableStatement)) {
-				result = executableStatement.execute();
-			} else {
-				ga("send", "event", "Commands", "execution - None of the statements are executable", command);
-				throw new coreTypes.Exception("None of the statements are executable");
-			}
 		} catch (e) {
 			const error = typeof e === "string" ? e : (e.message ? e.message : e.toString());
 			ga("send", "event", "Commands", "execution - error: " + error, command);
