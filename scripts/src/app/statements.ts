@@ -308,7 +308,13 @@ class StatementSessionImpl implements StatementSession {
 				preparedCommandExpression = this.prepareCommand(commandExpression, executableStatements),
 				matches = semantics.match(preparedCommandExpression);
 
-			if (!matches.empty()) {
+			if (matches.empty()) {
+				throw new StatementException(`The expression semantics could not be matched`);
+
+			} else if (matches.length > 1) {
+				throw new StatementException("The expression semantics is ambiguous");
+
+			} else {
 				const firstMatch = matches.first();
 				return new CompoundStatement(this.context, firstMatch.match.command,
 					firstMatch.match.rule, firstMatch.interpretedCommand, executableStatements);
@@ -322,12 +328,15 @@ class StatementSessionImpl implements StatementSession {
 		let preparedCommandExpression: input.CommandExpression = this.prepareCommand(commandExpression, []),
 			matches: semantics.PossibleInterpretation[] = semantics.match(preparedCommandExpression);
 
-		if (!matches.empty()) {
-			let firstMatch = matches.first();
-			return new AtomicStatement(this.context, firstMatch.match.command, firstMatch.match.rule, firstMatch.interpretedCommand);
+		if (matches.empty()) {
+			throw new StatementException(`The expression semantics could not be matched`);
+
+		} else if (matches.length > 1) {
+			throw new StatementException("The expression semantics is ambiguous");
 
 		} else {
-			return null;
+			let firstMatch = matches.first();
+			return new AtomicStatement(this.context, firstMatch.match.command, firstMatch.match.rule, firstMatch.interpretedCommand);
 		}
 	}
 
