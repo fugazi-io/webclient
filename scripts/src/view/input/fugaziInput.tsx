@@ -121,12 +121,12 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 			expressionsIterator = (item.getExpression() as input.CommandExpression).getExpressions().getIterator(),
 			newValue: string = "",
 			haveStoppedForParameter = false,
-			iterator = item.getRule().getTokens().getIterator();
+			toeknIterator = item.getRule().getTokens().getIterator();
 
-		while (iterator.hasNext()) {
-			let token: syntax.RuleToken = iterator.next();
+		while (toeknIterator.hasNext()) {
+			const token = toeknIterator.next();
 			// by taking the value from the token we fix keyword typos
-			if (token.getTokenType() == syntax.TokenType.Keyword) {
+			if (token.getTokenType() === syntax.TokenType.Keyword) {
 				newValue += `${(token as syntax.Keyword).getWord()} `;
 				expressionsIterator.next();
 			// taking the parameter as given
