@@ -1,26 +1,32 @@
 (function () {
-	let x = null,
-		y = null,
+	let X = null,
+		Y = null,
 		handler = z => {
-			if (x === null) {
+			if (X === null) {
 				return {
 					type: "string",
 					status: fugazi.handler.ResultStatus.Prompt,
 					message: "please enter a value for x",
-					handler
+					handler: x => {
+						X = x;
+						handler(z);
+					}
 				}
 			}
 
-			if (y === null) {
+			if (Y === null) {
 				return {
 					type: "string",
 					status: fugazi.handler.ResultStatus.Prompt,
 					message: "please enter a value for y",
-					handler
+					handler: y => {
+						Y = y;
+						handler(z);
+					}
 				}
 			}
 
-			console.log(x * y * z);
+			return X * Y * z;
 		}
 
 	fugazi.loaded({
@@ -28,6 +34,7 @@
 		title: "A Test!",
 		commands: {
 			test: {
+				returns: "number",
 				syntax: "do it (x number)",
 				handler: function(context, z) {
 					return handler(z);
