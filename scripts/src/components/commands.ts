@@ -15,6 +15,7 @@ export class ExecutionResult {
 
 	protected type: types.Type;
 	protected future: coreTypes.Future<any>;
+	private promptHandler: (promptInfo: handler.PromptResult) => void;
 
 	constructor(type: types.Type, asynced: boolean) {
 		this.type = type;
@@ -30,15 +31,20 @@ export class ExecutionResult {
 		return this.type;
 	}
 
-	public then(successHandler: (value: any) => void): ExecutionResult {
+	public wrap(other: ExecutionResult) {
+		this.future = other.future;
+	}
+
+	public onPrompt(handler: (promptInfo: handler.PromptResult) => void) {
+		this.promptHandler = handler;
+	}
+
+	public onSuccess(successHandler: (value: any) => void): ExecutionResult {
 		this.future.then(successHandler);
 		return this;
 	}
 
-	/**
-	 * @override
-	 */
-	public catch(errorHandler: (error: coreTypes.Exception) => void): ExecutionResult {
+	public onFailure(errorHandler: (error: coreTypes.Exception) => void): ExecutionResult {
 		this.future.catch(errorHandler);
 		return this;
 	}
@@ -51,7 +57,12 @@ export class ExecutionResult {
 			str = value.toString();
 		}
 		ga("send", "event", "Commands", "execution.result - resolved", str);
-		this.future.resolve(value);
+
+		if (handler.isPromptResult(value)) {
+			this.promptHandler(value);
+		} else {
+			this.future.resolve(value);
+		}
 	}
 
 	public reject(error: coreTypes.Exception): void {
