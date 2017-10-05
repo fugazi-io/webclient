@@ -200,7 +200,9 @@ class CompoundStatement extends Statement {
 	private executeAll(params: ParameterPart[], executableStatements: Statement[],
 					   commandParams: commands.ExecutionParameters, executer: commands.Executer): void {
 		if (params.empty()) {
-			executer.execute(commandParams).then(executer.result.resolve.bind(executer.result)).catch(executer.result.reject.bind(executer.result));
+			executer.execute(commandParams)
+				.onSuccess(executer.result.resolve.bind(executer.result))
+				.onFailure(executer.result.reject.bind(executer.result));
 
 		} else {
 			let parameterPart = params[0];
@@ -209,14 +211,17 @@ class CompoundStatement extends Statement {
 				if (executableStatements.empty()) {
 					executer.result.reject(new InvalidStatementException([parameterPart]));
 				} else {
-					executableStatements[0].execute().then(value => {
-						if (parameterPart.getType().validate(value)) {
-							commandParams.add(parameterPart.getName(), value);
-							this.executeAll(params.slice(1), executableStatements.slice(1), commandParams, executer);
-						} else {
-							executer.result.reject(new InvalidStatementException([parameterPart]));
-						}
-					}).catch(executer.result.reject.bind(executer.result));
+					executableStatements[0]
+						.execute()
+						.onSuccess(value => {
+							if (parameterPart.getType().validate(value)) {
+								commandParams.add(parameterPart.getName(), value);
+								this.executeAll(params.slice(1), executableStatements.slice(1), commandParams, executer);
+							} else {
+								executer.result.reject(new InvalidStatementException([parameterPart]));
+							}
+						})
+						.onFailure(executer.result.reject.bind(executer.result));
 				}
 			} else if (parameterPart.validate()) {
 				commandParams.add(parameterPart.getName(), parameterPart.getValue());
