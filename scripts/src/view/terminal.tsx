@@ -33,7 +33,11 @@ export interface TerminalState extends view.ViewState {
 }
 
 export class TerminalView extends view.View<TerminalProperties, TerminalState> {
-	private promptResult: commandsHandler.PromptResult;
+	private promptInfo: {
+		input: string;
+		executionResult: commands.ExecutionResult;
+		promptResult: commandsHandler.PromptResult;
+	};
 
 	public constructor(props: TerminalProperties) {
 		super(props);
@@ -52,11 +56,10 @@ export class TerminalView extends view.View<TerminalProperties, TerminalState> {
 		let inputView: JSX.Element;
 
 		if (this.state.promptMode) {
-			const type = this.promptResult.type === "password" ? "password" : "text";
 			inputView = <baseInput.PromptInputView
-				type={ type }
-				message={ this.promptResult.message }
-				handler={ this.handlePassword.bind(this) } />
+				handler={ this.handlePromptValue.bind(this) }
+				message={ this.promptInfo.promptResult.message }
+				type={ this.promptInfo.promptResult.type === "password" ? "password" : "text" } />
 		} else if (this.state.searchHistoryMode) {
 			inputView = <fugaziInput.SearchHistoryInputView
 				history={ this.props.history }
@@ -91,34 +94,38 @@ export class TerminalView extends view.View<TerminalProperties, TerminalState> {
 		} as TerminalState);
 	}
 
-	private onExecute(input: string): void {
-		const result: commands.ExecutionResult = this.props.executer(input);
+	private onExecute(input: string, currentResult?: commands.ExecutionResult): void {
+		const result = this.props.executer(input);
 
-		result.then(value => {
-			if (commandsHandler.isPromptResult(value)) {
-				this.promptResult = value;
+		result.onPrompt(value => {
+			this.promptInfo = { input, executionResult: result, promptResult: value };
 
-				this.setState({
-					promptMode: true
-				} as TerminalState);
-			}
+			this.setState({
+				promptMode: true
+			} as TerminalState);
 		});
 
-		this.getOutput().addExecutionResult(input, result);
+		if (currentResult) {
+			result.wrap(currentResult);
+		} else {
+			this.getOutput().addExecutionResult(input, result);
+		}
 	}
 
 	private getOutput(): output.OutputView {
 		return this.refs["output"] as output.OutputView;
 	}
 
-	private handlePassword(password: string) {
-		if (password != null) {
-			this.promptResult.handler(password);
-		}
-		this.promptResult = null;
+	private handlePromptValue(value: string) {
+		const info = this.promptInfo;
+		this.promptInfo = null;
+
+		info.promptResult.handler(value);
 
 		this.setState({
 			promptMode: false
-		} as TerminalState);
+		} as TerminalState, () => {
+			this.onExecute(info.input, info.executionResult);
+		});
 	}
 }
