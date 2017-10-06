@@ -12,14 +12,13 @@ import * as coreTypes from "../core/types";
 import * as net from "../core/net";
 import * as collections from "../core/types.collections";
 
-
-var index: collections.FugaziMap<modules.Module> = collections.map<modules.Module>(),
-	defaultConverters: collections.FugaziMap<converters.Converter> = collections.map<converters.Converter>();
+const index = collections.map<modules.Module>(),
+	defaultConverters = collections.map<converters.Converter>();
 
 export class ModuleAssociationException extends coreTypes.Exception {
 }
 
-export var Events = {
+export const Events = {
 	Ready: "ready"
 };
 
