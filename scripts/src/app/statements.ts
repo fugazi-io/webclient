@@ -13,7 +13,19 @@ export enum StatementPartRole {
 	Parameter
 }
 
-export class StatementException extends coreTypes.Exception {
+export class StatementException extends coreTypes.Exception {}
+
+export class AmbiguityStatementException extends StatementException {
+	private ambiguousMatches: semantics.PossibleInterpretation[];
+
+	constructor(message: string, ambiguousMatches: semantics.PossibleInterpretation[]) {
+		super(message);
+		this.ambiguousMatches = ambiguousMatches;
+	}
+
+	public getAmbiguousMatches(): semantics.PossibleInterpretation[] {
+		return this.ambiguousMatches;
+	}
 }
 
 export class InvalidStatementException extends StatementException {
@@ -312,7 +324,7 @@ class StatementSessionImpl implements StatementSession {
 				throw new StatementException(`The expression semantics could not be matched`);
 
 			} else if (matches.length > 1) {
-				throw new StatementException("The expression semantics is ambiguous");
+				throw new AmbiguityStatementException("The expression semantics is ambiguous", matches);
 
 			} else {
 				const firstMatch = matches.first();
@@ -332,7 +344,7 @@ class StatementSessionImpl implements StatementSession {
 			throw new StatementException(`The expression semantics could not be matched`);
 
 		} else if (matches.length > 1) {
-			throw new StatementException("The expression semantics is ambiguous");
+			throw new AmbiguityStatementException("The expression semantics is ambiguous", matches);
 
 		} else {
 			let firstMatch = matches.first();
