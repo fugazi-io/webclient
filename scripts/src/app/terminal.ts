@@ -207,6 +207,10 @@ export class Terminal {
 			result = executableStatement.execute();
 
 		} catch (e) {
+			if (e instanceof statements.AmbiguityStatementException) {
+				throw e;
+			}
+
 			const error = typeof e === "string" ? e : (e.message ? e.message : e.toString());
 			ga("send", "event", "Commands", "execution - error: " + error, command);
 			result = new commands.ExecutionResult(registry.getType("any"), false);

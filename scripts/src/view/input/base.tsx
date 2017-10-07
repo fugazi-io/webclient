@@ -386,8 +386,6 @@ export abstract class SuggestibleInputView<P extends SuggestibleInputProperties<
 			suggestions: this.props.suggestions,
 			focus: "input"
 		} as S;
-
-
 	}
 
 	protected onTabPressed(): boolean {

@@ -135,10 +135,21 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 			});
 		} else if (!this.inputbox.value.empty()) {
 			this.history.mark(this.inputbox.value);
-			this.props.onExecute(this.inputbox.value);
+			let showSuggestions: boolean;
+
+			try {
+				this.props.onExecute(this.inputbox.value);
+				showSuggestions = false;
+			} catch (e) {
+				if (e instanceof statements.AmbiguityStatementException) {
+					this.updateSuggestions(this.inputbox.value, 0);
+					showSuggestions = true;
+				}
+			}
+
 			this.setState({
 				value: "",
-				showing: false,
+				showing: showSuggestions,
 				focus: "input"
 			});
 		}
