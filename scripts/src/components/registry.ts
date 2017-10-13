@@ -15,8 +15,7 @@ import * as collections from "../core/types.collections";
 const index = collections.map<modules.Module>(),
 	defaultConverters = collections.map<converters.Converter>();
 
-export class ModuleAssociationException extends coreTypes.Exception {
-}
+export class ModuleAssociationException extends coreTypes.Exception {}
 
 export const Events = {
 	Ready: "ready"
@@ -517,4 +516,3 @@ applicationBus.register(constants.Events.Loaded, function (): void {
 
 	applicationBus.post(Events.Ready);
 });
-

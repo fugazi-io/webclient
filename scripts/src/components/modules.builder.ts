@@ -19,6 +19,7 @@ import * as descriptor from "./modules.descriptor";
 
 import * as typesDescriptor from "./types.descriptor";
 import * as typesBuilder from "./types.builder";
+
 function breakDescriptorWithPath(moduleDescriptor: descriptor.Descriptor) {
 	let result: descriptor.Descriptor,
 		path: string[] = moduleDescriptor.name.split(".");
@@ -41,6 +42,35 @@ function breakDescriptorWithPath(moduleDescriptor: descriptor.Descriptor) {
 
 	return result;
 }
+
+class PreprocessPipeline implements Preprocessor {
+	private preprocessors: Preprocessor[];
+
+	constructor() {
+		this.preprocessors = [];
+	}
+
+	async preprocess(descriptor: descriptor.Descriptor): Promise<descriptor.Descriptor> {
+		for (let i = 0; i < this.preprocessors.length; i++) {
+			descriptor = await (this.preprocessors[i].preprocess(descriptor));
+		}
+		return descriptor;
+	}
+}
+
+export interface Preprocessor {
+	 preprocess(descriptor: descriptor.Descriptor): Promise<descriptor.Descriptor>;
+}
+
+const preprocessors = {
+	Prompter: {
+		preprocess: async function (descriptor: descriptor.Descriptor): Promise<descriptor.Descriptor> {
+			descriptor.preprocess && descriptor.preprocess.prompt && Object.entries(descriptor.preprocess.prompt).forEach((name, promptInfo) => {
+
+			});
+		}
+	}
+} as { [id: string]: Preprocessor };
 
 export function create(url: net.Url): componentsBuilder.Builder<modules.Module>;
 export function create(moduleDescriptor: descriptor.Descriptor, parent?: componentsBuilder.Builder<components.Component>): componentsBuilder.Builder<modules.Module>;

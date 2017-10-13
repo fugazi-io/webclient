@@ -6,6 +6,7 @@
 		"rootDir": "src",
 		"declaration": true,
 		"skipLibCheck": true,
+		"lib": ["es2017"],
 		"skipDefaultLibCheck": true
 	}
 }

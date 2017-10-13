@@ -45,6 +45,13 @@ export interface Descriptor extends componentsDescriptor.Descriptor {
 	basePath?: string; // set when building
 	remote?: RemoteDescriptor;
 	lookup?: { [name: string]: string };
+	preprocess?: {
+		prompt?: { [name: string]: {
+			message: string;
+			type: "string" | "password";
+			path: string;
+		}; };
+	};
 	modules?: InnerModulesCollection;
 	types?: string | InnerComponentsCollection<typesDescriptor.Descriptor>;
 	commands?: string | InnerComponentsCollection<commandsDescriptor.Descriptor>;
