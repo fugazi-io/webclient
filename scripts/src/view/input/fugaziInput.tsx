@@ -104,22 +104,11 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 	protected onEnterPressed(): boolean {
 		if (!this.inputbox.value.empty()) {
 			this.history.mark();
-			let showSuggestions: boolean;
-
-			try {
-				this.props.onExecute(this.inputbox.value);
-				showSuggestions = false;
-			} catch (e) {
-				if (e instanceof statements.AmbiguityStatementException) {
-					this.updateSuggestions(this.inputbox.value, 0);
-					showSuggestions = true;
-				}
-			}
-
+			this.props.onExecute(this.inputbox.value);
 			this.inputbox.value = "";
 			this.setState({
 				value: "",
-				showing: showSuggestions,
+				showing: false,
 				focus: "input"
 			});
 		}

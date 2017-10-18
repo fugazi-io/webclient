@@ -14,6 +14,7 @@ import * as modulesBuilder from "../components/modules.builder";
 import * as types from "../components/types";
 import * as commands from "../components/commands";
 import * as handler from "../components/commands.handler";
+import * as semantics from "../app/semantics";
 
 
 export interface Properties {
@@ -21,6 +22,12 @@ export interface Properties {
 	title?: string;
 	description?: string;
 	history?: string[];
+}
+
+export class SuggestionsAmbiguityResolver implements viewTerminal.AmbiguityResolver {
+	public resolve(ambiguousSet: semantics.PossibleInterpretation[]): commands.ExecutionResult {
+		return null;
+	}
 }
 
 export abstract class BaseTerminalContext extends app.BaseContext<app.ApplicationContext> {
@@ -202,21 +209,41 @@ export class Terminal {
 		ga("send", "event", "Commands", "execution - start", command);
 		storage.local.store(this.properties.name, this.properties);
 
-		let result: commands.ExecutionResult = null;
+		let result: commands.ExecutionResult;
+		let session = statements.createStatementsSession(command, this.contextProvider);
+
 		try {
-			let session = statements.createStatementsSession(command, this.contextProvider),
-				executableStatement = session.getExecutable();
+			result = this.executeCommandInSession(new SuggestionsAmbiguityResolver(), session);
+
+		} catch (e) {
+			const error = typeof e === "string" ? e : (e.message ? e.message : e.toString());
+			ga("send", "event", "Commands", "execution - error: " + error, command);
+
+			result = new commands.ExecutionResult(registry.getType("any"), false);
+			result.reject(e);
+		}
+
+		return result;
+	}
+
+	private executeCommandInSession(resolver: viewTerminal.AmbiguityResolver, session: statements.StatementSession): commands.ExecutionResult {
+		let result: commands.ExecutionResult;
+		try {
+			let executableStatement = session.getExecutable();
 			result = executableStatement.execute();
 
 		} catch (e) {
 			if (e instanceof statements.AmbiguityStatementException) {
+				let ase = e as statements.AmbiguityStatementException;
+				resolver.resolve(ase.getAmbiguousMatches())
+					.then(selection => {
+						session.pinInterpretation(ase.getAmbiguousExpression().range, selection);
+						result = this.executeCommandInSession(resolver, session);
+					});
+
+			} else {
 				throw e;
 			}
-
-			const error = typeof e === "string" ? e : (e.message ? e.message : e.toString());
-			ga("send", "event", "Commands", "execution - error: " + error, command);
-			result = new commands.ExecutionResult(registry.getType("any"), false);
-			result.reject(e);
 		}
 
 		return result;

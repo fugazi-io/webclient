@@ -30,6 +30,10 @@ export class RangeImpl implements Range {
 	get length(): number {
 		return this.endIndex - this.startIndex;
 	}
+
+	public toString(): string {
+		return `Expression [${ this.start }, ${ this.end }]`;
+	}
 }
 
 export class ParseException extends coreTypes.Exception {
