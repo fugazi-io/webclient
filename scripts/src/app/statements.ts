@@ -17,14 +17,20 @@ export class StatementException extends coreTypes.Exception {}
 
 export class AmbiguityStatementException extends StatementException {
 	private ambiguousMatches: semantics.PossibleInterpretation[];
+	private ambiguousExpression: input.CommandExpression;
 
-	constructor(message: string, ambiguousMatches: semantics.PossibleInterpretation[]) {
-		super(message);
+	constructor(ambiguousExpression: input.CommandExpression, ambiguousMatches: semantics.PossibleInterpretation[]) {
+		super("The expression semantics is ambiguous");
 		this.ambiguousMatches = ambiguousMatches;
+		this.ambiguousExpression = ambiguousExpression;
 	}
 
 	public getAmbiguousMatches(): semantics.PossibleInterpretation[] {
 		return this.ambiguousMatches;
+	}
+
+	public getAmbiguousExpression(): input.CommandExpression {
+		return this.ambiguousExpression;
 	}
 }
 
@@ -261,15 +267,19 @@ class CompoundStatement extends Statement {
 export interface StatementSession {
 	getSuggestions(currentPosition: number): Statement[];
 	getExecutable(): Statement;
+	pinInterpretation(identifyingRange: input.Range, interpretation: semantics.PossibleInterpretation): void;
+	getPinnedInterpretationFor(identifyingRange: input.Range): semantics.PossibleInterpretation;
 }
 
 class StatementSessionImpl implements StatementSession {
 	private rawInput: string;
 	private context: terminal.ContextProvider;
+	private pinnedInterpretations: Map<string, semantics.PossibleInterpretation>;
 
 	constructor(rawInput: string, context: terminal.ContextProvider) {
 		this.rawInput = rawInput;
 		this.context = context;
+		this.pinnedInterpretations = new Map<string, semantics.PossibleInterpretation>();
 	}
 
 	public getSuggestions(currentPosition: number): Statement[] {
@@ -293,6 +303,14 @@ class StatementSessionImpl implements StatementSession {
 	public getExecutable(): Statement {
 		let commandExpression: input.CommandExpression = input.parse(this.rawInput);
 		return this.createExecutable(commandExpression);
+	}
+
+	public pinInterpretation(identifyingRange: input.Range, interpretation: semantics.PossibleInterpretation): void {
+		this.pinnedInterpretations.set(identifyingRange.toString(), interpretation);
+	}
+
+	public getPinnedInterpretationFor(identifyingRange: input.Range): semantics.PossibleInterpretation {
+		return this.pinnedInterpretations.get(identifyingRange.toString());
 	}
 
 	private createExecutable(commandExpression: input.CommandExpression): Statement {
@@ -324,7 +342,14 @@ class StatementSessionImpl implements StatementSession {
 				throw new StatementException(`The expression semantics could not be matched`);
 
 			} else if (matches.length > 1) {
-				throw new AmbiguityStatementException("The expression semantics is ambiguous", matches);
+				let pinnedInterpretation = this.getPinnedInterpretationFor(preparedCommandExpression.range);
+				if (pinnedInterpretation !== null) {
+					return new CompoundStatement(this.context, pinnedInterpretation.match.command,
+						pinnedInterpretation.match.rule, pinnedInterpretation.interpretedCommand, executableStatements);
+
+				} else {
+					throw new AmbiguityStatementException(preparedCommandExpression, matches);
+				}
 
 			} else {
 				const firstMatch = matches.first();
@@ -344,7 +369,14 @@ class StatementSessionImpl implements StatementSession {
 			throw new StatementException(`The expression semantics could not be matched`);
 
 		} else if (matches.length > 1) {
-			throw new AmbiguityStatementException("The expression semantics is ambiguous", matches);
+			let pinnedInterpretation = this.getPinnedInterpretationFor(preparedCommandExpression.range);
+			if (pinnedInterpretation !== null) {
+				return new AtomicStatement(this.context, pinnedInterpretation.match.command,
+					pinnedInterpretation.match.rule, pinnedInterpretation.interpretedCommand);
+
+			} else {
+				throw new AmbiguityStatementException(preparedCommandExpression, matches);
+			}
 
 		} else {
 			let firstMatch = matches.first();

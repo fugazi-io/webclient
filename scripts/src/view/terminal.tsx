@@ -3,17 +3,22 @@ import * as baseInput from "./input/base";
 import * as view from "./view";
 import * as fugaziInput from "./input/fugaziInput";
 import * as statements from "../app/statements";
+import * as semantics from "../app/semantics";
 import * as componentsDescriptor from "../components/components.descriptor";
 import * as commands from "../components/commands";
 import * as commandsHandler from "../components/commands.handler";
 import * as React from "react";
+
+export interface AmbiguityResolver {
+	resolve(ambiguousSet: semantics.PossibleInterpretation[]): commands.ExecutionResult;
+}
 
 export interface TerminalFactory {
 	createTerminal(properties: TerminalProperties): Promise<TerminalView>;
 }
 
 export interface ExecuteCommand {
-	(command: string): commands.ExecutionResult;
+	(command: string, resolver: AmbiguityResolver): commands.ExecutionResult;
 }
 
 export interface StatementsQuerier {
@@ -87,8 +92,8 @@ export class TerminalView extends view.View<TerminalProperties, TerminalState> {
 		} as TerminalState);
 	}
 
-	private onExecute(input: string): void {
-		const result: commands.ExecutionResult = this.props.executer(input);
+	private onExecute(input: string, resolver: AmbiguityResolver): void {
+		const result: commands.ExecutionResult = this.props.executer(input, resolver);
 
 		result.then(value => {
 			if (commandsHandler.isPromptData(value)) {
