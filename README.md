@@ -1,7 +1,13 @@
 # fugazi.io 
 
 A web based terminal application for executing local and remote commands.  
-The latest version of the terminal can be found here: http://fugazi.io
+The latest version of the terminal can be found here: http://fugazi.io.  
+
+Here's a short introduction video:  
+[![short introduction](https://img.youtube.com/vi/lKf1rhJdonI/0.jpg)](https://www.youtube.com/watch?v=lKf1rhJdonI)
+
+Documentation can be found here: https://fugazi-io.github.io.  
+You can contact us here: https://gitter.im/fugazi-io/Lobby.
 
 ### Short example
 Fugazi isn't a regular terminal, it won't execute the commands which you are used to.  
@@ -84,6 +90,8 @@ Here's how to run it locally:
 9. Search for command in history (press `CTRL + R` then start typing and `ENTER` to select, `ESC` to close)
 
 ### More documentation
+
+There's a new documentation site here: https://fugazi-io.github.io, this is the old version:
 
 #### Components
 * [Components basics](docs/components/components.md)

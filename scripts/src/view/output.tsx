@@ -182,25 +182,24 @@ export class OutputView extends view.View<OutputProperties, OutputState> {
 			}
 		});
 
-		if (this.state.sayhello) {
-			blocks.unshift(
-				<li key="hello" className="hello version">fugazi version { constants.version.code }</li>,
-				<li key="repoLink" className="hello moreInfo">
-					run <span className="help-command">help</span> for more info or
-					check out the <a target="_blank" href="https://github.com/fugazi-io/webclient">GitHub repo</a>
-				</li>,
-				<li key="helpUs" className="hello help">
-					we'd love to get your feedback, so if something isn't clear or not working find us in <a
-					target="_blank" href="https://gitter.im/fugazi-io/Lobby">our gitter</a>
-				</li>
-			);
+			if (this.state.sayhello) {
+				blocks.unshift(
+					<li key="hello" className="hello version">fugazi version { constants.version.code }</li>,
+					<li key="repoLink" className="hello moreInfo">
+						run <span className="help-command">help</span> for more info or
+						read <a target="_blank" href="https://fugazi-io.github.io/docs/#/?id=fugaziio">the documentation</a>
+					</li>,
+					<li key="helpUs" className="hello help">
+						we'd love to get your feedback, so if something isn't clear or not working find us in <a target="_blank" href="https://gitter.im/fugazi-io/Lobby">our gitter</a>
+					</li>
+				);
+			}
+			
+			return <section className="output" ref={ el => this.container = el } onClick={ this.onClick.bind(this) }>
+				<div className="spacer"></div>
+				<ol className="items">{ blocks }</ol>
+			</section>;
 		}
-
-		return <section className="output" ref={ el => this.container = el } onClick={ this.onClick.bind(this) }>
-			<div className="spacer"></div>
-			<ol className="items">{ blocks }</ol>
-		</section>;
-	}
 
 	private onClick() {
 		PsSingleton.blur();
