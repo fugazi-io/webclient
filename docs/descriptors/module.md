@@ -18,11 +18,11 @@ interface RemoteRelativeDescriptor {
 interface ModuleDescriptor extends ComponentDescriptor {
 	remote?: RemoteSourceDescriptor | RemoteRelativeDescriptor;
 	lookup?: { [name: string]: string };
-	modules?: Array<ModuleDescriptor> | Map<ModuleDescriptor>;
-	types?: url | Array<TypeDescriptor> | Map<TypeDescriptor>;
-	commands?: url | Array<CommandDescriptor> | Map<CommandDescriptor>;
-	converters?: url | Array<ConverterDescriptor> | Map<ConverterDescriptor>;
-	constraints?: url | Array<ConstraintDescriptor> | Map<ConstraintDescriptor>;
+	modules?: Array<ModuleDescriptor> | FugaziMap<ModuleDescriptor>;
+	types?: url | Array<TypeDescriptor> | FugaziMap<TypeDescriptor>;
+	commands?: url | Array<CommandDescriptor> | FugaziMap<CommandDescriptor>;
+	converters?: url | Array<ConverterDescriptor> | FugaziMap<ConverterDescriptor>;
+	constraints?: url | Array<ConstraintDescriptor> | FugaziMap<ConstraintDescriptor>;
 }
 ```
 

@@ -1,10 +1,5 @@
-/// <reference path="../../../../scripts/bin/app/application.d.ts" />
-/// <reference path="../../../../scripts/bin/components/registry.d.ts" />
-/// <reference path="../../../../scripts/bin/components/components.d.ts" />
+import { Component, Descriptor, FugaziMap, ModuleContext } from "../../../../scripts/bin/app/modules.api";
 
-/**
- * Created by nitzan on 07/06/2016.
- */
 
 (function(): void {
 	let echoExamples = "#### Examples:\n";
@@ -23,7 +18,7 @@
 	}
 
 	function fugaziToJson(value: any): any {
-		if (value instanceof fugazi.collections.Map) {
+		if (value instanceof fugazi.collections.FugaziMap) {
 			return value.asObject();
 		} else if (fugazi.is(value, Array)) {
 			return value.map(v => fugaziToJson(v));
@@ -32,7 +27,7 @@
 		}
 	}
 
-	fugazi.components.modules.descriptor.loaded(<fugazi.components.modules.descriptor.Descriptor> {
+	fugazi.loaded(<Descriptor> {
 		name: "io.fugazi",
 		commands: {
 			echo: {
@@ -44,7 +39,7 @@
 					method: "append",
 					markdown: echoExamples
 				},
-				handler: function(context: fugazi.app.modules.ModuleContext, value: any) {
+				handler: function(context: ModuleContext, value: any) {
 					return value;
 				}
 			},
@@ -60,18 +55,18 @@
 					method: "append",
 					markdown: manExamples
 				},
-				handler: function(context: fugazi.app.modules.ModuleContext, value: string) {
-					let components: fugazi.components.Component[];
+				handler: function(context: ModuleContext, value: string) {
+					let components: Component[];
 
 					if (value.indexOf(".") > 0) {
-						components = [fugazi.components.registry.getUnknown(value)];
+						components = [fugazi.registry.getUnknown(value)];
 					} else {
-						components = fugazi.components.registry.findCommand(value);
+						components = fugazi.registry.findCommand(value);
 					}
 
 					if (!components || components.length === 0) {
 						return {
-							status: fugazi.components.commands.handler.ResultStatus.Failure,
+							status: fugazi.handler.ResultStatus.Failure,
 							error: `couldn't find component "${ value }"`
 						}
 					}
@@ -80,7 +75,7 @@
 
 					if (!markdown) {
 						return {
-							status: fugazi.components.commands.handler.ResultStatus.Failure,
+							status: fugazi.handler.ResultStatus.Failure,
 							error: `"${ value }" has no manual`
 						}
 					}
@@ -92,8 +87,8 @@
 				title: "show fugazi client version",
 				syntax: "version",
 				returns: "ui.message",
-				handler: function(context: fugazi.app.modules.ModuleContext) {
-					return fugazi.app.version.toString();
+				handler: function(context: ModuleContext) {
+					return fugazi.version.toString();
 				}
 			},
 			extract: {
@@ -107,15 +102,15 @@
 				],
 				returns: "any",
 				parametersForm: "map",
-				handler: function(context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>) {
+				handler: function(context: ModuleContext, params: FugaziMap<any>) {
 					let index: string | [string] | number | [number] = params.get("index");
-					let value: any[] | fugazi.collections.Map<any> = params.get("value");
+					let value: any[] | FugaziMap<any> = params.get("value");
 
 					if (fugazi.isPlainObject(value)) {
 						value = fugazi.collections.map(value);
 					}
 
-					if ((typeof index === "string" || (index instanceof Array && typeof index[0] === "string")) && value instanceof fugazi.collections.Map) {
+					if ((typeof index === "string" || (index instanceof Array && typeof index[0] === "string")) && value instanceof fugazi.collections.FugaziMap) {
 						if (index instanceof Array) {
 							index = index.join(".");
 						}
@@ -128,7 +123,7 @@
 						if (path.length > 1) {
 							let result: any = value;
 
-							while (result instanceof fugazi.collections.Map && !path.empty() && result.has(path.first())) {
+							while (result instanceof fugazi.collections.FugaziMap && !path.empty() && result.has(path.first())) {
 								result = result.get(path.remove(0));
 							}
 
@@ -161,7 +156,7 @@
 				],
 				returns: "any",
 				parametersForm: "arguments",
-				handler: function(context: fugazi.app.modules.ModuleContext, value: string) {
+				handler: function(context: ModuleContext, value: string) {
 					try {
 						return jsonToFugazi(JSON.parse(value));
 					} catch (e) {
@@ -177,7 +172,7 @@
 				],
 				returns: "string",
 				parametersForm: "arguments",
-				handler: function(context: fugazi.app.modules.ModuleContext, value: any) {
+				handler: function(context: ModuleContext, value: any) {
 					return JSON.stringify(fugaziToJson(value));
 				}
 			}

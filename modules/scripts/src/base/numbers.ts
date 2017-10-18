@@ -1,12 +1,8 @@
-/// <reference path="../../../../scripts/bin/components/components.d.ts" />
-/// <reference path="../../../../scripts/bin/components/modules.d.ts" />
+import { BoundConstraintValidator, Descriptor } from "../../../../scripts/bin/app/modules.api";
 
-/**
- * Created by nitzan on 24/04/2016.
- */
 
 (function(): void {
-	fugazi.components.modules.descriptor.loaded(<fugazi.components.modules.descriptor.Descriptor> {
+	fugazi.loaded(<Descriptor> {
 		name: "io.fugazi.numbers",
 		constraints: [
 			{
@@ -14,8 +10,8 @@
 				title: "Integer",
 				types: ["number"],
 				params: [],
-				validator: function (): fugazi.components.types.constraints.BoundConstraintValidator {
-					return function (value: number): boolean {
+				validator: function(): BoundConstraintValidator {
+					return function(value: number): boolean {
 						return fugazi.isInteger(value);
 					}
 				}
@@ -25,8 +21,8 @@
 				title: "Float",
 				types: ["number"],
 				params: [],
-				validator: function (): fugazi.components.types.constraints.BoundConstraintValidator {
-					return function (value: number): boolean {
+				validator: function(): BoundConstraintValidator {
+					return function(value: number): boolean {
 						return fugazi.isFloat(value);
 					}
 				}
@@ -36,12 +32,12 @@
 				title: "function Value",
 				types: ["number"],
 				params: ["max"],
-				validator: function (max: number | string): fugazi.components.types.constraints.BoundConstraintValidator {
+				validator: function (max: number | string): BoundConstraintValidator {
 					if (typeof max === "string") {
 						max = parseFloat(max);
 					}
 
-					return function (value: number): boolean {
+					return function(value: number): boolean {
 						return value <= max;
 					}
 				}
@@ -51,12 +47,12 @@
 				title: "Minimum Value",
 				types: ["number"],
 				params: ["min"],
-				validator: function (min: number | string): fugazi.components.types.constraints.BoundConstraintValidator {
+				validator: function(min: number | string): BoundConstraintValidator {
 					if (typeof min === "string") {
 						min = parseFloat(min);
 					}
 
-					return function (value: number): boolean {
+					return function(value: number): boolean {
 						return value >= min;
 					}
 				}
@@ -66,7 +62,7 @@
 				title: "Between Values",
 				types: ["number"],
 				params: ["min", "max"],
-				validator: function (min: number | string, max: number | string): fugazi.components.types.constraints.BoundConstraintValidator {
+				validator: function(min: number | string, max: number | string): BoundConstraintValidator {
 					if (typeof min === "string") {
 						min = parseFloat(min);
 					}
@@ -74,7 +70,7 @@
 						max = parseFloat(max);
 					}
 
-					return function (value: number): boolean {
+					return function(value: number): boolean {
 						return value >= min && value <= max;
 					}
 				}
@@ -84,8 +80,8 @@
 				title: "Positive Value",
 				types: ["number"],
 				params: [],
-				validator: function (): fugazi.components.types.constraints.BoundConstraintValidator {
-					return function (value: number): boolean {
+				validator: function(): BoundConstraintValidator {
+					return function(value: number): boolean {
 						return value >= 0;
 					}
 				}
@@ -95,8 +91,8 @@
 				title: "Negative Value",
 				types: ["number"],
 				params: [],
-				validator: function (): fugazi.components.types.constraints.BoundConstraintValidator {
-					return function (value: number): boolean {
+				validator: function(): BoundConstraintValidator {
+					return function(value: number): boolean {
 						return value < 0;
 					}
 				}
@@ -106,8 +102,8 @@
 				title: "Even Value",
 				types: ["number"],
 				params: [],
-				validator: function (): fugazi.components.types.constraints.BoundConstraintValidator {
-					return function (value: number): boolean {
+				validator: function(): BoundConstraintValidator {
+					return function(value: number): boolean {
 						return value % 2 === 0;
 					}
 				}
@@ -117,8 +113,8 @@
 				title: "Odd Value",
 				types: ["number"],
 				params: [],
-				validator: function (): fugazi.components.types.constraints.BoundConstraintValidator {
-					return function (value: number): boolean {
+				validator: function(): BoundConstraintValidator {
+					return function(value: number): boolean {
 						return value % 2 === 1;
 					}
 				}
@@ -128,12 +124,12 @@
 				title: "Divided By Value",
 				types: ["number"],
 				params: ["divisor"],
-				validator: function (divisor: number | string): fugazi.components.types.constraints.BoundConstraintValidator {
+				validator: function(divisor: number | string): BoundConstraintValidator {
 					if (typeof divisor === "string") {
 						divisor = parseFloat(divisor);
 					}
 
-					return function (value: number): boolean {
+					return function(value: number): boolean {
 						return value % (divisor as number) === 0;
 					}
 				}

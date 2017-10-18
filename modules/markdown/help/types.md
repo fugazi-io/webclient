@@ -7,7 +7,7 @@ All fugazi types are based on the following core types (similar to json):
  * Number
  * String
  * List
- * Map
+ * FugaziMap
 
 And two additional "special" type:
 

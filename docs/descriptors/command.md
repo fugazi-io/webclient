@@ -110,7 +110,7 @@ interface RemoteCommandDescriptor extends CommandDescriptor {
 	The options are:
 	* "list": the function will receive all params in an array
 	* "arguments": the function will receive the params as regular js named params
-	* "map": the function will receive the params in the fugazi `Map` type
+	* "map": the function will receive the params in the fugazi `FugaziMap` type
 	* "struct": the function will receive the params in a simple js object.
 	
 	Defaults to `arguments`.
