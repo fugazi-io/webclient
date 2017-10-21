@@ -248,7 +248,7 @@ class ResultView extends view.View<ResultViewProperties, ResultViewState> {
 	 * @Override
 	 */
 	public componentDidMount(): void {
-		this.props.result.then(this.success.bind(this)).catch(this.fail.bind(this));
+		this.props.result.whenReady(this.success.bind(this)).catch(this.fail.bind(this));
 	}
 
 	public componentWillUpdate(): void {
