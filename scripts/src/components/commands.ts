@@ -30,7 +30,7 @@ export class ExecutionResult {
 		return this.type;
 	}
 
-	public then(successHandler: (value: any) => void): ExecutionResult {
+	public whenReady(successHandler: (value: any) => void): ExecutionResult {
 		this.future.then(successHandler);
 		return this;
 	}
