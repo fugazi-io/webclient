@@ -218,7 +218,7 @@ class CompoundStatement extends Statement {
 	private executeAll(params: ParameterPart[], executableStatements: Statement[],
 					   commandParams: commands.ExecutionParameters, executer: commands.Executer): void {
 		if (params.empty()) {
-			executer.execute(commandParams).whenReady(executer.result.resolve.bind(executer.result)).catch(executer.result.reject.bind(executer.result));
+			executer.execute(commandParams).then(executer.result.resolve.bind(executer.result)).catch(executer.result.reject.bind(executer.result));
 
 		} else {
 			let parameterPart = params[0];
@@ -227,7 +227,7 @@ class CompoundStatement extends Statement {
 				if (executableStatements.empty()) {
 					executer.result.reject(new InvalidStatementException([parameterPart]));
 				} else {
-					executableStatements[0].execute().whenReady(value => {
+					executableStatements[0].execute().then(value => {
 						if (parameterPart.getType().validate(value)) {
 							commandParams.add(parameterPart.getName(), value);
 							this.executeAll(params.slice(1), executableStatements.slice(1), commandParams, executer);
@@ -316,7 +316,6 @@ class StatementSessionImpl implements StatementSession {
 	private createExecutable(commandExpression: input.CommandExpression): Statement {
 		if (commandExpression.getExpressions().some(exp => exp instanceof input.CommandExpression)) {
 			return this.createCompoundExecutable(commandExpression);
-
 		} else {
 			return this.createAtomicExecutable(commandExpression);
 		}
@@ -340,13 +339,11 @@ class StatementSessionImpl implements StatementSession {
 
 			if (matches.empty()) {
 				throw new StatementException(`The expression semantics could not be matched`);
-
 			} else if (matches.length > 1) {
 				let pinnedInterpretation = this.getPinnedInterpretationFor(preparedCommandExpression.range);
 				if (pinnedInterpretation != null) {
 					return new CompoundStatement(this.context, pinnedInterpretation.match.command,
 						pinnedInterpretation.match.rule, pinnedInterpretation.interpretedCommand, executableStatements);
-
 				} else {
 					throw new AmbiguityStatementException(preparedCommandExpression, matches);
 				}
@@ -367,7 +364,6 @@ class StatementSessionImpl implements StatementSession {
 
 		if (matches.empty()) {
 			throw new StatementException(`The expression semantics could not be matched`);
-
 		} else if (matches.length > 1) {
 			let pinnedInterpretation = this.getPinnedInterpretationFor(preparedCommandExpression.range);
 			if (pinnedInterpretation != null) {
@@ -377,7 +373,6 @@ class StatementSessionImpl implements StatementSession {
 			} else {
 				throw new AmbiguityStatementException(preparedCommandExpression, matches);
 			}
-
 		} else {
 			let firstMatch = matches.first();
 			return new AtomicStatement(this.context, firstMatch.match.command, firstMatch.match.rule, firstMatch.interpretedCommand);

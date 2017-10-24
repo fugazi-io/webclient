@@ -30,14 +30,11 @@ export class ExecutionResult {
 		return this.type;
 	}
 
-	public whenReady(successHandler: (value: any) => void): ExecutionResult {
+	public then(successHandler: (value: any) => void): ExecutionResult {
 		this.future.then(successHandler);
 		return this;
 	}
 
-	/**
-	 * @override
-	 */
 	public catch(errorHandler: (error: coreTypes.Exception) => void): ExecutionResult {
 		this.future.catch(errorHandler);
 		return this;

@@ -12,16 +12,18 @@ export interface TerminalFactory {
 	createTerminal(properties: TerminalProperties): Promise<TerminalView>;
 }
 
-export interface ExecuteCommand {
-	(command: string): Promise<commands.ExecutionResult>;
-}
+export type CommandExecuter = () => commands.ExecutionResult;
+
+export type CommandValidationResult = Promise<CommandExecuter>;
+
+export type CommandValidator = (command: string) => CommandValidationResult;
 
 export interface StatementsQuerier {
 	(command: string, position: number): Promise<statements.Statement[]>;
 }
 
 export interface TerminalProperties extends componentsDescriptor.Descriptor, view.ViewProperties {
-	executer: ExecuteCommand;
+	validator: CommandValidator;
 	querier: StatementsQuerier;
 	history?: string[];
 }
@@ -66,12 +68,14 @@ export class TerminalView extends view.View<TerminalProperties, TerminalState> {
 				onSearchHistoryRequested={ this.switchToHistorySearch.bind(this) }/>;
 		}
 
-		return <article className="terminal">
-			<output.OutputView ref="output"/>
-			<section className="inputs">
-				{ inputView }
-			</section>
-		</article>;
+		return (
+			<article className="terminal">
+				<output.OutputView ref="output"/>
+				<section className="inputs">
+					{ inputView }
+				</section>
+			</article>
+		);
 	}
 
 	private switchToHistorySearch(): void {
@@ -88,8 +92,12 @@ export class TerminalView extends view.View<TerminalProperties, TerminalState> {
 	}
 
 	private onExecute(input: string): void {
-		this.props.executer(input).then(result => {
-			result.whenReady(value => {
+		this.props.validator(input)
+			.then(executer => {
+				const result = executer();
+				this.getOutput().addExecutionResult(input, result);
+
+				result.then(value => {
 					if (commandsHandler.isPromptData(value)) {
 						this.promptValueHandler = value.handlePromptValue;
 						this.setState({
@@ -97,9 +105,10 @@ export class TerminalView extends view.View<TerminalProperties, TerminalState> {
 						} as TerminalState);
 					}
 				});
-
-				this.getOutput().addExecutionResult(input, result);
-		});
+			})
+			.catch(e => {
+				// TODO: handler this case
+			});
 	}
 
 	private getOutput(): output.OutputView {
