@@ -49,7 +49,7 @@ export class MainView extends view.View<MainProperties, MainState> implements te
 				description={ this.state.terminals[i].description }
 				history={ this.state.terminals[i].history }
 				querier={ this.state.terminals[i].querier }
-				executer={ this.state.terminals[i].executer }
+				validator={ this.state.terminals[i].validator }
 			/>);
 		}
 

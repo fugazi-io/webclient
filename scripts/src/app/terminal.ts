@@ -16,7 +16,6 @@ import * as commands from "../components/commands";
 import * as handler from "../components/commands.handler";
 import * as semantics from "../app/semantics";
 
-
 export interface Properties {
 	name: string;
 	title?: string;
@@ -165,7 +164,8 @@ export class Terminal {
 			description: properties.description,
 			history: this.properties.history,
 			querier: this.queryForStatements.bind(this),
-			executer: this.executeCommand.bind(this)
+			//executer: this.executeCommand.bind(this)
+			validator: this.validateCommand.bind(this)
 		}).then(this.setView.bind(this));
 	}
 
@@ -206,7 +206,48 @@ export class Terminal {
 		this.view = view;
 	}
 
-	private executeCommand(command: string): Promise<commands.ExecutionResult> {
+	private validateCommand(command: string): viewTerminal.CommandValidationResult {
+		const session = statements.createStatementsSession(command, this.contextProvider);
+		const resolver = new SuggestionsAmbiguityResolver();
+		const fn = () => {
+			try {
+				const executable = session.getExecutable();
+
+				return Promise.resolve(() => {
+					let result: commands.ExecutionResult;
+
+					ga("send", "event", "Commands", "execution - start", command);
+					storage.local.store(this.properties.name, this.properties);
+
+					try {
+						result = executable.execute();
+					} catch (e1) {
+						const error = typeof e1 === "string" ? e1 : (e1.message ? e1.message : e1.toString());
+						ga("send", "event", "Commands", "execution - error: " + error, command);
+
+						result = new commands.ExecutionResult(registry.getType("any"), false);
+						result.reject(e1);
+					}
+
+					return result;
+				});
+			} catch (e2) {
+				if (e2 instanceof statements.AmbiguityStatementException) {
+					return resolver.resolve(e2.getAmbiguousMatches())
+						.then(selection => {
+							session.pinInterpretation(e2.getAmbiguousExpression().range, selection);
+							return fn();
+						});
+				} else {
+					return Promise.reject(e2);
+				}
+			}
+		};
+
+		return fn();
+	}
+
+	/*private executeCommand(command: string): Promise<commands.ExecutionResult> {
 		ga("send", "event", "Commands", "execution - start", command);
 		storage.local.store(this.properties.name, this.properties);
 
@@ -230,9 +271,9 @@ export class Terminal {
 		}
 
 		return currentAmbiguityState.asPromise();
-	}
+	}*/
 
-	private executeCommandInSession(resolver: SuggestionsAmbiguityResolver, session: statements.StatementSession): void {
+	/*private executeCommandInSession(resolver: SuggestionsAmbiguityResolver, session: statements.StatementSession): void {
 		try {
 			this.ambiguityResolvingState.resolve(session.getExecutable().execute());
 			this.ambiguityResolvingState = null;
@@ -248,7 +289,7 @@ export class Terminal {
 				throw e;
 			}
 		}
-	}
+	}*/
 
 	private queryForStatements(command: string, position: number): Promise<statements.Statement[]> {
 		let future = new coreTypes.Future<statements.Statement[]>(),
