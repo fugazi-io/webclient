@@ -137,7 +137,7 @@ export class Terminal {
 	private properties: Properties;
 	private view: viewTerminal.TerminalView;
 	private context: TerminalContext;
-	private ambiguityResolvingState: coreTypes.Future<commands.ExecutionResult>;
+	//private ambiguityResolvingState: coreTypes.Future<commands.ExecutionResult>;
 	private contextProvider: ContextProvider;
 	private modules: Map<string, LoadedModule>;
 	private variables: collections.FugaziMap<app.Variable>;
