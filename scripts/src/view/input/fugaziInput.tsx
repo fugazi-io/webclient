@@ -27,10 +27,10 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 
 	constructor(props: FugaziInputProperties) {
 		super(props, "fugazi", props.prompt || DEFAULT_FUGAZI_PROMPT);
-		this.addKeyMapping(false, true, false, "R", this.onShowSearch.bind(this));
+		this.addKeyMapping(this.onShowSearch.bind(this), "r", base.ModifierKey.CONTROL);
 
 		if (this.props.searchResult && this.props.searchResult.length > 0) {
-			this.state = {value: this.props.searchResult} as any;
+			this.state = { value: this.props.searchResult } as any;
 		}
 	}
 
@@ -40,6 +40,11 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 	}
 
 	public onChange(event: React.FormEvent<HTMLInputElement>): void {
+		// for some reason a new line is inserted automatically when this input is rendered with a value
+		if (event.type === "change" && this.state.value + "\n" === this.getValue(event)) {
+			return;
+		}
+
 		super.onChange(event);
 		this.history.update();
 		this.updateSuggestions(this.getValue(), this.getPosition());
@@ -93,12 +98,10 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 		return new Promise((resolve, reject) => {
 			onResult.then(statements => {
 				this.setState({
-					suggestions: statements,
-					value: this.inputbox.value
+					suggestions: statements
 				} as any, () => resolve());
 			}).catch(reject);
 		});
-
 	}
 
 	protected onEnterPressed(): boolean {
@@ -121,10 +124,10 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 			expressionsIterator = (item.getExpression() as input.CommandExpression).getExpressions().getIterator(),
 			newValue: string = "",
 			haveStoppedForParameter = false,
-			toeknIterator = item.getRule().getTokens().getIterator();
+			tokenIterator = item.getRule().getTokens().getIterator();
 
-		while (toeknIterator.hasNext()) {
-			const token = toeknIterator.next();
+		while (tokenIterator.hasNext()) {
+			const token = tokenIterator.next();
 			// by taking the value from the token we fix keyword typos
 			if (token.getTokenType() === syntax.TokenType.Keyword) {
 				newValue += `${(token as syntax.Keyword).getWord()} `;
@@ -275,12 +278,12 @@ export class SearchHistoryInputView extends base.BackgroundTextInput<SearchHisto
 }
 
 class History {
-	private element: HTMLInputElement;
+	private element: HTMLTextAreaElement;
 	private originals: string[];
 	private cache: string[];
 	private cursor: number;
 
-	public constructor(element: HTMLInputElement, loaded?: string[]) {
+	public constructor(element: HTMLTextAreaElement, loaded?: string[]) {
 		this.element = element;
 		this.originals = loaded || [];
 		this.reset();

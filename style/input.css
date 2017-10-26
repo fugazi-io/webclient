@@ -14,14 +14,24 @@ main#ui article.terminal section.inputs .input > .container {
 	background-color: #252526;
 }
 
-main#ui article.terminal section.inputs .input input {
+main#ui article.terminal section.inputs .input input,
+main#ui article.terminal section.inputs .input textarea {
 	outline: 0;
 	padding: 0;
 	width: 100%;
 	border: 0px;
-	font-size: 12px;
 	color: #ADADAD;
+	font-size: 12px;
 	background-color: transparent;
+}
+
+/*main#ui article.terminal section.inputs .input input {*/
+main#ui article.terminal section.inputs .input textarea {
+	resize: none;
+	white-space: pre;
+	overflow-x: hidden;
+	vertical-align: top;
+	overflow-wrap: normal;
 }
 
 main#ui article.terminal section.inputs .suggestible.input .suggestionPanel {

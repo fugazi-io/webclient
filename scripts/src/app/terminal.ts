@@ -15,7 +15,6 @@ import * as types from "../components/types";
 import * as commands from "../components/commands";
 import * as handler from "../components/commands.handler";
 
-
 export interface Properties {
 	name: string;
 	title?: string;
@@ -85,8 +84,7 @@ export class TerminalContext extends BaseTerminalContext {
 	}
 }
 
-export class RestrictedTerminalContext extends BaseTerminalContext {
-}
+export class RestrictedTerminalContext extends BaseTerminalContext {}
 
 export class TerminalCommand extends commands.LocalCommand {
 	constructor() {
