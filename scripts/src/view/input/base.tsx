@@ -65,6 +65,7 @@ export class ModifierKey extends KeyEnum {
 	private static COUNTER = 0;
 	private static VALUES: ModifierKey[] = [];
 
+	public static NONE = new ModifierKey(-1, "None");
 	public static ALT = new ModifierKey(18, "Alt");
 	public static SHIFT = new ModifierKey(16, "Shift");
 	public static CONTROL = new ModifierKey(17, "Ctrl");
@@ -73,13 +74,34 @@ export class ModifierKey extends KeyEnum {
 
 	private constructor(code: number, name: string) {
 		super(code, name, ModifierKey.COUNTER++);
-		this.flag = 1 << this.ordinal;
+
+		if (code < 0) {
+			this.flag = 0;
+		} else {
+			this.flag = 1 << this.ordinal;
+		}
 
 		ModifierKey.VALUES.push(this);
 	}
 
 	public static values() {
 		return this.VALUES;
+	}
+
+	public static flagsFromEvent(event: React.KeyboardEvent<any>): number {
+		let flags = 0;
+
+		if (event.altKey) {
+			flags |= ModifierKey.ALT.flag;
+		}
+		if (event.ctrlKey) {
+			flags |= ModifierKey.CONTROL.flag;
+		}
+		if (event.shiftKey) {
+			flags |= ModifierKey.SHIFT.flag;
+		}
+
+		return flags;
 	}
 }
 
@@ -221,14 +243,11 @@ export abstract class InputView<
 	protected onKeyPress(event: React.KeyboardEvent<any>): void {}
 
 	protected onKeyDown(event: React.KeyboardEvent<any>): void {
+		const flags = ModifierKey.flagsFromEvent(event);
 		let stopPropagation: boolean;
 
-		if (event.altKey || event.ctrlKey || event.shiftKey) {
-			if (event.which < 20) {
-				return;
-			}
-
-			let key = createEventSequenceKey(event);
+		if (flags | ModifierKey.NONE.flag) {
+			const key = createEventSequenceKey(event);
 			if (this.keymap.has(key)) {
 				stopPropagation = this.keymap.get(key)();
 			}
@@ -307,6 +326,10 @@ export abstract class InputView<
 }
 
 export class TextInputView<P extends InputProperties, S extends InputState> extends InputView<P, S, HTMLTextAreaElement> {
+	public constructor(props: P, className: string, prompt?: string) {
+		super(props, className, prompt);
+	}
+
 	protected getInputType(): "input" | "textarea" {
 		return "textarea";
 	}
@@ -581,19 +604,7 @@ function createModifiersSequenceKey(char: string | SpecialKey, ...specials: Modi
 }
 
 function createEventSequenceKey(event: React.KeyboardEvent<any>): string {
-	let flags = 0;
-
-	if (event.altKey) {
-		flags |= ModifierKey.ALT.flag;
-	}
-	if (event.ctrlKey) {
-		flags |= ModifierKey.CONTROL.flag;
-	}
-	if (event.shiftKey) {
-		flags |= ModifierKey.SHIFT.flag;
-	}
-
-	return createSequenceKey(event.key, flags);
+	return createSequenceKey(event.key, ModifierKey.flagsFromEvent(event));
 }
 
 function createSequenceKey(char: string | SpecialKey, flags: number) {

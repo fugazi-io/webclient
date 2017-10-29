@@ -6,8 +6,8 @@ import * as view from "../view";
 import * as base from "./base";
 import * as React from "react";
 
-let DEFAULT_FUGAZI_PROMPT = "fugazi //";
-let HISTORY_SEARCH_PROMPT = "search history:";
+const DEFAULT_FUGAZI_PROMPT = "fugazi //";
+const HISTORY_SEARCH_PROMPT = "search history:";
 
 export interface ExecuteHandler {
 	(input: string): void;
@@ -24,10 +24,14 @@ export interface FugaziInputProperties extends base.SuggestibleInputProperties<s
 
 export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProperties, base.SuggestibleInputState<statements.Statement>, statements.Statement> {
 	private history: History;
+	private addingNewLine: boolean;
 
 	constructor(props: FugaziInputProperties) {
 		super(props, "fugazi", props.prompt || DEFAULT_FUGAZI_PROMPT);
+
+		this.addingNewLine = false;
 		this.addKeyMapping(this.onShowSearch.bind(this), "r", base.ModifierKey.CONTROL);
+		this.addKeyMapping(this.onShiftEnter.bind(this), base.SpecialKey.ENTER, base.ModifierKey.SHIFT);
 
 		if (this.props.searchResult && this.props.searchResult.length > 0) {
 			this.state = { value: this.props.searchResult } as any;
@@ -41,9 +45,12 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 
 	public onChange(event: React.FormEvent<HTMLInputElement>): void {
 		// for some reason a new line is inserted automatically when this input is rendered with a value
-		if (event.type === "change" && this.state.value + "\n" === this.getValue(event)) {
+		if (!this.addingNewLine && event.type === "change" && this.state.value + "\n" === this.getValue(event)) {
+			console.log("moo?");
 			return;
 		}
+
+		this.addingNewLine = false;
 
 		super.onChange(event);
 		this.history.update();
@@ -116,7 +123,7 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 			});
 		}
 
-		return false;
+		return true;
 	}
 
 	protected onSuggestionItemPressed(item: statements.Statement): void {
@@ -158,6 +165,15 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 				this.inputbox.focus();
 				this.setCaretPosition(this.getValue().length);
 			});
+	}
+
+	private onShiftEnter(): boolean {
+		if (this.getValue().charAt(this.getPosition() - 1) === "\n") {
+			return true;
+		}
+
+		this.addingNewLine = true;
+		return false;
 	}
 
 	private onShowSearch(): boolean {
