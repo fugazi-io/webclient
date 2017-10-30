@@ -343,6 +343,16 @@ export class TextInputView<P extends InputProperties, S extends InputState> exte
 
 		return Object.assign({}, super.getViewProperties(), { rows: Math.min(linesCount, 4) });
 	}
+
+	protected getLinesCount(): number {
+		// might end up being a naive implementation
+		return this.getValue().split("\n").length;
+	}
+
+	protected getCurrentLine(): number {
+		// might end up being a naive implementation
+		return this.getValue().substring(0, this.getPosition()).split("\n").length;
+	}
 }
 
 export interface SuggestibleInputProperties<T> extends InputProperties {

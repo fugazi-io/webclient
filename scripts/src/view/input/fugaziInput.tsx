@@ -40,20 +40,19 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 
 	public componentDidMount(): void {
 		super.componentDidMount();
-		this.history = new History(this.inputbox, this.props.history);
+		this.history = new History(this.props.history);
 	}
 
 	public onChange(event: React.FormEvent<HTMLInputElement>): void {
 		// for some reason a new line is inserted automatically when this input is rendered with a value
 		if (!this.addingNewLine && event.type === "change" && this.state.value + "\n" === this.getValue(event)) {
-			console.log("moo?");
 			return;
 		}
 
 		this.addingNewLine = false;
 
 		super.onChange(event);
-		this.history.update();
+		this.history.update(this.getValue());
 		this.updateSuggestions(this.getValue(), this.getPosition());
 	}
 
@@ -65,24 +64,41 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 	}
 
 	protected onArrowUpPressed(): boolean {
-		this.history.previous();
-		this.updateSuggestions(this.getValue(), this.getValue().length).then(() => {
+		if (this.getLinesCount() > 1 && this.getCurrentLine() > 1) {
+			return false;
+		}
+
+		const newValue = this.history.previous();
+		if (newValue === null) {
+			return false;
+		}
+
+		this.updateSuggestions(newValue, this.getValue().length).then(() => {
 			setTimeout(() => {
 				this.setCaretPosition(this.getValue().length);
 			}, 5);
 		});
-		return false;
+
+		return true;
 	}
 
 	protected onArrowDownPressed(): boolean {
-		this.history.next();
-		this.updateSuggestions(this.getValue(), this.getValue().length).then(() => {
+		if (this.getLinesCount() > 1 && this.getCurrentLine() < this.getLinesCount()) {
+			return false;
+		}
+
+		const newValue = this.history.next();
+		if (newValue === null) {
+			return false;
+		}
+
+		this.updateSuggestions(newValue, this.getValue().length).then(() => {
 			setTimeout(() => {
 				this.setCaretPosition(this.getValue().length);
 			}, 5);
 		});
 
-		return false;
+		return true;
 	}
 
 	protected onArrowLeftPressed(): boolean {
@@ -105,6 +121,7 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 		return new Promise((resolve, reject) => {
 			onResult.then(statements => {
 				this.setState({
+					value,
 					suggestions: statements
 				} as any, () => resolve());
 			}).catch(reject);
@@ -113,7 +130,7 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 
 	protected onEnterPressed(): boolean {
 		if (!this.inputbox.value.empty()) {
-			this.history.mark();
+			this.history.mark(this.getValue());
 			this.props.onExecute(this.inputbox.value);
 			this.inputbox.value = "";
 			this.setState({
@@ -177,8 +194,8 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 	}
 
 	private onShowSearch(): boolean {
-		this.history.mark();
-		this.history.update();
+		this.history.mark(this.getValue());
+		this.history.update(this.getValue());
 		this.props.onSearchHistoryRequested();
 		return true;
 	}
@@ -294,13 +311,11 @@ export class SearchHistoryInputView extends base.BackgroundTextInput<SearchHisto
 }
 
 class History {
-	private element: HTMLTextAreaElement;
 	private originals: string[];
 	private cache: string[];
 	private cursor: number;
 
-	public constructor(element: HTMLTextAreaElement, loaded?: string[]) {
-		this.element = element;
+	public constructor(loaded?: string[]) {
 		this.originals = loaded || [];
 		this.reset();
 	}
@@ -310,34 +325,34 @@ class History {
 		this.reset();
 	}
 
-	public mark(): void {
-		if (this.originals.first() !== this.element.value) {
-			this.originals.unshift(this.element.value);
+	public mark(value: string): void {
+		if (this.originals.first() !== value) {
+			this.originals.unshift(value);
 		}
 
 		this.reset();
 	}
 
-	public update(): void {
-		if (this.element.value.trim() !== "") {
-			this.cache[this.cursor] = this.element.value;
+	public update(value: string): void {
+		if (value.trim() !== "") {
+			this.cache[this.cursor] = value;
 		}
 	}
 
-	public previous(): void {
+	public previous(): string | null {
 		if (this.cursor === this.cache.length - 1) {
-			return;
+			return null;
 		}
 
-		this.element.value = this.cache[++this.cursor];
+		return this.cache[++this.cursor];
 	}
 
-	public next(): void {
+	public next(): string | null {
 		if (this.cursor == 0) {
-			return;
+			return null;
 		}
 
-		this.element.value = this.cache[--this.cursor];
+		return this.cache[--this.cursor];
 	}
 
 	private reset(): void {
