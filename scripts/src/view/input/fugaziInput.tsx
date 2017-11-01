@@ -130,11 +130,12 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 
 	protected onEnterPressed(): boolean {
 		if (this.isCurrentlyInAString() || this.getValue()[this.getPosition() - 1] === "\\") {
-			this.setState({ value: this.getValue() + "\n" });
+			this.setState({
+				value: this.getValue().substring(0, this.getPosition()) + "\n" + this.getValue().substring(this.getPosition())
+			});
 		} else if (!this.inputbox.value.empty()) {
-			this.history.mark(this.getValue());
+			this.history.mark(this.inputbox.value);
 			this.props.onExecute(this.inputbox.value);
-			this.inputbox.value = "";
 			this.setState({
 				value: "",
 				showing: false,
@@ -207,9 +208,11 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 		let quotesType: string | null = null;
 
 		for (let i = 0; i < this.getPosition(); i++) {
-			if (value[i] === quotesType) {
+			if (value[i] === "\\") {
+				i++;
+			} else if (value[i] === quotesType) {
 				quotesType = null;
-			} else if (quotesType !== null || value[i] === "\\") {
+			} else if (quotesType !== null) {
 				continue;
 			} else if (value[i] === "\"" || value[i] === "'") {
 				quotesType = value[i];
