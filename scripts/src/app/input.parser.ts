@@ -1,11 +1,11 @@
 import * as collections from "../core/types.collections";
 import * as inputModule from "./input";
 
-var input: Input,
+let input: Input,
 	stack: StateStack;
 
 export function parse(commandInput: string): inputModule.CommandExpression {
-	var state: ParserState<any>,
+	let state: ParserState<any>,
 		command: CommandState;
 
 	input = new Input(commandInput);
@@ -89,7 +89,7 @@ class Input {
 	}
 
 	use(startIndex: number = this.used): UsedInput {
-		var usedInput: UsedInput = {
+		const usedInput: UsedInput = {
 			value: this.substring(startIndex, this.cursor),
 			range: new inputModule.RangeImpl(startIndex, this.cursor)
 		};
@@ -162,8 +162,7 @@ class ParserState<T extends inputModule.Expression<any>> {
 	}
 }
 
-class AtomicState<T extends inputModule.Expression<any>> extends ParserState<T> {
-}
+class AtomicState<T extends inputModule.Expression<any>> extends ParserState<T> {}
 
 class WordState extends AtomicState<inputModule.Word> {
 	private static ILLEGAL_CHARACTERS: string[] = ": \" ' [ ( { ,".split(" ");
@@ -180,7 +179,7 @@ class WordState extends AtomicState<inputModule.Word> {
 	 * @override
 	 */
 	parse(): StateStatus {
-		var expressionState: inputModule.ExpressionState,
+		let expressionState: inputModule.ExpressionState,
 			used: UsedInput;
 
 		while (!this.parsingEnded()) {
@@ -227,7 +226,7 @@ class StringState extends AtomicState<inputModule.StringParameter> {
 	 * @override
 	 */
 	parse(): StateStatus {
-		var expressionState: inputModule.ExpressionState,
+		let expressionState: inputModule.ExpressionState,
 			used: UsedInput;
 
 		input.advance();
@@ -344,7 +343,7 @@ class CommandState extends CompoundState<inputModule.CommandExpression> {
 	}
 
 	private handleEnd(): void {
-		var expressionState: inputModule.ExpressionState,
+		let expressionState: inputModule.ExpressionState,
 			used: UsedInput;
 
 		this.status = StateStatus.Done;
