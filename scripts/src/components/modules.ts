@@ -385,7 +385,7 @@ class BasicAuthentication extends Authenticator {
 			return {
 				status: handler.ResultStatus.Failure,
 				error: "username is empty"
-			}; //as commands.handler.FailResult;
+			} as handler.FailureResult;
 		}
 
 		this.username = username.trim();

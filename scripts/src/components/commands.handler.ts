@@ -1,9 +1,4 @@
-import * as coreTypes from "../core/types";
 import * as appModules from "../app/modules";
-
-export function isHandlerResult(value: any): value is Result {
-	return coreTypes.isPlainObject(value) && typeof ResultStatus[value.status] === "string";
-}
 
 export enum ResultStatus {
 	Success,
@@ -13,22 +8,43 @@ export enum ResultStatus {
 
 export interface Result {
 	status: ResultStatus;
-	value?: any;
-	error?: string;
 }
 
-export interface PromptData {
-	type: "password";
-	message: string;
-	handlePromptValue: (value: string) => void;
+export function isResult(obj: any, status?: ResultStatus): obj is Result {
+	return obj
+		&& typeof obj.status === "number"
+		&& typeof ResultStatus[obj.status] === "string"
+		&& (status === undefined || obj.status === status);
+}
+
+export interface SuccessResult extends Result {
+	value?: any;
+}
+
+export function isSuccessResult(obj: Result): obj is SuccessResult {
+	return isResult(obj, ResultStatus.Success)
+		&& (Object.keys(obj).length === 1 || (Object.keys(obj).length === 2 && (obj as SuccessResult).value));
+}
+
+export interface FailureResult extends Result {
+	error: string;
+}
+
+export function isFailureResult(obj: Result): obj is FailureResult {
+	return isResult(obj, ResultStatus.Failure) && typeof (obj as FailureResult).error === "string";
 }
 
 export interface PromptResult extends Result {
-	prompt: PromptData;
+	message: "string";
+	type: "string" | "password";
+	handler: (value: string) => Result;
 }
 
-export function isPromptData(result: any): result is PromptData {
-	return result && (result as PromptData).type === "password" && typeof (result as PromptData).message === "string";
+export function isPromptResult(obj: Result): obj is PromptResult {
+	return isResult(obj, ResultStatus.Prompt)
+		&& typeof (obj as PromptResult).message === "string"
+		&& typeof (obj as PromptResult).handler === "function"
+		&& ((obj as PromptResult).type === "string" || (obj as PromptResult).type === "password");
 }
 
 export enum PassedParametersForm {

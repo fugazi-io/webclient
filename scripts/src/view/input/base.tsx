@@ -5,10 +5,12 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 
 export interface PasswordInputViewProperties extends view.ViewProperties {
+	message: string;
+	type: "text" | "password";
 	handler: (password: string | null) => void; // null when canceled
 }
 
-export class PasswordInputView extends view.View<PasswordInputViewProperties, view.ViewState> {
+export class PromptInputView extends view.View<PasswordInputViewProperties, view.ViewState> {
 	private input: HTMLInputElement;
 
 	public componentDidMount(): void {
@@ -17,10 +19,13 @@ export class PasswordInputView extends view.View<PasswordInputViewProperties, vi
 
 	public render() {
 		return (
-			<article className="input password">
+			<article className="input prompt">
 				<div className="container">
+					<div className="message">
+						<span>{ this.props.message }:</span>
+					</div>
 					<div className="inputbox">
-						<input type="password" onKeyDown={ this.onKeyDown.bind(this) }
+						<input type={ this.props.type } onKeyDown={ this.onKeyDown.bind(this) }
 							   ref={ input => this.input = input }/>
 					</div>
 				</div>
@@ -59,12 +64,11 @@ export abstract class InputView<P extends InputProperties, S extends InputState>
 	public constructor(props: P, className: string, prompt?: string) {
 		super(props);
 
-
 		this.prompt = prompt;
 		this.className = ["input", className];
 		this.keymap = new Map<string, () => boolean>();
 		this.state = {
-			value: this.props.value || ""
+			value: this.props.value
 		} as S;
 	}
 
@@ -109,7 +113,7 @@ export abstract class InputView<P extends InputProperties, S extends InputState>
 	protected getContainerElements(): JSX.Element[] {
 		return [
 			<div key="inputbox" className="inputbox">
-				<input tabIndex={ -1 } key="input" type="text" ref="inputbox" value={ this.state.value }
+				<input tabIndex={ -1 } key="input" type="text" ref="inputbox" value={ this.state.value || "" }
 					   onFocus={ this.onFocus.bind(this) }
 					   onBlur={ this.onBlur.bind(this) }
 					   onChange={ this.onChange.bind(this) }

@@ -248,7 +248,7 @@ class ResultView extends view.View<ResultViewProperties, ResultViewState> {
 	 * @Override
 	 */
 	public componentDidMount(): void {
-		this.props.result.then(this.success.bind(this)).catch(this.fail.bind(this));
+		this.props.result.onSuccess(this.success.bind(this)).onFailure(this.fail.bind(this));
 	}
 
 	public componentWillUpdate(): void {
@@ -320,7 +320,7 @@ class ResultView extends view.View<ResultViewProperties, ResultViewState> {
 	private success(value: any): void {
 		this.setState({
 			status: "success",
-			value: handler.isPromptData(value) ? value.message : value
+			value: handler.isPromptResult(value) ? value.message : value
 		});
 	}
 

@@ -1,4 +1,5 @@
 import { Descriptor, FugaziMap, ModuleContext } from "../../../scripts/bin/app/modules.api";
+import { ResultStatus } from "../../../scripts/bin/components/commands.handler";
 
 (function(): void {
 	const FIB_CACHE = [0, 1] as number[];
@@ -35,6 +36,7 @@ import { Descriptor, FugaziMap, ModuleContext } from "../../../scripts/bin/app/m
 					"add (numbers list<number>)"
 				],
 				handler: function(context: ModuleContext, params: FugaziMap<any>): number {
+					let a = ResultStatus.Success;
 					if (params.has("a") && params.has("b")) {
 						return params.get("a") + params.get("b");
 					}
