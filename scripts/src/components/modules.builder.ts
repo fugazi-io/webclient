@@ -43,33 +43,54 @@ function breakDescriptorWithPath(moduleDescriptor: descriptor.Descriptor) {
 	return result;
 }
 
-class PreprocessPipeline implements Preprocessor {
+class PreprocessPipeline implements PreprocessorObject {
 	private preprocessors: Preprocessor[];
 
 	constructor() {
 		this.preprocessors = [];
 	}
 
-	async preprocess(descriptor: descriptor.Descriptor): Promise<descriptor.Descriptor> {
-		for (let i = 0; i < this.preprocessors.length; i++) {
-			descriptor = await (this.preprocessors[i].preprocess(descriptor));
+	add(preprocessor: Preprocessor): this {
+		this.preprocessors.push(preprocessor);
+		return this;
+	}
+
+	preprocess(descriptor: descriptor.Descriptor): Promise<descriptor.Descriptor> {
+		let promise = this.preprocessItem(0, descriptor);
+
+		for (let i = 1; i < this.preprocessors.length; i++) {
+			promise = promise.then(result => this.preprocessItem(i, result));
 		}
-		return descriptor;
+
+		return promise;
+	}
+
+	private preprocessItem(index: number, descriptor: descriptor.Descriptor): Promise<descriptor.Descriptor> {
+		const preprocessor = this.preprocessors[index];
+		return isPreprocessorFunction(preprocessor) ? preprocessor(descriptor) : preprocessor.preprocess(descriptor);
 	}
 }
 
-export interface Preprocessor {
-	 preprocess(descriptor: descriptor.Descriptor): Promise<descriptor.Descriptor>;
+export type PreprocessorFunction = (descriptor: descriptor.Descriptor) => Promise<descriptor.Descriptor>;
+function isPreprocessorFunction(preprocessor: Preprocessor): preprocessor is PreprocessorFunction {
+	return typeof preprocessor === "function";
 }
 
+export interface PreprocessorObject {
+	preprocess(descriptor: descriptor.Descriptor): Promise<descriptor.Descriptor>;
+}
+
+export type Preprocessor = PreprocessorFunction | PreprocessorObject;
+
 const preprocessors = {
-	Prompter: {
-		preprocess: async function (descriptor: descriptor.Descriptor): Promise<descriptor.Descriptor> {
+	AddBase: (descriptor: descriptor.Descriptor) => Promise.resolve(Object.assign({}, descriptor )),
+	/*Prompter: {
+		preprocess: function (descriptor: descriptor.Descriptor): Promise<descriptor.Descriptor> {
 			descriptor.preprocess && descriptor.preprocess.prompt && Object.entries(descriptor.preprocess.prompt).forEach((name, promptInfo) => {
 
 			});
 		}
-	}
+	}*/
 } as { [id: string]: Preprocessor };
 
 export function create(url: net.Url): componentsBuilder.Builder<modules.Module>;
@@ -93,15 +114,7 @@ export function create(moduleDescriptor: net.Url | descriptor.Descriptor, parent
 		}
 	}
 
-	loader.then(aDescriptor => {
-		const tree = breakDescriptorWithPath(aDescriptor);
-
-		if (!parent) {
-			(tree as any).basePath = aDescriptor.name;
-		}
-
-		return tree;
-	});
+	loader.then(aDescriptor => breakDescriptorWithPath(aDescriptor));
 	return new Builder(loader, parent);
 }
 
@@ -111,12 +124,12 @@ interface RemoteBuilderInfo {
 	name?: string;
 }
 
-export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descriptor.Descriptor> {
-	private innerModuleBuilders: collections.FugaziMap<componentsBuilder.Builder<modules.Module>>;
-	private innerTypesBuilders: collections.FugaziMap<componentsBuilder.Builder<types.Type>>;
-	private innerCommandsBuilders: collections.FugaziMap<componentsBuilder.Builder<commands.Command>>;
-	private innerConvertersBuilders: collections.FugaziMap<componentsBuilder.Builder<converters.Converter>>;
-	private innerConstraintBuilders: collections.FugaziMap<componentsBuilder.Builder<constraints.Constraint>>;
+export class Builder<R extends modules.Remote = modules.RemotePath> extends componentsBuilder.BaseBuilder<modules.Module, descriptor.Descriptor> {
+	protected innerModuleBuilders: collections.FugaziMap<componentsBuilder.Builder<modules.Module>>;
+	protected innerTypesBuilders: collections.FugaziMap<componentsBuilder.Builder<types.Type>>;
+	protected innerCommandsBuilders: collections.FugaziMap<componentsBuilder.Builder<commands.Command>>;
+	protected innerConvertersBuilders: collections.FugaziMap<componentsBuilder.Builder<converters.Converter>>;
+	protected innerConstraintBuilders: collections.FugaziMap<componentsBuilder.Builder<constraints.Constraint>>;
 
 	private innerModuleRemoteBuilders: Array<RemoteBuilderInfo>;
 	private innerTypeModuleRemoteBuilders: Array<RemoteBuilderInfo>;
@@ -124,9 +137,8 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 	private innerConvertersModuleRemoteBuilders: Array<RemoteBuilderInfo>;
 	private innerConstraintModuleRemoteBuilders: Array<RemoteBuilderInfo>;
 
-	private basePath: components.Path;
-	private remote: modules.Remote;
-	private params: modules.Parameters;
+	protected params: modules.Parameters;
+	protected remote: R;
 
 	public constructor(loader: componentsDescriptor.Loader<descriptor.Descriptor>, parent?: componentsBuilder.Builder<components.Component>) {
 		super(modules.Module, loader, parent);
@@ -174,7 +186,7 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 	}
 
 	public getBasePath() {
-		return this.getParent() ? (this.getParent() as Builder).getBasePath() : this.basePath;
+		return this.getParent() ? (this.getParent() as Builder).getBasePath() : new components.Path(this.componentDescriptor.name);
 	}
 
 	protected onDescriptorReady(): void {
@@ -216,10 +228,6 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 			const remote = <descriptor.RemoteDescriptor>(<descriptor.Descriptor> this.componentDescriptor).remote;
 
 			this.handleRemoteDescriptor(remote);
-		}
-
-		if (!this.getParent()) {
-			this.basePath = new components.Path(this.componentDescriptor.basePath);
 		}
 	}
 
@@ -551,19 +559,24 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 		this.innerBuilderCompleted();
 	}
 
-	private handleRemoteDescriptor(remote: descriptor.RemoteDescriptor) {
-		if (descriptor.isRelativeRemoteDescriptor(remote)) {
-			this.handleRemoteRelativeDescriptor(remote);
-		} else {
-			this.handleRemoteSourceDescriptor(remote);
-		}
+	protected handleRemoteDescriptor(remote: descriptor.RemoteDescriptor) {
+		this.remote = new modules.RemotePath((remote as descriptor.RelativeRemoteDescriptor).path) as any as R;
+	}
+}
+
+export class RootBuilder extends Builder<modules.RemoteSource> {
+	private pipeline: PreprocessPipeline;
+
+	public constructor(loader: componentsDescriptor.Loader<descriptor.Descriptor>, parent?: componentsBuilder.Builder<components.Component>) {
+		super(loader, parent);
+		this.pipeline = new PreprocessPipeline();
 	}
 
-	private handleRemoteRelativeDescriptor(relative: descriptor.RelativeRemoteDescriptor) {
-		this.remote = new modules.RemotePath(relative.path);
+	protected onDescriptorReady(): void {
+
 	}
 
-	private handleRemoteSourceDescriptor(source: descriptor.SourceRemoteDescriptor) {
+	protected handleRemoteDescriptor(remote: descriptor.RemoteDescriptor) {
 		if (this.getParent() != null &&
 			this.getParent().getComponent() != null &&
 			(<modules.Module> this.getParent().getComponent()).isRemote()) {
@@ -573,7 +586,7 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 						and its parent module '${this.getParent().getPath()}'`);
 		}
 
-		this.remote = new modules.RemoteSource(source);
+		this.remote = new modules.RemoteSource(remote as descriptor.SourceRemoteDescriptor);
 		const loginCommandDescriptor = (this.remote as modules.RemoteSource).loginCommandDescriptor();
 		if (loginCommandDescriptor != null && Object.keys(loginCommandDescriptor).length > 0) {
 			this.innerCommandsBuilders.set(loginCommandDescriptor.name, commandsBuilder.create(loginCommandDescriptor, this));

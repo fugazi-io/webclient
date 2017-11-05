@@ -42,7 +42,6 @@ export interface InnerModulesArrayCollection extends InnerModulesCollection, Arr
 export interface InnerModulesObjectCollection extends InnerModulesCollection, coreTypes.PlainObject<Descriptor | string> {}
 
 export interface Descriptor extends componentsDescriptor.Descriptor {
-	basePath?: string; // set when building
 	remote?: RemoteDescriptor;
 	lookup?: { [name: string]: string };
 	preprocess?: {

@@ -213,4 +213,3 @@ export abstract class BaseBuilder<C extends components.Component, D extends desc
 		(<any> this.component).description = this.description;
 	}
 }
-
