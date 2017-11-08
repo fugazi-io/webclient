@@ -9,7 +9,8 @@ export function create(converterDescriptor: descriptor.Descriptor, parent: compo
 }
 
 class ConverterBuilder extends componentsBuilder.BaseBuilder<converters.Converter, descriptor.Descriptor> {
-	protected onDescriptorReady(): void {
+	protected onDescriptorReady(): Promise<void> {
+		return Promise.resolve();
 	}
 
 	protected concreteBuild(): void {
@@ -22,4 +23,3 @@ class ConverterBuilder extends componentsBuilder.BaseBuilder<converters.Converte
 		(this.component as any).conversionFunction = this.componentDescriptor.converter;
 	}
 }
-

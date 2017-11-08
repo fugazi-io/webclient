@@ -1,0 +1,45 @@
+{
+	"name": "aRemoteTest",
+	"title": "A (remote) Test!",
+	"remote": {
+		"origin": "$ORIGIN",
+		"base": "$BASE"
+	},
+	"variables": {
+		"ORIGIN": {
+			"type": "string",
+			"prompt": "Enter the base url for the service"
+		},
+		"BASE": {
+			"type": "string",
+			"default": "/",
+			"prompt": "Enter the base path for the service"
+		},
+		"Y": {
+			"type": "number",
+			"prompt": "Enter the Y param"
+		}
+	},
+	"commands": {
+		"doit1": {
+			"returns": "number",
+			"syntax": "do it (x number)",
+			"endpoint": "/{ $Y }/it/x"
+		},
+		"doit2": {
+			"returns": "number",
+			"syntax": "do it (x number) for (Y number)",
+			"endpoint": "/{ Y }/it/x"
+		},
+		"dothat1": {
+			"returns": "number",
+			"syntax": "do that (x number)",
+			"endpoint": "/{ $Y }/that/x"
+		},
+		"dothat2": {
+			"returns": "number",
+			"syntax": "do that (x number) for (Y number)",
+			"endpoint": "/{ Y }/that/x"
+		}
+	}
+}

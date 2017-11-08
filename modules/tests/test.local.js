@@ -30,10 +30,10 @@
 		}
 
 	fugazi.loaded({
-		name: "aTest",
-		title: "A Test!",
+		name: "aLocalTest",
+		title: "A (local) Test!",
 		commands: {
-			test: {
+			doit: {
 				returns: "number",
 				syntax: "do it (x number)",
 				handler: function(context, z) {

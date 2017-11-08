@@ -60,4 +60,3 @@ export function modules() {
 dom.ready(() => {
 	baseUrl = current();
 });
-

@@ -4,7 +4,7 @@ import * as components from "./components";
 import * as registry from "./registry";
 import * as descriptor from "./components.descriptor";
 
-var anonymousNameSettings: utils.GenerateIdParameters = {
+const anonymousNameSettings: utils.GenerateIdParameters = {
 	prefix: "anonymous:",
 	min: 5,
 	max: 10
@@ -170,7 +170,7 @@ export abstract class BaseBuilder<C extends components.Component, D extends desc
 
 	protected abstract concreteAssociate(): void;
 
-	protected abstract onDescriptorReady(): void;
+	protected abstract onDescriptorReady(): Promise<void>;
 
 	private descriptorReady(componentDescriptor: D): void {
 		this.state = State.Initiated;
@@ -190,11 +190,13 @@ export abstract class BaseBuilder<C extends components.Component, D extends desc
 			this.componentConstructor = componentDescriptor.componentConstructor as { new (): C };
 		}
 
-		this.onDescriptorReady();
-
-		if (this.buildCalled) {
-			this.build();
-		}
+		this.onDescriptorReady()
+			.then(() => {
+				if (this.buildCalled) {
+					this.build();
+				}
+			})
+			.catch(this.future.reject.bind(this.future));
 	}
 
 	private descriptorInvalid(error: coreTypes.Exception): void {

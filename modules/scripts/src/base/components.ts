@@ -51,7 +51,7 @@ import {
 				syntax: "load module from (url net.url)",
 				componentConstructor: fugazi.terminal.TerminalCommand,
 				handler: function (context: PrivilegedModuleContext, props: LoadProperties): Promise<string> {
-					return fugazi.registry.load(props).then<string>(loadedModule => {
+					return fugazi.registry.load(context.getParent().getUIServiceProvider(), props).then<string>(loadedModule => {
 						context.getParent().getTerminal().moduleLoaded(loadedModule);
 						return "module " + loadedModule.getPath().toString() + " loaded";
 					});

@@ -34,7 +34,7 @@ class CommandBuilder<T extends commands.Command> extends componentsBuilder.BaseB
 	private returnType: types.TextualDefinition | componentsBuilder.Builder<types.Type>;
 	private syntaxBuilders: componentsBuilder.Builder<syntax.SyntaxRule>[];
 
-	protected onDescriptorReady(): void {
+	protected onDescriptorReady(): Promise<void> {
 		this.syntaxBuilders = [];
 
 		if (this.componentDescriptor.returns != null
@@ -54,6 +54,8 @@ class CommandBuilder<T extends commands.Command> extends componentsBuilder.BaseB
 			this.innerBuilderCreated();
 			return this.syntaxBuilders.push(syntaxBuilder.create(syntaxString, this))
 		});
+
+		return Promise.resolve();
 	}
 
 	protected concreteBuild(): void {

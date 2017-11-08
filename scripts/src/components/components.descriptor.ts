@@ -47,11 +47,13 @@ export class ExistingLoader<T extends Descriptor> extends BaseLoader<T> {
 	}
 
 	then(fn: (aDescriptor: T) => any | T): Loader<T> {
-		let result = fn(this.aDescriptor);
+		setTimeout(() => {
+			let result = fn(this.aDescriptor);
 
-		if (coreTypes.isPlainObject(result) && coreTypes.is((<T> result).name, String)) {
-			this.aDescriptor = <T> result;
-		}
+			if (coreTypes.isPlainObject(result) && coreTypes.is((<T> result).name, String)) {
+				this.aDescriptor = <T> result;
+			}
+		},1);
 
 		return this;
 	}

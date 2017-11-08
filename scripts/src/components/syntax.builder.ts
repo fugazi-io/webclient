@@ -8,8 +8,9 @@ import * as descriptor from "./syntax.descriptor";
 
 import * as typesDescriptor from "./types.descriptor";
 import * as typesBuilder from "./types.builder";
+
 export function create(rule: string, parent: componentsBuilder.Builder<components.Component>): componentsBuilder.Builder<syntax.SyntaxRule> {
-	var anonymousDescriptor: descriptor.Descriptor = <descriptor.Descriptor> componentsBuilder.createAnonymousDescriptor(components.ComponentType.SyntaxRule);
+	const anonymousDescriptor = componentsBuilder.createAnonymousDescriptor(components.ComponentType.SyntaxRule) as descriptor.Descriptor;
 	anonymousDescriptor.rule = rule;
 
 	return new SyntaxRuleBuilder(new componentsDescriptor.ExistingLoader(anonymousDescriptor), parent);
@@ -31,7 +32,7 @@ class SyntaxRuleBuilder extends componentsBuilder.BaseBuilder<syntax.SyntaxRule,
 		super(syntax.SyntaxRule, loader, parent);
 	}
 
-	protected onDescriptorReady(): void {
+	protected onDescriptorReady(): Promise<void> {
 		this.parser = {
 			rule: this.componentDescriptor.rule,
 			parts: [],
@@ -39,6 +40,7 @@ class SyntaxRuleBuilder extends componentsBuilder.BaseBuilder<syntax.SyntaxRule,
 		}
 
 		this.parse();
+		return Promise.resolve();
 	}
 
 	protected concreteBuild(): void {
@@ -55,6 +57,7 @@ class SyntaxRuleBuilder extends componentsBuilder.BaseBuilder<syntax.SyntaxRule,
 
 	protected concreteAssociate(): void {
 		(this.component as any).raw = this.componentDescriptor.rule;
+
 		this.parser.parts.forEach(part => {
 			if (coreTypes.is(part, String)) {
 				(<any> this.component).tokens.push(new syntax.Keyword(<string> part));
@@ -98,10 +101,10 @@ class SyntaxRuleBuilder extends componentsBuilder.BaseBuilder<syntax.SyntaxRule,
 	}
 
 	private parseParameter(): void {
-		var name: string;
-		var type: string;
-		var anonymous: boolean;
-		var endPos: number = this.parser.rule.indexOf(")", this.parser.index);
+		let name: string,
+			type: string,
+			anonymous: boolean,
+			endPos: number = this.parser.rule.indexOf(")", this.parser.index);
 
 		this.parser.index++; // (
 		name = this.parseWord();
@@ -125,7 +128,7 @@ class SyntaxRuleBuilder extends componentsBuilder.BaseBuilder<syntax.SyntaxRule,
 	}
 
 	private parseWord(): string {
-		var end: number = this.parser.rule.indexOf(" ", this.parser.index),
+		let end: number = this.parser.rule.indexOf(" ", this.parser.index),
 			word: string;
 
 		if (end < 0) {

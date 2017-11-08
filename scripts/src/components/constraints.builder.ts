@@ -18,9 +18,10 @@ class ConstraintBuilder extends componentsBuilder.BaseBuilder<constraints.Constr
 		super(constraints.Constraint, loader, parent);
 	}
 
-	protected onDescriptorReady(): void {
+	protected onDescriptorReady(): Promise<void> {
 		this.types = this.componentDescriptor.types;
 		this.validator = this.componentDescriptor.validator;
+		return Promise.resolve();
 	}
 
 	protected concreteBuild(): void {
@@ -46,4 +47,3 @@ class ConstraintBuilder extends componentsBuilder.BaseBuilder<constraints.Constr
 		}
 	}
 }
-

@@ -53,8 +53,9 @@ function getDefinitionType(definition: types.Definition): string {
 abstract class TypeBuilder<T extends types.Definition> extends componentsBuilder.BaseBuilder<types.Type, descriptor.Descriptor> {
 	protected base: string;
 
-	protected onDescriptorReady(): void {
+	protected onDescriptorReady(): Promise<void> {
 		this.parseDefinition(<T> this.componentDescriptor.type);
+		return Promise.resolve();
 	}
 
 	protected concreteAssociate(): void {
