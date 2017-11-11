@@ -35,9 +35,6 @@ export class ExecutionResult {
 		return this;
 	}
 
-	/**
-	 * @override
-	 */
 	public catch(errorHandler: (error: coreTypes.Exception) => void): ExecutionResult {
 		this.future.catch(errorHandler);
 		return this;

@@ -103,7 +103,7 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 	}
 
 	public resolve<C2 extends components.Component>(type: components.ComponentType, name: string): C2 {
-		var path: string[] = name.split("."),
+		let path: string[] = name.split("."),
 			collection: collections.FugaziMap<componentsBuilder.Builder<components.Component>> = null;
 
 		if (path.length > 1) {

@@ -4,14 +4,13 @@ import * as components from "./components";
 import * as registry from "./registry";
 import * as descriptor from "./components.descriptor";
 
-var anonymousNameSettings: utils.GenerateIdParameters = {
+const anonymousNameSettings: utils.GenerateIdParameters = {
 	prefix: "anonymous:",
 	min: 5,
 	max: 10
 };
 
-export class Exception extends coreTypes.Exception {
-}
+export class Exception extends coreTypes.Exception {}
 
 export enum State {
 	None,
@@ -213,4 +212,3 @@ export abstract class BaseBuilder<C extends components.Component, D extends desc
 		(<any> this.component).description = this.description;
 	}
 }
-
