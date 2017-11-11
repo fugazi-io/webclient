@@ -32,6 +32,10 @@ export type Variable = {
 	value: any
 }
 
+export interface UIServiceProvider {
+	promptFor(message: string, type?: "string" | "password"): Promise<string>;
+}
+
 export interface Context {
 	getId(): string;
 

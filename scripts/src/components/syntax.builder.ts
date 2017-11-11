@@ -10,7 +10,7 @@ import * as typesDescriptor from "./types.descriptor";
 import * as typesBuilder from "./types.builder";
 
 export function create(rule: string, parent: componentsBuilder.Builder<components.Component>): componentsBuilder.Builder<syntax.SyntaxRule> {
-	const anonymousDescriptor: descriptor.Descriptor = <descriptor.Descriptor> componentsBuilder.createAnonymousDescriptor(components.ComponentType.SyntaxRule);
+	const anonymousDescriptor = componentsBuilder.createAnonymousDescriptor(components.ComponentType.SyntaxRule) as descriptor.Descriptor;
 	anonymousDescriptor.rule = rule;
 
 	return new SyntaxRuleBuilder(new componentsDescriptor.ExistingLoader(anonymousDescriptor), parent);

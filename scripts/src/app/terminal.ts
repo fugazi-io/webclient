@@ -23,11 +23,14 @@ export interface Properties {
 }
 
 export abstract class BaseTerminalContext extends app.BaseContext<app.ApplicationContext> {
-	private moduleToRemoteId: collections.FugaziMap<string>;
+	private moduleToRemoteId: Map<string, string>;
 
-	constructor(parent: app.ApplicationContext, id?: string) {
+	protected terminal: Terminal;
+
+	constructor(terminal: Terminal, parent: app.ApplicationContext, id?: string) {
 		super(parent, id);
-		this.moduleToRemoteId = new collections.FugaziMap<string>();
+		this.terminal = terminal;
+		this.moduleToRemoteId = new Map<string, string>();
 	}
 
 	public setRemoteSource(modulePath: components.Path, remoteId: string): void {
@@ -35,7 +38,7 @@ export abstract class BaseTerminalContext extends app.BaseContext<app.Applicatio
 	}
 
 	public getRemoteSource(modulePath: components.Path): string {
-		let id: string = this.moduleToRemoteId.get(modulePath.toString());
+		const id: string = this.moduleToRemoteId.get(modulePath.toString());
 
 		if (!coreTypes.isNull(id) || modulePath.first() == modulePath.last()) {
 			return id;
@@ -43,22 +46,19 @@ export abstract class BaseTerminalContext extends app.BaseContext<app.Applicatio
 
 		return this.getRemoteSource(modulePath.parent());
 	}
+
+	public getUIServiceProvider(): app.UIServiceProvider {
+		return this.terminal;
+	}
 }
 
 export class TerminalContext extends BaseTerminalContext {
-	private terminal: Terminal;
-
-	constructor(terminal: Terminal, parent: app.ApplicationContext) {
-		super(parent);
-		this.terminal = terminal;
-	}
-
 	public getTerminal(): Terminal {
 		return this.terminal;
 	}
 
 	public asRestricted(): RestrictedTerminalContext {
-		let context = new RestrictedTerminalContext(this.getParent(), this.getId());
+		const context = new RestrictedTerminalContext(this.terminal, this.getParent(), this.getId());
 		Object.seal(context);
 		return context;
 	}
@@ -126,7 +126,7 @@ function moduleContextProvider(this: { modules: Map<string, LoadedModule> }, typ
 	return null;
 }
 
-export class Terminal {
+export class Terminal implements app.UIServiceProvider {
 	private properties: Properties;
 	private view: viewTerminal.TerminalView;
 	private context: TerminalContext;
@@ -192,6 +192,10 @@ export class Terminal {
 		return this.variables.get(extractVariableName(name));
 	}
 
+	public promptFor(message: string, type: "string" | "password" = "string"): Promise<string> {
+		throw new Error("Method not implemented.");
+	}
+
 	private setView(view: viewTerminal.TerminalView): void {
 		this.view = view;
 	}
@@ -238,7 +242,7 @@ function extractVariableName(input: string): string {
 
 // init
 bus.register(constants.Events.Ready, function (): void {
-	let coreCommands = {
+	const coreCommands = {
 		name: "io.fugazi.terminal",
 		title: "Terminal Module",
 		constraints: {
@@ -329,7 +333,11 @@ bus.register(constants.Events.Ready, function (): void {
 		}
 	};
 
-	let moduleBuilder = modulesBuilder.create(coreCommands) as modulesBuilder.Builder;
+	const moduleBuilder = modulesBuilder.create({
+		promptFor: () => {
+			throw new Error("ui provider not implemented");
+		}
+	}, coreCommands) as modulesBuilder.Builder;
 	moduleBuilder.build().then((aModule: componentsModules.Module) => {
 		moduleBuilder.associate();
 		registry.add(aModule);

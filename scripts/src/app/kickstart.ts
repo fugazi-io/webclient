@@ -22,7 +22,14 @@ function kickstart(): void {
 	storage.initialize({useCompression: false});
 
 	bus.register(registry.Events.Ready, () => {
-		registry.load({augment: true, url: location.modules("base.json")}).then(() => {
+		registry.load({
+			promptFor: () => {
+				throw new Error("kickstart modules cannot use the ui");
+			}
+		},{
+			augment: true,
+			url: location.modules("base.json")
+		}).then(() => {
 			bus.post(constants.Events.Ready);
 			showView();
 		});

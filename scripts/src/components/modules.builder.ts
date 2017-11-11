@@ -19,6 +19,9 @@ import * as descriptor from "./modules.descriptor";
 
 import * as typesDescriptor from "./types.descriptor";
 import * as typesBuilder from "./types.builder";
+
+import { UIServiceProvider } from "../app/application";
+
 function breakDescriptorWithPath(moduleDescriptor: descriptor.Descriptor) {
 	let result: descriptor.Descriptor,
 		path: string[] = moduleDescriptor.name.split(".");
@@ -42,9 +45,9 @@ function breakDescriptorWithPath(moduleDescriptor: descriptor.Descriptor) {
 	return result;
 }
 
-export function create(url: net.Url): componentsBuilder.Builder<modules.Module>;
-export function create(moduleDescriptor: descriptor.Descriptor, parent?: componentsBuilder.Builder<components.Component>): componentsBuilder.Builder<modules.Module>;
-export function create(moduleDescriptor: net.Url | descriptor.Descriptor, parent?): componentsBuilder.Builder<modules.Module> {
+export function create(ui: UIServiceProvider, url: net.Url): componentsBuilder.Builder<modules.Module>;
+export function create(ui: UIServiceProvider, moduleDescriptor: descriptor.Descriptor, parent?: componentsBuilder.Builder<components.Component>): componentsBuilder.Builder<modules.Module>;
+export function create(ui: UIServiceProvider, moduleDescriptor: net.Url | descriptor.Descriptor, parent?): componentsBuilder.Builder<modules.Module> {
 	let loader: componentsDescriptor.Loader<descriptor.Descriptor>;
 
 	if (moduleDescriptor instanceof net.Url) {
@@ -72,7 +75,7 @@ export function create(moduleDescriptor: net.Url | descriptor.Descriptor, parent
 
 		return tree;
 	});
-	return new Builder(loader, parent);
+	return new Builder(ui, loader, parent);
 }
 
 interface RemoteBuilderInfo {
@@ -97,9 +100,11 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 	private basePath: components.Path;
 	private remote: modules.Remote;
 	private params: modules.Parameters;
+	private uiProvider: UIServiceProvider;
 
-	public constructor(loader: componentsDescriptor.Loader<descriptor.Descriptor>, parent?: componentsBuilder.Builder<components.Component>) {
+	public constructor(ui: UIServiceProvider, loader: componentsDescriptor.Loader<descriptor.Descriptor>, parent?: componentsBuilder.Builder<components.Component>) {
 		super(modules.Module, loader, parent);
+		this.uiProvider = ui;
 	}
 
 	public resolve<C2 extends components.Component>(type: components.ComponentType, name: string): C2 {
@@ -284,10 +289,10 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 				if (typeof current === "string") { // url
 					this.innerModuleRemoteBuilders.push({
 						path: this.getPath().clone(),
-						builder: <Builder> create(this.createInnerUrl(current))
+						builder: <Builder> create(this.uiProvider, this.createInnerUrl(current))
 					});
 				} else { // descriptor
-					this.innerModuleBuilders.set(current.name, create(current, this));
+					this.innerModuleBuilders.set(current.name, create(this.uiProvider, current, this));
 				}
 			});
 		} else if (coreTypes.isPlainObject(this.componentDescriptor.modules)) {
@@ -298,11 +303,11 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 					this.innerModuleRemoteBuilders.push({
 						name: moduleName,
 						path: this.getPath().clone(),
-						builder: <Builder> create(this.createInnerUrl(moduleDescriptor))
+						builder: <Builder> create(this.uiProvider, this.createInnerUrl(moduleDescriptor))
 					});
 				} else { // descriptor
 					moduleDescriptor.name = moduleName;
-					this.innerModuleBuilders.set(moduleName, create(moduleDescriptor, this));
+					this.innerModuleBuilders.set(moduleName, create(this.uiProvider, moduleDescriptor, this));
 				}
 			});
 		} else {
@@ -314,14 +319,14 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 		if (typeof this.componentDescriptor.commands === "string") { // url
 			this.innerCommandModuleRemoteBuilders.push({
 				path: this.getPath().clone(),
-				builder: <Builder> create(this.createInnerUrl(<string> this.componentDescriptor.commands))
+				builder: <Builder> create(this.uiProvider, this.createInnerUrl(<string> this.componentDescriptor.commands))
 			});
 		} else if (this.componentDescriptor.commands instanceof Array) {
 			(<descriptor.InnerComponentsArrayCollection<commandsDescriptor.Descriptor>> this.componentDescriptor.commands).forEach(current => {
 				if (typeof current === "string") { // url
 					this.innerCommandModuleRemoteBuilders.push({
 						path: this.getPath().clone(),
-						builder: <Builder> create(this.createInnerUrl(current))
+						builder: <Builder> create(this.uiProvider, this.createInnerUrl(current))
 					});
 				} else { // descriptor
 					this.innerCommandsBuilders.set(current.name, commandsBuilder.create(current, this));
@@ -335,7 +340,7 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 					this.innerCommandModuleRemoteBuilders.push({
 						name: commandName,
 						path: this.getPath().clone(),
-						builder: <Builder> create(this.createInnerUrl(commandDescriptor))
+						builder: <Builder> create(this.uiProvider, this.createInnerUrl(commandDescriptor))
 					});
 				} else { // descriptor
 					commandDescriptor.name = commandName;
@@ -351,14 +356,14 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 		if (typeof this.componentDescriptor.converters === "string") { // url
 			this.innerConvertersModuleRemoteBuilders.push({
 				path: this.getPath().clone(),
-				builder: <Builder> create(this.createInnerUrl(<string> this.componentDescriptor.converters))
+				builder: <Builder> create(this.uiProvider, this.createInnerUrl(<string> this.componentDescriptor.converters))
 			});
 		} else if (this.componentDescriptor.converters instanceof Array) {
 			(<descriptor.InnerComponentsArrayCollection<convertersDescriptor.Descriptor>> this.componentDescriptor.converters).forEach(current => {
 				if (typeof current === "string") { // url
 					this.innerConvertersModuleRemoteBuilders.push({
 						path: this.getPath().clone(),
-						builder: <Builder> create(this.createInnerUrl(current))
+						builder: <Builder> create(this.uiProvider, this.createInnerUrl(current))
 					});
 				} else { // descriptor
 					this.innerConvertersBuilders.set(current.name, convertersBuilder.create(current, this));
@@ -372,7 +377,7 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 					this.innerConvertersModuleRemoteBuilders.push({
 						name: converterName,
 						path: this.getPath().clone(),
-						builder: <Builder> create(this.createInnerUrl(converterDescriptor))
+						builder: <Builder> create(this.uiProvider, this.createInnerUrl(converterDescriptor))
 					});
 				} else { // descriptor
 					converterDescriptor.name = converterName;
@@ -388,14 +393,14 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 		if (typeof this.componentDescriptor.constraints === "string") { // url
 			this.innerConstraintModuleRemoteBuilders.push({
 				path: this.getPath().clone(),
-				builder: <Builder> create(this.createInnerUrl(<string> this.componentDescriptor.constraints))
+				builder: <Builder> create(this.uiProvider, this.createInnerUrl(<string> this.componentDescriptor.constraints))
 			});
 		} else if (this.componentDescriptor.constraints instanceof Array) {
 			(<descriptor.InnerComponentsArrayCollection<constraintsDescriptor.Descriptor>> this.componentDescriptor.constraints).forEach(current => {
 				if (typeof current === "string") { // url
 					this.innerConstraintModuleRemoteBuilders.push({
 						path: this.getPath().clone(),
-						builder: <Builder> create(this.createInnerUrl(current))
+						builder: <Builder> create(this.uiProvider, this.createInnerUrl(current))
 					});
 				} else { // descriptor
 					this.innerConstraintBuilders.set(current.name, constraintsBuilder.create(current, this));
@@ -409,7 +414,7 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 					this.innerConstraintModuleRemoteBuilders.push({
 						name: constraintName,
 						path: this.getPath().clone(),
-						builder: <Builder> create(this.createInnerUrl(constraintDescriptor))
+						builder: <Builder> create(this.uiProvider, this.createInnerUrl(constraintDescriptor))
 					});
 				} else { // descriptor
 					constraintDescriptor.name = constraintName;
@@ -425,14 +430,14 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 		if (typeof this.componentDescriptor.types === "string") { // url
 			this.innerTypeModuleRemoteBuilders.push({
 				path: this.getPath().clone(),
-				builder: <Builder> create(this.createInnerUrl(<string> this.componentDescriptor.types))
+				builder: <Builder> create(this.uiProvider, this.createInnerUrl(<string> this.componentDescriptor.types))
 			});
 		} else if (this.componentDescriptor.types instanceof Array) {
 			(<descriptor.InnerComponentsArrayCollection<typesDescriptor.Descriptor>> this.componentDescriptor.types).forEach(current => {
 				if (typeof current === "string") { // url
 					this.innerTypeModuleRemoteBuilders.push({
 						path: this.getPath().clone(),
-						builder: <Builder> create(this.createInnerUrl(current))
+						builder: <Builder> create(this.uiProvider, this.createInnerUrl(current))
 					});
 				} else { // descriptor
 					this.innerTypesBuilders.set(current.name, typesBuilder.create(current, this));
@@ -446,7 +451,7 @@ export class Builder extends componentsBuilder.BaseBuilder<modules.Module, descr
 					this.innerTypeModuleRemoteBuilders.push({
 						name: typeName,
 						path: this.getPath().clone(),
-						builder: <Builder> create(this.createInnerUrl(typeDescriptor))
+						builder: <Builder> create(this.uiProvider, this.createInnerUrl(typeDescriptor))
 					});
 				} else { // descriptor
 					typeDescriptor.name = typeName;
