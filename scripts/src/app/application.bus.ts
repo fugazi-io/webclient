@@ -7,7 +7,7 @@ export interface EventHandler {
 }
 
 export function register(eventName: string, eventHandler: EventHandler): void {
-	var handlers: EventHandler[];
+	let handlers: EventHandler[];
 
 	if (subscribers.has(eventName)) {
 		handlers = subscribers.get(eventName);
@@ -30,4 +30,3 @@ export function post(eventName: string) {
 		subscribers.get(eventName).forEach(handler => handler());
 	}
 }
-

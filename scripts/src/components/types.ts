@@ -3,14 +3,11 @@ import * as constraints from "./constraints";
 import * as components from "./components";
 import * as registry from "./registry";
 
-export interface Definition {
-}
+export interface Definition {}
 
-export interface TextualDefinition extends Definition, String {
-}
+export interface TextualDefinition extends Definition, String {}
 
-export interface StructDefinition extends Definition, coreTypes.PlainObject<Definition> {
-}
+export interface StructDefinition extends Definition, coreTypes.PlainObject<Definition> {}
 
 export abstract class Type extends components.Component {
 	public constructor() {
