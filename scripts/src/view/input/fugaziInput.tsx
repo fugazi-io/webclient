@@ -324,6 +324,11 @@ export class SearchHistoryInputView extends base.BackgroundTextInput<SearchHisto
 		return false;
 	}
 
+	protected onTabPressed(): boolean {
+		// disable tab in history view
+		return true;
+	}
+
 	private getMatch(value: string): string {
 		let regex = new RegExp("^" + value),
 			matches = this.props.history.filter(item => regex.test(item));
