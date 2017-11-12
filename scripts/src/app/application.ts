@@ -1,4 +1,3 @@
-import * as viewMain from "../view/main";
 import * as utils from "../core/utils";
 import * as registry from "../components/registry";
 import * as converters from "../components/converters";
@@ -10,14 +9,6 @@ export function getContext() {
 }
 export function setContext(newContext: ApplicationContext) {
 	context = newContext;
-}
-
-let mainView: viewMain.MainView;
-export function getMainView() {
-	return mainView;
-}
-export function setMainView(newMainView: viewMain.MainView) {
-	mainView = newMainView;
 }
 
 export const CONTEXT_ID_PARAMS: utils.GenerateIdParameters = {
