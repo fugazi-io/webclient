@@ -8,6 +8,8 @@ import * as commands from "../components/commands";
 import * as commandsHandler from "../components/commands.handler";
 import * as React from "react";
 
+import { setUIProvider, UIServiceProvider } from "../app/application";
+
 export interface TerminalFactory {
 	createTerminal(properties: TerminalProperties): Promise<TerminalView>;
 }
@@ -34,7 +36,7 @@ export interface TerminalState extends view.ViewState {
 	searchHistoryResult?: string;
 }
 
-export class TerminalView extends view.View<TerminalProperties, TerminalState> {
+export class TerminalView extends view.View<TerminalProperties, TerminalState> implements UIServiceProvider {
 	private promptValueHandler: (value: string) => void;
 
 	public constructor(props: TerminalProperties) {
@@ -44,6 +46,21 @@ export class TerminalView extends view.View<TerminalProperties, TerminalState> {
 			promptMode: false,
 			searchHistoryMode: false
 		};
+
+		setUIProvider(this);
+	}
+
+	public promptFor(message: string, type?: "string" | "password"): Promise<string> {
+		return null;
+	}
+
+	public showSuggestions(): Promise<string> {
+		this.setState({
+			suggestions: statements,
+			value: inputbox.value
+		} as any;
+
+		return null;
 	}
 
 	public clearOutput(): void {

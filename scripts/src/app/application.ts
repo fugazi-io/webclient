@@ -32,6 +32,18 @@ export type Variable = {
 	value: any
 }
 
+export interface UIServiceProvider {
+	promptFor(message: string, type?: "string" | "password"): Promise<string>;
+	showSuggestionBox(): Promise<string>;
+}
+let PROVIDER: UIServiceProvider;
+export function setUIProvider(provider: UIServiceProvider) {
+	PROVIDER = provider;
+}
+export function getUIProvider() {
+	return PROVIDER;
+}
+
 export interface Context {
 	getId(): string;
 

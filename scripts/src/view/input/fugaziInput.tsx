@@ -120,6 +120,7 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 
 		return new Promise((resolve, reject) => {
 			onResult.then(statements => {
+				//this,terminal.
 				this.setState({
 					value,
 					suggestions: statements
