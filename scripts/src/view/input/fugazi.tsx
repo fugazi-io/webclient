@@ -6,8 +6,9 @@ import * as view from "../view";
 import * as base from "./base";
 import * as React from "react";
 
+import { History } from "../../app/terminal";
+
 const DEFAULT_FUGAZI_PROMPT = "fugazi //";
-const HISTORY_SEARCH_PROMPT = "search history:";
 
 export interface ExecuteHandler {
 	(input: string): void;
@@ -18,12 +19,11 @@ export interface FugaziInputProperties extends base.SuggestibleInputProperties<s
 	onExecute: ExecuteHandler;
 	onQuery: terminal.StatementsQuerier;
 	searchResult?: string;
-	history?: string[];
+	history: History;
 	prompt?: string;
 }
 
 export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProperties, base.SuggestibleInputState<statements.Statement>, statements.Statement> {
-	private history: History;
 	private addingNewLine: boolean;
 
 	constructor(props: FugaziInputProperties) {
@@ -40,7 +40,6 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 
 	public componentDidMount(): void {
 		super.componentDidMount();
-		this.history = new History(this.props.history);
 	}
 
 	public onChange(event: React.FormEvent<HTMLInputElement>): void {
@@ -52,7 +51,7 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 		this.addingNewLine = false;
 
 		super.onChange(event);
-		this.history.update(this.getValue());
+		this.props.history.update(this.getValue());
 		this.updateSuggestions(this.getValue(), this.getPosition());
 	}
 
@@ -68,7 +67,7 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 			return false;
 		}
 
-		const newValue = this.history.previous();
+		const newValue = this.props.history.previous();
 		if (newValue === null) {
 			return false;
 		}
@@ -87,7 +86,7 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 			return false;
 		}
 
-		const newValue = this.history.next();
+		const newValue = this.props.history.next();
 		if (newValue === null) {
 			return false;
 		}
@@ -134,7 +133,7 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 				value: this.getValue().substring(0, this.getPosition()) + "\n" + this.getValue().substring(this.getPosition())
 			});
 		} else if (!this.inputbox.value.empty()) {
-			this.history.mark(this.inputbox.value);
+			this.props.history.mark(this.inputbox.value);
 			this.props.onExecute(this.inputbox.value);
 			this.setState({
 				value: "",
@@ -197,8 +196,8 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 	}
 
 	private onShowSearch(): boolean {
-		this.history.mark(this.getValue());
-		this.history.update(this.getValue());
+		this.props.history.mark(this.getValue());
+		this.props.history.update(this.getValue());
 		this.props.onSearchHistoryRequested();
 		return true;
 	}
@@ -285,101 +284,5 @@ class StatementSuggestionItem extends view.View<StatementSuggestionItemPropertie
 		} else {
 			return null;
 		}
-	}
-}
-
-export interface SearchHistoryInputProperties extends base.BackgroundTextInputProperties {
-	resultHandler: (result: string) => void;
-	history: string[];
-}
-
-export class SearchHistoryInputView extends base.BackgroundTextInput<SearchHistoryInputProperties, base.BackgroundTextInputState> {
-	constructor(props: SearchHistoryInputProperties) {
-		super(props, "historySearcher", HISTORY_SEARCH_PROMPT);
-	}
-
-	protected onEscapePressed(): boolean {
-		this.props.resultHandler("");
-		return false;
-	}
-
-	protected onChange(event: React.FormEvent<HTMLInputElement>): void {
-		let bgtext: string,
-			match = this.getMatch(this.getValue(event));
-
-		super.onChange(event);
-		if (match) {
-			bgtext = match;
-		} else {
-			bgtext = this.getValue() + "  no matching results";
-		}
-
-		this.setState({
-			backgroundText: bgtext
-		});
-	}
-
-	protected onEnterPressed(): boolean {
-		this.props.resultHandler(this.getMatch(this.inputbox.value));
-		return false;
-	}
-
-	private getMatch(value: string): string {
-		let regex = new RegExp("^" + value),
-			matches = this.props.history.filter(item => regex.test(item));
-
-		return matches.length > 0 ? matches.first() : null;
-	}
-}
-
-class History {
-	private originals: string[];
-	private cache: string[];
-	private cursor: number;
-
-	public constructor(loaded?: string[]) {
-		this.originals = loaded || [];
-		this.reset();
-	}
-
-	public clear(): void {
-		this.originals = [];
-		this.reset();
-	}
-
-	public mark(value: string): void {
-		if (this.originals.first() !== value) {
-			this.originals.unshift(value);
-		}
-
-		this.reset();
-	}
-
-	public update(value: string): void {
-		if (value.trim() !== "") {
-			this.cache[this.cursor] = value;
-		}
-	}
-
-	public previous(): string | null {
-		if (this.cursor === this.cache.length - 1) {
-			return null;
-		}
-
-		return this.cache[++this.cursor];
-	}
-
-	public next(): string | null {
-		if (this.cursor == 0) {
-			return null;
-		}
-
-		return this.cache[--this.cursor];
-	}
-
-	private reset(): void {
-		this.cursor = 0;
-		this.cache = this.originals.clone();
-		this.cache.unshift("");
 	}
 }

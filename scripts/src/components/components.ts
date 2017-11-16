@@ -240,9 +240,6 @@ export class Component {
 	}
 }
 
-
 export interface ComponentResolver {
 	resolve<T extends Component>(type: ComponentType, name: string): T;
 }
-
-

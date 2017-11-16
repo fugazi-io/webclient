@@ -1,7 +1,7 @@
 import "../core/polyfill";
 import * as location from "./application.location";
 import * as bus from "./application.bus";
-import { ApplicationContext, setContext, setMainView } from "./application";
+import { ApplicationContext, setContext } from "./application";
 import * as storage from "./storage";
 import * as terminal from "./terminal";
 import * as terminals from "./application.terminals";
@@ -22,7 +22,14 @@ function kickstart(): void {
 	storage.initialize({useCompression: false});
 
 	bus.register(registry.Events.Ready, () => {
-		registry.load({augment: true, url: location.modules("base.json")}).then(() => {
+		registry.load({
+			promptFor: () => {
+				throw new Error("kickstart modules cannot use the ui");
+			}
+		},{
+			augment: true,
+			url: location.modules("base.json")
+		}).then(() => {
 			bus.post(constants.Events.Ready);
 			showView();
 		});
@@ -45,7 +52,6 @@ function showView() {
 	}
 
 	let newMainView = viewMain.render(<HTMLElement> dom.get("main#ui"));
-	setMainView(newMainView);
 
 	terminals.create(properties, newMainView);
 }

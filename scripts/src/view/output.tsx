@@ -111,7 +111,7 @@ export class OutputView extends view.View<OutputProperties, OutputState> {
 	}
 
 	public componentDidUpdate(): void {
-		var node = ReactDOM.findDOMNode(this) as HTMLElement;
+		const node = ReactDOM.findDOMNode(this) as HTMLElement;
 
 		if (this.shouldScrollBottom) {
 			node.scrollTop = node.scrollHeight
@@ -152,30 +152,36 @@ export class OutputView extends view.View<OutputProperties, OutputState> {
 
 			if (infoType === "message") {
 				blocks.push(<li key={ `${ index.toString() }-separator` } className="separator"></li>);
-				blocks.push(<li key={ index.toString() } className="message">
-					<i className="fa fa-square-o"></i>
-					{ (info as MessageOutputItemInfo).message }
-				</li>);
+				blocks.push((
+					<li key={ index.toString() } className="message">
+						<i className="fa fa-square-o"></i>
+						{ (info as MessageOutputItemInfo).message }
+					</li>
+				));
 			} else if (infoType === "execution") {
 				blocks.push(<li key={ `${ index.toString() }-separator` } className="separator"></li>);
 
 				if ((info as ExecutionOutputItemInfo).result.getType().is("void")) {
-					blocks.push(<li key={ index.toString() } className="async execution">
-						<div className="command">
-							<i className="fa fa-square-o"></i>
-							{ (info as ExecutionOutputItemInfo).statement }
-						</div>
-					</li>);
+					blocks.push((
+						<li key={ index.toString() } className="async execution">
+							<div className="command">
+								<i className="fa fa-square-o"></i>
+								{ (info as ExecutionOutputItemInfo).statement }
+							</div>
+						</li>
+					));
 				} else {
-					blocks.push(<li key={ index.toString() } className="async execution">
-						<div className="command">
-							<i className="fa fa-square-o"></i>
-							{ (info as ExecutionOutputItemInfo).statement }
-						</div>
-						<ResultView result={ (info as ExecutionOutputItemInfo).result }
-									onBeforeStyleChange={ this.onBeforeStyleChange.bind(this) }
-									onStyleChange={ this.onStyleChange.bind(this) }/>
-					</li>);
+					blocks.push((
+						<li key={ index.toString() } className="async execution">
+							<div className="command">
+								<i className="fa fa-square-o"></i>
+								{ (info as ExecutionOutputItemInfo).statement }
+							</div>
+							<ResultView result={ (info as ExecutionOutputItemInfo).result }
+										onBeforeStyleChange={ this.onBeforeStyleChange.bind(this) }
+										onStyleChange={ this.onStyleChange.bind(this) }/>
+						</li>
+					));
 				}
 			} else {
 				logger.warn("unknown OutputItemInfo type: ", info);
@@ -196,10 +202,12 @@ export class OutputView extends view.View<OutputProperties, OutputState> {
 			);
 		}
 
-		return <section className="output" ref={ el => this.container = el } onClick={ this.onClick.bind(this) }>
-			<div className="spacer"></div>
-			<ol className="items">{ blocks }</ol>
-		</section>;
+		return (
+			<section className="output" ref={ el => this.container = el } onClick={ this.onClick.bind(this) }>
+				<div className="spacer"></div>
+				<ol className="items">{ blocks }</ol>
+			</section>
+		);
 	}
 
 	private onClick() {
@@ -215,7 +223,7 @@ export class OutputView extends view.View<OutputProperties, OutputState> {
 	}
 
 	private checkOverflow(): boolean {
-		var node: any = ReactDOM.findDOMNode(this);
+		const node: any = ReactDOM.findDOMNode(this);
 		return node.scrollTop + node.offsetHeight === node.scrollHeight;
 	}
 }
@@ -244,9 +252,6 @@ class ResultView extends view.View<ResultViewProperties, ResultViewState> {
 		}
 	}
 
-	/**
-	 * @Override
-	 */
 	public componentDidMount(): void {
 		this.props.result.then(this.success.bind(this)).catch(this.fail.bind(this));
 	}
@@ -259,9 +264,6 @@ class ResultView extends view.View<ResultViewProperties, ResultViewState> {
 		this.props.onStyleChange();
 	}
 
-	/**
-	 * @Override
-	 */
 	public render(): JSX.Element {
 		let error: string,
 			element: JSX.Element,
@@ -296,11 +298,15 @@ class ResultView extends view.View<ResultViewProperties, ResultViewState> {
 				break;
 		}
 
-		return <div className={ className } ref={ el => this.container = el }
-					onDoubleClick={ this.onDoubleClick.bind(this) } onClick={ this.onClick.bind(this) }>
-			<i className="fa fa-square"></i>
-			{ element }
-		</div>;
+		return (
+			<div className={ className }
+					ref={ el => this.container = el }
+					onDoubleClick={ this.onDoubleClick.bind(this) }
+					onClick={ this.onClick.bind(this) }>
+				<i className="fa fa-square"></i>
+				{ element }
+			</div>
+		);
 	}
 
 	private onClick(event: React.MouseEvent<HTMLDivElement>) {
@@ -311,7 +317,8 @@ class ResultView extends view.View<ResultViewProperties, ResultViewState> {
 	private onDoubleClick(event: React.MouseEvent<HTMLDivElement>) {
 		event.stopPropagation();
 		PsSingleton.blur(this.container);
-		var selection = window.getSelection();
+
+		const selection = window.getSelection();
 		if (selection) {
 			selection.removeAllRanges();
 		}

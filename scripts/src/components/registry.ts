@@ -12,14 +12,14 @@ import * as coreTypes from "../core/types";
 import * as net from "../core/net";
 import * as collections from "../core/types.collections";
 
+import { UIServiceProvider } from "../app/application";
 
-var index: collections.FugaziMap<modules.Module> = collections.map<modules.Module>(),
-	defaultConverters: collections.FugaziMap<converters.Converter> = collections.map<converters.Converter>();
+const index = collections.map<modules.Module>(),
+	defaultConverters = collections.map<converters.Converter>();
 
-export class ModuleAssociationException extends coreTypes.Exception {
-}
+export class ModuleAssociationException extends coreTypes.Exception {}
 
-export var Events = {
+export const Events = {
 	Ready: "ready"
 };
 
@@ -28,10 +28,10 @@ export interface LoadProperties {
 	url: string | net.Url;
 }
 
-export function load(props: LoadProperties): Promise<modules.Module> {
+export function load(ui: UIServiceProvider, props: LoadProperties): Promise<modules.Module> {
 	let url: net.Url = props.url instanceof net.Url ? <net.Url> props.url : new net.Url(<string> props.url),
 		future = new coreTypes.Future<modules.Module>(),
-		moduleBuilder = modulesBuilder.create(url) as modulesBuilder.Builder;
+		moduleBuilder = modulesBuilder.create(ui, url) as modulesBuilder.Builder;
 
 	moduleBuilder.build()
 		.then(wrapper => {
@@ -518,4 +518,3 @@ applicationBus.register(constants.Events.Loaded, function (): void {
 
 	applicationBus.post(Events.Ready);
 });
-

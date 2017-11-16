@@ -1,12 +1,17 @@
-import * as output from "./output";
-import * as baseInput from "./input/base";
-import * as view from "./view";
-import * as fugaziInput from "./input/fugaziInput";
+import * as React from "react";
+
 import * as statements from "../app/statements";
-import * as componentsDescriptor from "../components/components.descriptor";
 import * as commands from "../components/commands";
 import * as commandsHandler from "../components/commands.handler";
-import * as React from "react";
+import * as componentsDescriptor from "../components/components.descriptor";
+
+import * as view from "./view";
+import * as output from "./output";
+import * as baseInput from "./input/base";
+
+import { History } from "../app/terminal";
+import { SearchHistoryInputView } from "./input/history";
+import { FugaziInputView } from "./input/fugazi";
 
 export interface TerminalFactory {
 	createTerminal(properties: TerminalProperties): Promise<TerminalView>;
@@ -23,7 +28,7 @@ export interface StatementsQuerier {
 export interface TerminalProperties extends componentsDescriptor.Descriptor, view.ViewProperties {
 	executer: ExecuteCommand;
 	querier: StatementsQuerier;
-	history?: string[];
+	history: History;
 }
 
 export interface TerminalState extends view.ViewState {
@@ -52,26 +57,32 @@ export class TerminalView extends view.View<TerminalProperties, TerminalState> {
 		let inputView: JSX.Element;
 
 		if (this.state.promptMode) {
-			inputView = <baseInput.PasswordInputView handler={ this.handlePassword.bind(this) }/>
+			inputView = <baseInput.PasswordInputView handler={ this.handlePassword.bind(this) } />
 		} else if (this.state.searchHistoryMode) {
-			inputView = <fugaziInput.SearchHistoryInputView
-				history={ this.props.history }
-				resultHandler={ this.handleHistorySearchResult.bind(this) }/>
+			inputView = (
+				<SearchHistoryInputView
+					history={ this.props.history }
+					resultHandler={ this.handleHistorySearchResult.bind(this) } />
+			);
 		} else {
-			inputView = <fugaziInput.FugaziInputView
-				history={ this.props.history }
-				searchResult={ this.state.searchHistoryResult }
-				onQuery={ this.props.querier }
-				onExecute={ this.onExecute.bind(this) }
-				onSearchHistoryRequested={ this.switchToHistorySearch.bind(this) }/>;
+			inputView = (
+				<FugaziInputView
+					history={ this.props.history }
+					searchResult={ this.state.searchHistoryResult }
+					onQuery={ this.props.querier }
+					onExecute={ this.onExecute.bind(this) }
+					onSearchHistoryRequested={ this.switchToHistorySearch.bind(this) } />
+			);
 		}
 
-		return <article className="terminal">
-			<output.OutputView ref="output"/>
-			<section className="inputs">
-				{ inputView }
-			</section>
-		</article>;
+		return (
+			<article className="terminal">
+				<output.OutputView ref="output" />
+				<section className="inputs">
+					{ inputView }
+				</section>
+			</article>
+		);
 	}
 
 	private switchToHistorySearch(): void {

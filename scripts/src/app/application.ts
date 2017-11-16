@@ -1,4 +1,3 @@
-import * as viewMain from "../view/main";
 import * as utils from "../core/utils";
 import * as registry from "../components/registry";
 import * as converters from "../components/converters";
@@ -12,14 +11,6 @@ export function setContext(newContext: ApplicationContext) {
 	context = newContext;
 }
 
-let mainView: viewMain.MainView;
-export function getMainView() {
-	return mainView;
-}
-export function setMainView(newMainView: viewMain.MainView) {
-	mainView = newMainView;
-}
-
 export const CONTEXT_ID_PARAMS: utils.GenerateIdParameters = {
 	min: 5,
 	max: 10,
@@ -30,6 +21,16 @@ export type Variable = {
 	name: string,
 	type: types.Type,
 	value: any
+}
+
+export interface UIServiceProvider {
+	promptFor(message: string, input?: "text" | "password", type?: types.Type): Promise<string>;
+	promptFor<T>(message: string, input?: "text" | "password", type?: types.Type): Promise<T>;
+
+	promptFor(message: string, input: "boolean", labels?: [string, string]): Promise<boolean>;
+
+	promptFor(message: string, input: "select", items: string[]): Promise<number>;
+	promptFor<T extends number|string>(message: string, input: "select", items: Map<T, string>): Promise<T>;
 }
 
 export interface Context {
