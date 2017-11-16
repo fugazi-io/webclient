@@ -126,7 +126,67 @@ function moduleContextProvider(this: { modules: Map<string, LoadedModule> }, typ
 	return null;
 }
 
+export type UIServicePromptInputTypes = "boolean" | "text" | "password" | "select";
+export type UIServiceObjTypes<T> = types.Type | [string, string] | string[] | Map<T, string>;
+
+export class History {
+	private originals: string[];
+	private cache: string[];
+	private cursor: number;
+
+	public constructor(loaded?: string[]) {
+		this.originals = loaded || [];
+		this.reset();
+	}
+
+	public clear(): void {
+		this.originals = [];
+		this.reset();
+	}
+
+	public mark(value: string): void {
+		if (this.originals.first() !== value) {
+			this.originals.unshift(value);
+		}
+
+		this.reset();
+	}
+
+	public update(value: string): void {
+		if (value.trim() !== "") {
+			this.cache[this.cursor] = value;
+		}
+	}
+
+	public previous(): string | null {
+		if (this.cursor === this.cache.length - 1) {
+			return null;
+		}
+
+		return this.cache[++this.cursor];
+	}
+
+	public next(): string | null {
+		if (this.cursor == 0) {
+			return null;
+		}
+
+		return this.cache[--this.cursor];
+	}
+
+	public items(): string[] {
+		return this.originals.slice(0);
+	}
+
+	private reset(): void {
+		this.cursor = 0;
+		this.cache = this.originals.clone();
+		this.cache.unshift("");
+	}
+}
+
 export class Terminal implements app.UIServiceProvider {
+	private history: History;
 	private properties: Properties;
 	private view: viewTerminal.TerminalView;
 	private context: TerminalContext;
@@ -137,6 +197,7 @@ export class Terminal implements app.UIServiceProvider {
 	constructor(properties: Properties, applicationContext: app.ApplicationContext, viewFactory: viewTerminal.TerminalFactory) {
 		this.properties = properties;
 		this.modules = new Map();
+		this.history = new History(properties.history);
 		this.variables = collections.map<app.Variable>();
 		this.context = new TerminalContext(this, applicationContext);
 		this.contextProvider = {
@@ -153,7 +214,7 @@ export class Terminal implements app.UIServiceProvider {
 			name: properties.name,
 			title: properties.title || properties.name,
 			description: properties.description,
-			history: this.properties.history,
+			history: this.history,
 			querier: this.queryForStatements.bind(this),
 			executer: this.executeCommand.bind(this)
 		}).then(this.setView.bind(this));
@@ -192,7 +253,7 @@ export class Terminal implements app.UIServiceProvider {
 		return this.variables.get(extractVariableName(name));
 	}
 
-	public promptFor(message: string, type: "string" | "password" = "string"): Promise<string> {
+	public promptFor<T>(message: string, input: UIServicePromptInputTypes = "text", obj?: UIServiceObjTypes<T>): Promise<T> {
 		throw new Error("Method not implemented.");
 	}
 

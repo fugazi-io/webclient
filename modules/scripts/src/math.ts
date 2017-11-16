@@ -54,6 +54,10 @@ import { Descriptor, FugaziMap, ModuleContext } from "../../../scripts/bin/app/m
 					"sub (numbers list<number>)"
 				],
 				handler: function(context: ModuleContext, params: FugaziMap<any>): number {
+					context.getParent().getUIServiceProvider().promptFor("hey!")
+						.then(x => console.log(x))
+						.catch(y => console.log(y));
+
 					if (params.has("a") && params.has("b")) {
 						return params.get("a") - params.get("b");
 					}
