@@ -23,12 +23,6 @@ export interface Properties {
 	history?: string[];
 }
 
-export class SuggestionsAmbiguityResolver {
-	public resolve(ambiguousSet: semantics.PossibleInterpretation[]): Promise<semantics.PossibleInterpretation> {
-		return Promise.resolve(ambiguousSet[0]);
-	}
-}
-
 export abstract class BaseTerminalContext extends app.BaseContext<app.ApplicationContext> {
 	private moduleToRemoteId: collections.FugaziMap<string>;
 
@@ -137,7 +131,6 @@ export class Terminal {
 	private properties: Properties;
 	private view: viewTerminal.TerminalView;
 	private context: TerminalContext;
-	//private ambiguityResolvingState: coreTypes.Future<commands.ExecutionResult>;
 	private contextProvider: ContextProvider;
 	private modules: Map<string, LoadedModule>;
 	private variables: collections.FugaziMap<app.Variable>;
@@ -163,7 +156,6 @@ export class Terminal {
 			description: properties.description,
 			history: this.properties.history,
 			querier: this.queryForStatements.bind(this),
-			//executer: this.executeCommand.bind(this)
 			validator: this.validateCommand.bind(this)
 		}).then(this.setView.bind(this));
 	}
@@ -207,7 +199,6 @@ export class Terminal {
 
 	private validateCommand(command: string): viewTerminal.CommandValidationResult {
 		const session = statements.createStatementsSession(command, this.contextProvider);
-		const resolver = new SuggestionsAmbiguityResolver();
 		const fn = () => {
 			try {
 				const executable = session.getExecutable();
@@ -232,9 +223,9 @@ export class Terminal {
 				});
 			} catch (e2) {
 				if (e2 instanceof statements.AmbiguityStatementException) {
-					return resolver.resolve(e2.getAmbiguousMatches())
-						.then(selection => {
-							session.pinInterpretation(e2.getAmbiguousExpression().range, selection);
+					return this.view.promptFor("please resolve", "select", e2.getAmbiguousMatches().map((s) => { return `${s.match.command.getParent().getName()}: ${s.interpretedCommand.input}` }))
+						.then((selection: number) => {
+							session.pinInterpretation(e2.getAmbiguousExpression().range, e2.getAmbiguousMatches()[selection]);
 							return fn();
 						});
 				} else {
@@ -245,50 +236,6 @@ export class Terminal {
 
 		return fn();
 	}
-
-	/*private executeCommand(command: string): Promise<commands.ExecutionResult> {
-		ga("send", "event", "Commands", "execution - start", command);
-		storage.local.store(this.properties.name, this.properties);
-
-		if (!this.ambiguityResolvingState) {
-			this.ambiguityResolvingState = new coreTypes.Future();
-		}
-
-		const currentAmbiguityState = this.ambiguityResolvingState;
-
-		let session = statements.createStatementsSession(command, this.contextProvider);
-
-		try {
-			this.executeCommandInSession(new SuggestionsAmbiguityResolver(), session);
-		} catch (e) {
-			const error = typeof e === "string" ? e : (e.message ? e.message : e.toString());
-			ga("send", "event", "Commands", "execution - error: " + error, command);
-
-			const result = new commands.ExecutionResult(registry.getType("any"), false);
-			result.reject(e);
-			currentAmbiguityState.resolve(result);
-		}
-
-		return currentAmbiguityState.asPromise();
-	}*/
-
-	/*private executeCommandInSession(resolver: SuggestionsAmbiguityResolver, session: statements.StatementSession): void {
-		try {
-			this.ambiguityResolvingState.resolve(session.getExecutable().execute());
-			this.ambiguityResolvingState = null;
-		} catch (e) {
-			if (e instanceof statements.AmbiguityStatementException) {
-				let ase = e as statements.AmbiguityStatementException;
-				resolver.resolve(ase.getAmbiguousMatches())
-					.then(selection => {
-						session.pinInterpretation(ase.getAmbiguousExpression().range, selection);
-						this.executeCommandInSession(resolver, session);
-					});
-			} else {
-				throw e;
-			}
-		}
-	}*/
 
 	private queryForStatements(command: string, position: number): Promise<statements.Statement[]> {
 		let future = new coreTypes.Future<statements.Statement[]>(),

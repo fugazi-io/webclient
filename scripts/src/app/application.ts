@@ -33,8 +33,13 @@ export type Variable = {
 }
 
 export interface UIServiceProvider {
-	promptFor(message: string, type?: "string" | "password"): Promise<string>;
-	showSuggestionBox(): Promise<string>;
+	promptFor(message: string, input?: "text" | "password", type?: types.Type): Promise<string>;
+	promptFor<T>(message: string, input?: "text" | "password", type?: types.Type): Promise<T>;
+
+	promptFor(message: string, input: "boolean", labels?: [string, string]): Promise<boolean>;
+
+	promptFor(message: string, input: "select", items: string[]): Promise<number>;
+	promptFor<T extends number|string>(message: string, input: "select", items: Map<T, string>): Promise<T>;
 }
 let PROVIDER: UIServiceProvider;
 export function setUIProvider(provider: UIServiceProvider) {

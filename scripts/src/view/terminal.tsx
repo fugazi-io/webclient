@@ -7,7 +7,7 @@ import * as componentsDescriptor from "../components/components.descriptor";
 import * as commands from "../components/commands";
 import * as commandsHandler from "../components/commands.handler";
 import * as React from "react";
-
+import * as types from "../components/types";
 import { setUIProvider, UIServiceProvider } from "../app/application";
 
 export interface TerminalFactory {
@@ -37,6 +37,16 @@ export interface TerminalState extends view.ViewState {
 }
 
 export class TerminalView extends view.View<TerminalProperties, TerminalState> implements UIServiceProvider {
+	//promptFor(message: string, input: "select", items: string[]): Promise<number>;
+	public promptFor(message, input?: any, items?: any): any {
+		if (input !== "select") {
+			throw "Fuck you!!!";
+		}
+
+		(items as string[]).forEach( i => { console.log(i) } );
+		return Promise.resolve(1);
+	}
+
 	private promptValueHandler: (value: string) => void;
 
 	public constructor(props: TerminalProperties) {
@@ -50,15 +60,11 @@ export class TerminalView extends view.View<TerminalProperties, TerminalState> i
 		setUIProvider(this);
 	}
 
-	public promptFor(message: string, type?: "string" | "password"): Promise<string> {
-		return null;
-	}
-
-	public showSuggestions(): Promise<string> {
-		this.setState({
+	public showSuggestionBox(): Promise<string> {
+		/*this.setState({
 			suggestions: statements,
-			value: inputbox.value
-		} as any;
+			value: this.inputbox.value
+		} as any);*/
 
 		return null;
 	}
