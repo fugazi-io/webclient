@@ -1,11 +1,11 @@
 import * as collections from "../core/types.collections";
 import * as inputModule from "./input";
 
-var input: Input,
+let input: Input,
 	stack: StateStack;
 
 export function parse(commandInput: string): inputModule.CommandExpression {
-	var state: ParserState<any>,
+	let state: ParserState<any>,
 		command: CommandState;
 
 	input = new Input(commandInput);
@@ -63,12 +63,12 @@ class Input {
 		return this.cursor >= this.value.length;
 	}
 
-	get space(): boolean {
-		return this.current === " ";
+	get whitespace(): boolean {
+		return this.current.test(/\s/);
 	}
 
-	skipSpaces(use: boolean = false): void {
-		while (this.space) {
+	skipWhitespace(use: boolean = false): void {
+		while (this.whitespace) {
 			this.cursor++;
 		}
 
@@ -89,7 +89,7 @@ class Input {
 	}
 
 	use(startIndex: number = this.used): UsedInput {
-		var usedInput: UsedInput = {
+		const usedInput: UsedInput = {
 			value: this.substring(startIndex, this.cursor),
 			range: new inputModule.RangeImpl(startIndex, this.cursor)
 		};
@@ -134,7 +134,7 @@ enum StateStatus {
 	Error
 }
 
-class ParserState<T extends inputModule.Expression<any>> {
+class ParserState<T extends inputModule.Expression> {
 	protected start: number;
 	protected expression: T;
 	protected status: StateStatus;
@@ -158,12 +158,11 @@ class ParserState<T extends inputModule.Expression<any>> {
 	}
 
 	protected parsingEnded(): boolean {
-		return input.eof || input.space;
+		return input.eof || input.whitespace;
 	}
 }
 
-class AtomicState<T extends inputModule.Expression<any>> extends ParserState<T> {
-}
+class AtomicState<T extends inputModule.Expression> extends ParserState<T> {}
 
 class WordState extends AtomicState<inputModule.Word> {
 	private static ILLEGAL_CHARACTERS: string[] = ": \" ' [ ( { ,".split(" ");
@@ -176,11 +175,8 @@ class WordState extends AtomicState<inputModule.Word> {
 		this.endingCharacters = typeof endingCharacters === "string" ? endingCharacters.split(" ") : endingCharacters;
 	}
 
-	/**
-	 * @override
-	 */
 	parse(): StateStatus {
-		var expressionState: inputModule.ExpressionState,
+		let expressionState: inputModule.ExpressionState,
 			used: UsedInput;
 
 		while (!this.parsingEnded()) {
@@ -192,7 +188,7 @@ class WordState extends AtomicState<inputModule.Word> {
 			input.advance();
 		}
 
-		expressionState = input.space || this.endingCharacters.includes(input.current) ? inputModule.ExpressionState.Complete : inputModule.ExpressionState.Unknown;
+		expressionState = input.whitespace || this.endingCharacters.includes(input.current) ? inputModule.ExpressionState.Complete : inputModule.ExpressionState.Unknown;
 		used = input.use();
 
 		if (used.range.length == 0) {
@@ -205,9 +201,6 @@ class WordState extends AtomicState<inputModule.Word> {
 		return this.status;
 	}
 
-	/**
-	 * @override
-	 */
 	protected parsingEnded(): boolean {
 		return super.parsingEnded() || this.endingCharacters.includes(input.current);
 	}
@@ -223,11 +216,8 @@ class StringState extends AtomicState<inputModule.StringParameter> {
 		this.quoteChar = input.current;
 	}
 
-	/**
-	 * @override
-	 */
 	parse(): StateStatus {
-		var expressionState: inputModule.ExpressionState,
+		let expressionState: inputModule.ExpressionState,
 			used: UsedInput;
 
 		input.advance();
@@ -255,15 +245,12 @@ class StringState extends AtomicState<inputModule.StringParameter> {
 		return this.status;
 	}
 
-	/**
-	 * @override
-	 */
 	protected parsingEnded(): boolean {
 		return input.eof || (input.current === this.quoteChar && !this.escaped);
 	}
 }
 
-class CompoundState<T extends inputModule.Expression<any>> extends ParserState<T> {
+class CompoundState<T extends inputModule.Expression> extends ParserState<T> {
 	protected innerState: ParserState<any>;
 
 	constructor() {
@@ -313,11 +300,8 @@ class CommandState extends CompoundState<inputModule.CommandExpression> {
 		}
 	}
 
-	/**
-	 * @override
-	 */
 	parse(): StateStatus {
-		input.skipSpaces(true);
+		input.skipWhitespace(true);
 
 		if (this.parsingEnded()) {
 			this.handleEnd();
@@ -328,23 +312,17 @@ class CommandState extends CompoundState<inputModule.CommandExpression> {
 		return this.status;
 	}
 
-	/**
-	 * @override
-	 */
 	addExpression(expression: inputModule.Expression<any>): inputModule.Expression<any> {
 		this.expressions.push(expression);
 		return super.addExpression(expression);
 	}
 
-	/**
-	 * @override
-	 */
 	protected parsingEnded(): boolean {
 		return input.eof || input.current === ")";
 	}
 
 	private handleEnd(): void {
-		var expressionState: inputModule.ExpressionState,
+		let expressionState: inputModule.ExpressionState,
 			used: UsedInput;
 
 		this.status = StateStatus.Done;
@@ -361,12 +339,9 @@ class CommandState extends CompoundState<inputModule.CommandExpression> {
 	}
 }
 
-class CompoundParameterState<T extends inputModule.Parameter<any>> extends CompoundState<T> {
+class CompoundParameterState<T extends inputModule.Parameter> extends CompoundState<T> {
 	protected isWordsCollection: boolean;
 
-	/**
-	 * @override
-	 */
 	addExpression(expression: inputModule.Expression<any>): inputModule.Expression<any> {
 		if (expression instanceof inputModule.Word) {
 			this.isWordsCollection = true;
@@ -402,11 +377,8 @@ class ListState extends CompoundParameterState<inputModule.ListParameter> {
 		input.advance(true); // [
 	}
 
-	/**
-	 * @override
-	 */
 	parse(): StateStatus {
-		input.skipSpaces(true);
+		input.skipWhitespace(true);
 
 		if (this.parsingEnded()) {
 			let expressionState: inputModule.ExpressionState,
@@ -440,9 +412,6 @@ class ListState extends CompoundParameterState<inputModule.ListParameter> {
 		return this.status;
 	}
 
-	/**
-	 * @override
-	 */
 	addExpression(expression: inputModule.Expression<any>): inputModule.Expression<any> {
 		if (this.expecting !== "item" && this.expecting !== "item | end") {
 			input.throw("expression added in the wrong list state");
@@ -456,9 +425,6 @@ class ListState extends CompoundParameterState<inputModule.ListParameter> {
 		return expression;
 	}
 
-	/**
-	 * @override
-	 */
 	protected parsingEnded(): boolean {
 		return input.eof || (input.current === "]" && (this.expecting === "comma | end" || this.expecting === "item | end"));
 	}
@@ -477,11 +443,8 @@ class MapState extends CompoundParameterState<inputModule.MapParameter> {
 		input.advance(true); // {
 	}
 
-	/**
-	 * @override
-	 */
 	parse(): StateStatus {
-		input.skipSpaces(true);
+		input.skipWhitespace(true);
 
 		if (this.parsingEnded()) {
 			let expressionState: inputModule.ExpressionState,
@@ -525,9 +488,6 @@ class MapState extends CompoundParameterState<inputModule.MapParameter> {
 		return this.status;
 	}
 
-	/**
-	 * @override
-	 */
 	addExpression(expression: inputModule.Expression<any>): inputModule.Expression<any> {
 		expression = super.addExpression(expression);
 
@@ -545,12 +505,7 @@ class MapState extends CompoundParameterState<inputModule.MapParameter> {
 		return expression;
 	}
 
-	/**
-	 * @override
-	 */
 	protected parsingEnded(): boolean {
 		return input.eof || (input.current === "}" && (this.expecting === "key | end" || this.expecting === "comma | end"));
 	}
 }
-
-

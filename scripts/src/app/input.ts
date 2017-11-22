@@ -83,7 +83,7 @@ export class WordTransformer {
 	}
 }
 
-export class Expression<T> {
+export class Expression<T = any> {
 	private expressionRange: Range;
 	private expressionState: ExpressionState;
 	private expressionInput: string;
@@ -114,9 +114,9 @@ export class Expression<T> {
 	}
 }
 
-export class CommandExpression extends Expression<Expression<any>[]> {
-	public getExpressions(): Expression<any>[] {
-		return <Expression<any>[]> this.value;
+export class CommandExpression extends Expression<Expression[]> {
+	public getExpressions(): Expression[] {
+		return <Expression[]> this.value;
 	}
 }
 
@@ -142,10 +142,9 @@ export class Word extends Expression<string> implements WordTransformer {
 }
 utils.applyMixins(Word, [WordTransformer]);
 
-export class Keyword extends Expression<string> {
-}
+export class Keyword extends Expression<string> {}
 
-export class Parameter<T> extends Expression<T> implements collections.Hashable {
+export class Parameter<T = any> extends Expression<T> implements collections.Hashable {
 	/**
 	 * @override
 	 */
@@ -218,7 +217,7 @@ export abstract class CompoundParameter<Pt, Rt> extends Parameter<Pt> {
 	public abstract getParameterValues(): Rt;
 }
 
-export class ListParameter extends CompoundParameter<Parameter<any>[], any[]> {
+export class ListParameter extends CompoundParameter<Parameter[], any[]> {
 	public getParameterValues(): any[] {
 		return this.expressionValue.map(param => {
 			if (param instanceof CompoundParameter) {
@@ -250,7 +249,7 @@ export class WordsListParameter extends ListParameter {
 	}
 }
 
-export class MapParameter extends CompoundParameter<collections.EntryMap<Parameter<any>, Parameter<any>>, collections.FugaziMap<any>> {
+export class MapParameter extends CompoundParameter<collections.EntryMap<Parameter, Parameter>, collections.FugaziMap<any>> {
 	public getParameterValues(): collections.FugaziMap<any> {
 		const values = collections.map<any>();
 

@@ -21,7 +21,7 @@ export class PasswordInputView extends view.View<PasswordInputViewProperties, vi
 				<div className="container">
 					<div className="inputbox">
 						<input type="password" onKeyDown={ this.onKeyDown.bind(this) }
-							   ref={ input => this.input = input }/>
+							ref={ input => this.input = input }/>
 					</div>
 				</div>
 			</article>
@@ -49,16 +49,94 @@ export interface InputState extends view.ViewState {
 	value?: string;
 }
 
-export abstract class InputView<P extends InputProperties, S extends InputState> extends view.View<P, S> {
+export class KeyEnum {
+	public readonly code: number;
+	public readonly name: string;
+	public readonly ordinal: number;
+
+	protected constructor(code: number, name: string, ordinal: number) {
+		this.code = code;
+		this.name = name;
+		this.ordinal = ordinal;
+	}
+}
+
+export class ModifierKey extends KeyEnum {
+	private static COUNTER = 0;
+	private static VALUES: ModifierKey[] = [];
+
+	public static NONE = new ModifierKey(-1, "None");
+	public static ALT = new ModifierKey(18, "Alt");
+	public static SHIFT = new ModifierKey(16, "Shift");
+	public static CONTROL = new ModifierKey(17, "Ctrl");
+
+	public readonly flag: number;
+
+	private constructor(code: number, name: string) {
+		super(code, name, ModifierKey.COUNTER++);
+
+		if (code < 0) {
+			this.flag = 0;
+		} else {
+			this.flag = 1 << this.ordinal;
+		}
+
+		ModifierKey.VALUES.push(this);
+	}
+
+	public static values() {
+		return this.VALUES;
+	}
+
+	public static flagsFromEvent(event: React.KeyboardEvent<any>): number {
+		let flags = 0;
+
+		if (event.altKey) {
+			flags |= ModifierKey.ALT.flag;
+		}
+		if (event.ctrlKey) {
+			flags |= ModifierKey.CONTROL.flag;
+		}
+		if (event.shiftKey) {
+			flags |= ModifierKey.SHIFT.flag;
+		}
+
+		return flags;
+	}
+}
+
+export class SpecialKey extends KeyEnum {
+	private static COUNTER = 0;
+	private static VALUES: SpecialKey[] = [];
+
+	public static TAB = new SpecialKey(9, "Tab");
+	public static ENTER = new SpecialKey(13, "Enter");
+	public static DELETE = new SpecialKey(8, "Del");
+	public static ESCAPE = new SpecialKey(27, "Esc");
+
+	private constructor(code: number, name: string) {
+		super(code, name, SpecialKey.COUNTER++);
+
+		SpecialKey.VALUES.push(this);
+	}
+
+	public static values() {
+		return this.VALUES;
+	}
+}
+
+export abstract class InputView<
+		P extends InputProperties = InputProperties,
+		S extends InputState = InputState,
+		I extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement> extends view.View<P, S> {
 	private prompt: string;
 	private className: string[];
 	private keymap: Map<string, () => boolean>;
 
-	protected inputbox: HTMLInputElement;
+	protected inputbox: I;
 
 	public constructor(props: P, className: string, prompt?: string) {
 		super(props);
-
 
 		this.prompt = prompt;
 		this.className = ["input", className];
@@ -69,15 +147,16 @@ export abstract class InputView<P extends InputProperties, S extends InputState>
 	}
 
 	public componentDidMount(): void {
-		this.inputbox = ReactDOM.findDOMNode<HTMLInputElement>(this.refs["inputbox"] as React.ClassicComponent<any, any>);
 		this.inputbox.focus();
 		this.setCaretPosition(this.getValue().length);
 	}
 
 	public render(): JSX.Element {
-		return <article className={ this.className.join(" ") }>
-			{ this.getInnerElements() }
-		</article>;
+		return (
+			<article className={ this.className.join(" ") }>
+				{ this.getInnerElements() }
+			</article>
+		);
 	}
 
 	protected getPosition(): number {
@@ -107,71 +186,68 @@ export abstract class InputView<P extends InputProperties, S extends InputState>
 	}
 
 	protected getContainerElements(): JSX.Element[] {
+		const type = this.getInputType(),
+			props = this.getViewProperties();
+
 		return [
 			<div key="inputbox" className="inputbox">
-				<input tabIndex={ -1 } key="input" type="text" ref="inputbox" value={ this.state.value }
-					   onFocus={ this.onFocus.bind(this) }
-					   onBlur={ this.onBlur.bind(this) }
-					   onChange={ this.onChange.bind(this) }
-					   onCopy={ this.onCopy.bind(this) }
-					   onCut={ this.onCut.bind(this) }
-					   onPaste={ this.onPaste.bind(this) }
-					   onKeyUp={ this.onKeyUp.bind(this) }
-					   onKeyPress={ this.onKeyPress.bind(this) }
-					   onKeyDown={ this.onKeyDown.bind(this) }/>
-			</div>];
+				{ React.createElement(type, props) }
+			</div>
+		];
 	}
 
-	protected addKeyMapping(alt: boolean, ctrl: boolean, shift: boolean, char: string, fn: () => boolean): void {
-		let key = "";
+	protected getInputType(): "input" | "textarea" {
+		return "input";
+	}
 
-		if (alt) {
-			key += "A";
-		}
+	protected getViewProperties() {
+		return {
+			key: "input",
+			tabIndex: -1,
+			ref: (el: I | null) => {
+				this.inputbox = el;
+				if (this.inputbox) {
+					this.inputbox.focus();
+				}
+			},
+			value: this.state.value,
+			onCut: this.onCut.bind(this),
+			onBlur: this.onBlur.bind(this),
+			onCopy: this.onCopy.bind(this),
+			onFocus: this.onFocus.bind(this),
+			onPaste: this.onPaste.bind(this),
+			onKeyUp: this.onKeyUp.bind(this),
+			onChange: this.onChange.bind(this),
+			onKeyDown: this.onKeyDown.bind(this),
+			onKeyPress: this.onKeyPress.bind(this)
+		};
+	}
 
-		if (ctrl) {
-			key += "C";
-		}
-
-		if (shift) {
-			key += "S";
-		}
-
-		key += "+" + char.toUpperCase();
-		this.keymap.set(key, fn);
+	protected addKeyMapping(cb: () => boolean, char: string | SpecialKey, ...modifiers: ModifierKey[]): void {
+		this.keymap.set(createModifiersSequenceKey(char, ...modifiers), cb);
 	}
 
 	// React/DOM events
-	protected onFocus(event: React.FocusEventHandler<any>): void {
-	}
+	protected onFocus(event: React.FocusEventHandler<any>): void {}
 
-	protected onBlur(event: React.FocusEventHandler<any>): void {
-	}
+	protected onBlur(event: React.FocusEventHandler<any>): void {}
 
-	protected onCopy(event: React.ClipboardEventHandler<any>): void {
-	}
+	protected onCopy(event: React.ClipboardEventHandler<any>): void {}
 
-	protected onCut(event: React.ClipboardEventHandler<any>): void {
-	}
+	protected onCut(event: React.ClipboardEventHandler<any>): void {}
 
-	protected onPaste(event: React.ClipboardEventHandler<any>): void {
-	}
+	protected onPaste(event: React.ClipboardEventHandler<any>): void {}
 
-	protected onKeyUp(event: React.KeyboardEvent<any>): void {
-	}
+	protected onKeyUp(event: React.KeyboardEvent<any>): void {}
 
-	protected onKeyPress(event: React.KeyboardEvent<any>): void {
-	}
+	protected onKeyPress(event: React.KeyboardEvent<any>): void {}
 
 	protected onKeyDown(event: React.KeyboardEvent<any>): void {
+		const flags = ModifierKey.flagsFromEvent(event);
 		let stopPropagation: boolean;
 
-		if (event.altKey || event.ctrlKey || event.shiftKey) {
-			if (event.which < 20) {
-				return;
-			}
-
-			let key = createEventSequenceKey(event);
+		if (flags | ModifierKey.NONE.flag) {
+			const key = createEventSequenceKey(event);
 			if (this.keymap.has(key)) {
 				stopPropagation = this.keymap.get(key)();
 			}
@@ -249,6 +325,36 @@ export abstract class InputView<P extends InputProperties, S extends InputState>
 	}
 }
 
+export class TextInputView<P extends InputProperties, S extends InputState> extends InputView<P, S, HTMLTextAreaElement> {
+	public constructor(props: P, className: string, prompt?: string) {
+		super(props, className, prompt);
+	}
+
+	protected getInputType(): "input" | "textarea" {
+		return "textarea";
+	}
+
+	protected getViewProperties() {
+		let linesCount = 1;
+
+		if (this.state.value) {
+			linesCount += this.state.value.length - this.state.value.replace(/\n/g, "").length;
+		}
+
+		return Object.assign({}, super.getViewProperties(), { rows: Math.min(linesCount, 4) });
+	}
+
+	protected getLinesCount(): number {
+		// might end up being a naive implementation
+		return this.getValue().split("\n").length;
+	}
+
+	protected getCurrentLine(): number {
+		// might end up being a naive implementation
+		return this.getValue().substring(0, this.getPosition()).split("\n").length;
+	}
+}
+
 export interface SuggestibleInputProperties<T> extends InputProperties {
 	suggestions?: T[];
 }
@@ -269,7 +375,7 @@ export type ItemRendererMouseEventsHandler = {
 };
 export type ItemRenderer<T> = (item: T, index: number, handler: ItemRendererMouseEventsHandler, selected: boolean) => JSX.Element;
 
-export abstract class SuggestibleInputView<P extends SuggestibleInputProperties<T>, S extends SuggestibleInputState<T>, T> extends InputView<P, S> {
+export abstract class SuggestibleInputView<P extends SuggestibleInputProperties<T>, S extends SuggestibleInputState<T>, T> extends TextInputView<P, S> {
 	private suggestionPanel: SuggestionPanel;
 
 	public constructor(props: P, className: string, prompt?: string) {
@@ -477,9 +583,14 @@ export class BackgroundTextInput<P extends BackgroundTextInputProperties, S exte
 	}
 
 	protected getContainerElements(): JSX.Element[] {
-		let elements = super.getContainerElements();
-		elements.push(<div key="bgtextbox" className="bgtextbox"><BackgroundTextBox text={ this.state.backgroundText }/>
-		</div>);
+		const elements = super.getContainerElements();
+
+		elements.push(
+			<div key="bgtextbox" className="bgtextbox">
+				<BackgroundTextBox text={ this.state.backgroundText } />
+			</div>
+		);
+
 		return elements;
 	}
 }
@@ -498,22 +609,22 @@ class BackgroundTextBox extends view.View<BackgroundTextBoxProperties, view.View
 	}
 }
 
+function createModifiersSequenceKey(char: string | SpecialKey, ...specials: ModifierKey[]): string {
+	return createSequenceKey(char, specials.reduce<number>((flags, modifier) => flags | modifier.flag, 0));
+}
+
 function createEventSequenceKey(event: React.KeyboardEvent<any>): string {
+	return createSequenceKey(event.key, ModifierKey.flagsFromEvent(event));
+}
+
+function createSequenceKey(char: string | SpecialKey, flags: number) {
 	let key = "";
 
-	if (event.altKey) {
-		key += "A";
-	}
+	ModifierKey.values().forEach(modifier => {
+		if (flags & modifier.flag) {
+			key += modifier.name + "+";
+		}
+	});
 
-	if (event.ctrlKey) {
-		key += "C";
-	}
-
-	if (event.shiftKey) {
-		key += "S";
-	}
-
-	key += "+" + String.fromCharCode(event.which).toUpperCase();
-
-	return key;
+	return key + (typeof char === "string" ? char : char.name);
 }

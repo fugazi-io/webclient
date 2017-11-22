@@ -6,8 +6,8 @@ import * as view from "../view";
 import * as base from "./base";
 import * as React from "react";
 
-let DEFAULT_FUGAZI_PROMPT = "fugazi //";
-let HISTORY_SEARCH_PROMPT = "search history:";
+const DEFAULT_FUGAZI_PROMPT = "fugazi //";
+const HISTORY_SEARCH_PROMPT = "search history:";
 
 export interface ExecuteHandler {
 	(input: string): void;
@@ -24,24 +24,35 @@ export interface FugaziInputProperties extends base.SuggestibleInputProperties<s
 
 export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProperties, base.SuggestibleInputState<statements.Statement>, statements.Statement> {
 	private history: History;
+	private addingNewLine: boolean;
 
 	constructor(props: FugaziInputProperties) {
 		super(props, "fugazi", props.prompt || DEFAULT_FUGAZI_PROMPT);
-		this.addKeyMapping(false, true, false, "R", this.onShowSearch.bind(this));
+
+		this.addingNewLine = false;
+		this.addKeyMapping(this.onShowSearch.bind(this), "r", base.ModifierKey.CONTROL);
+		this.addKeyMapping(this.onShiftEnter.bind(this), base.SpecialKey.ENTER, base.ModifierKey.SHIFT);
 
 		if (this.props.searchResult && this.props.searchResult.length > 0) {
-			this.state = {value: this.props.searchResult} as any;
+			this.state = { value: this.props.searchResult } as any;
 		}
 	}
 
 	public componentDidMount(): void {
 		super.componentDidMount();
-		this.history = new History(this.inputbox, this.props.history);
+		this.history = new History(this.props.history);
 	}
 
 	public onChange(event: React.FormEvent<HTMLInputElement>): void {
+		// for some reason a new line is inserted automatically when this input is rendered with a value
+		if (!this.addingNewLine && event.type === "change" && this.state.value + "\n" === this.getValue(event)) {
+			return;
+		}
+
+		this.addingNewLine = false;
+
 		super.onChange(event);
-		this.history.update();
+		this.history.update(this.getValue());
 		this.updateSuggestions(this.getValue(), this.getPosition());
 	}
 
@@ -53,24 +64,41 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 	}
 
 	protected onArrowUpPressed(): boolean {
-		this.history.previous();
-		this.updateSuggestions(this.getValue(), this.getValue().length).then(() => {
+		if (this.getLinesCount() > 1 && this.getCurrentLine() > 1) {
+			return false;
+		}
+
+		const newValue = this.history.previous();
+		if (newValue === null) {
+			return false;
+		}
+
+		this.updateSuggestions(newValue, this.getValue().length).then(() => {
 			setTimeout(() => {
 				this.setCaretPosition(this.getValue().length);
 			}, 5);
 		});
-		return false;
+
+		return true;
 	}
 
 	protected onArrowDownPressed(): boolean {
-		this.history.next();
-		this.updateSuggestions(this.getValue(), this.getValue().length).then(() => {
+		if (this.getLinesCount() > 1 && this.getCurrentLine() < this.getLinesCount()) {
+			return false;
+		}
+
+		const newValue = this.history.next();
+		if (newValue === null) {
+			return false;
+		}
+
+		this.updateSuggestions(newValue, this.getValue().length).then(() => {
 			setTimeout(() => {
 				this.setCaretPosition(this.getValue().length);
 			}, 5);
 		});
 
-		return false;
+		return true;
 	}
 
 	protected onArrowLeftPressed(): boolean {
@@ -93,19 +121,21 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 		return new Promise((resolve, reject) => {
 			onResult.then(statements => {
 				this.setState({
-					suggestions: statements,
-					value: this.inputbox.value
+					value,
+					suggestions: statements
 				} as any, () => resolve());
 			}).catch(reject);
 		});
-
 	}
 
 	protected onEnterPressed(): boolean {
-		if (!this.inputbox.value.empty()) {
-			this.history.mark();
+		if (this.isCurrentlyInAString() || this.getValue()[this.getPosition() - 1] === "\\") {
+			this.setState({
+				value: this.getValue().substring(0, this.getPosition()) + "\n" + this.getValue().substring(this.getPosition())
+			});
+		} else if (!this.inputbox.value.empty()) {
+			this.history.mark(this.inputbox.value);
 			this.props.onExecute(this.inputbox.value);
-			this.inputbox.value = "";
 			this.setState({
 				value: "",
 				showing: false,
@@ -113,7 +143,7 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 			});
 		}
 
-		return false;
+		return true;
 	}
 
 	protected onSuggestionItemPressed(item: statements.Statement): void {
@@ -121,10 +151,10 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 			expressionsIterator = (item.getExpression() as input.CommandExpression).getExpressions().getIterator(),
 			newValue: string = "",
 			haveStoppedForParameter = false,
-			toeknIterator = item.getRule().getTokens().getIterator();
+			tokenIterator = item.getRule().getTokens().getIterator();
 
-		while (toeknIterator.hasNext()) {
-			const token = toeknIterator.next();
+		while (tokenIterator.hasNext()) {
+			const token = tokenIterator.next();
 			// by taking the value from the token we fix keyword typos
 			if (token.getTokenType() === syntax.TokenType.Keyword) {
 				newValue += `${(token as syntax.Keyword).getWord()} `;
@@ -157,11 +187,39 @@ export class FugaziInputView extends base.SuggestibleInputView<FugaziInputProper
 			});
 	}
 
+	private onShiftEnter(): boolean {
+		if (this.getValue().charAt(this.getPosition() - 1) === "\n") {
+			return true;
+		}
+
+		this.addingNewLine = true;
+		return false;
+	}
+
 	private onShowSearch(): boolean {
-		this.history.mark();
-		this.history.update();
+		this.history.mark(this.getValue());
+		this.history.update(this.getValue());
 		this.props.onSearchHistoryRequested();
 		return true;
+	}
+
+	private isCurrentlyInAString(): boolean {
+		const value = this.getValue();
+		let quotesType: string | null = null;
+
+		for (let i = 0; i < this.getPosition(); i++) {
+			if (value[i] === "\\") {
+				i++;
+			} else if (value[i] === quotesType) {
+				quotesType = null;
+			} else if (quotesType !== null) {
+				continue;
+			} else if (value[i] === "\"" || value[i] === "'") {
+				quotesType = value[i];
+			}
+		}
+
+		return quotesType !== null;
 	}
 }
 
@@ -288,13 +346,11 @@ export class SearchHistoryInputView extends base.BackgroundTextInput<SearchHisto
 }
 
 class History {
-	private element: HTMLInputElement;
 	private originals: string[];
 	private cache: string[];
 	private cursor: number;
 
-	public constructor(element: HTMLInputElement, loaded?: string[]) {
-		this.element = element;
+	public constructor(loaded?: string[]) {
 		this.originals = loaded || [];
 		this.reset();
 	}
@@ -304,34 +360,34 @@ class History {
 		this.reset();
 	}
 
-	public mark(): void {
-		if (this.originals.first() !== this.element.value) {
-			this.originals.unshift(this.element.value);
+	public mark(value: string): void {
+		if (this.originals.first() !== value) {
+			this.originals.unshift(value);
 		}
 
 		this.reset();
 	}
 
-	public update(): void {
-		if (this.element.value.trim() !== "") {
-			this.cache[this.cursor] = this.element.value;
+	public update(value: string): void {
+		if (value.trim() !== "") {
+			this.cache[this.cursor] = value;
 		}
 	}
 
-	public previous(): void {
+	public previous(): string | null {
 		if (this.cursor === this.cache.length - 1) {
-			return;
+			return null;
 		}
 
-		this.element.value = this.cache[++this.cursor];
+		return this.cache[++this.cursor];
 	}
 
-	public next(): void {
+	public next(): string | null {
 		if (this.cursor == 0) {
-			return;
+			return null;
 		}
 
-		this.element.value = this.cache[--this.cursor];
+		return this.cache[--this.cursor];
 	}
 
 	private reset(): void {
