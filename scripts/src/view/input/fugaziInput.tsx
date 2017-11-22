@@ -174,18 +174,20 @@ interface StatementSuggestionItemProperties extends view.ViewProperties {
 
 class StatementSuggestionItem extends view.View<StatementSuggestionItemProperties, view.ViewState> {
 	render(): JSX.Element {
-		let elements: JSX.Element[] = [];
-		let className = this.props.selected ? "selected" : undefined;
+		const elements = [];
+		const className = this.props.selected ? "selected" : undefined;
 
-		elements.push(<span key="__command-path__"
-							className="path">{ this.props.statement.getCommand().getPath().parent().toString() }</span>);
-		this.props.statement.getRule().getTokens().forEach(token => {
-			elements.push(StatementSuggestionItem.getElementFor(token));
+		elements.push(
+			<span key="__command-path__" className="path">
+				{ this.props.statement.getCommand().getPath().parent().toString() }
+			</span>);
+
+		this.props.statement.getRule().getTokens().forEach((token, index) => {
+			elements.push(StatementSuggestionItem.getElementFor(token, index));
 		});
 
 		return (
 			<li
-
 				className={ className }
 				onMouseEnter={ () => this.props.handler.onEnter(this.props.index) }
 				onMouseLeave={ () => this.props.handler.onLeave(this.props.index) }
@@ -195,13 +197,17 @@ class StatementSuggestionItem extends view.View<StatementSuggestionItemPropertie
 		);
 	}
 
-	private static getElementFor(token: syntax.RuleToken): JSX.Element {
+	private static getElementFor(token: syntax.RuleToken, index: number): JSX.Element {
 		if (token.getTokenType() == syntax.TokenType.Keyword) {
-			let word = (token as syntax.Keyword).getWord();
-			return <span key={ word } className="keyword">{ word }</span>;
+			const word = (token as syntax.Keyword).getWord();
+
+			return (
+				<span key={ word + "_" + index } className="keyword">
+					{ word }
+				</span>);
 		} else if (token.getTokenType() == syntax.TokenType.Parameter) {
-			let typeClassName = "parameter ",
-				type = (token as syntax.Parameter).getType();
+			let typeClassName = "parameter ";
+			const type = (token as syntax.Parameter).getType();
 
 			if (type.is("string")) {
 				typeClassName += "string";
@@ -217,13 +223,15 @@ class StatementSuggestionItem extends view.View<StatementSuggestionItemPropertie
 				typeClassName += "map";
 			}
 
-			let name = (token as syntax.Parameter).getName(),
+			const name = (token as syntax.Parameter).getName(),
 				typeName = (token as syntax.Parameter).getType().toString();
-			return <span key={ name } className={ typeClassName }>
+
+			return (
+				<span key={ name + "_" + index } className={ typeClassName }>
 					<span className="name">{ name }</span>
 					<span className="separator">|</span>
 					<span className="type">{ typeName }</span>
-				</span>;
+				</span>);
 		} else {
 			return null;
 		}
