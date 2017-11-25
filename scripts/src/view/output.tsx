@@ -178,7 +178,7 @@ export class OutputView extends view.View<OutputProperties, OutputState> {
 					</li>);
 				}
 			} else {
-				logger.warn("unknown OutputItemInfo type: ", info);
+				logger.loggers.warn("unknown OutputItemInfo type: ", info);
 			}
 		});
 

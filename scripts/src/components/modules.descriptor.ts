@@ -21,7 +21,7 @@ export function loaded(moduleDescriptor: Descriptor): void {
 		name: string = currentScript.id;
 
 	if (!loadingScriptModules.has(name)) {
-		logger.error("unexpected module loaded");
+		logger.loggers.error("unexpected module loaded");
 		dom.remove(currentScript);
 		return;
 	}

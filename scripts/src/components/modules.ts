@@ -514,7 +514,7 @@ export class RemoteSource implements Remote {
 			check();
 		};
 		const rejected = (name: string, url: net.Url) => {
-			logger.error("failed to load frame");
+			logger.loggers.error("failed to load frame");
 			failed.push({name, url});
 			check();
 		};

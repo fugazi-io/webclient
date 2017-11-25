@@ -29,12 +29,12 @@ export interface GenerateIdParameters {
 	prefix?: string;
 }
 
-var generateIdParametersDefaults: GenerateIdParameters = {
+const generateIdParametersDefaults: GenerateIdParameters = {
 	min: 6,
 	max: 10
 };
 
-var generateIdCharacters: string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const generateIdCharacters: string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 export function generateId(params?: GenerateIdParameters): string {
 	var name: string,
