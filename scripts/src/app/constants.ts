@@ -1,5 +1,5 @@
 export const version = {
-	code: "1.0.16",
+	code: "1.1.21",
 	name: "The Argument",
 	toString: function () {
 		return `${ this.name } (${ this.code })`;
