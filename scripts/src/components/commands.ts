@@ -1,663 +1,419 @@
-/// <reference path="../../lib/analytics.d.ts" />
-/// <reference path="../app/application.ts" />
-/// <reference path="components.ts" />
-/// <reference path="registry.ts" />
-/// <reference path="syntax.ts" />
-/// <reference path="types.ts" />
+import * as handler from "./commands.handler";
+import * as collections from "../core/types.collections";
+import * as coreTypes from "../core/types";
+import * as net from "../core/net";
+import * as appModules from "../app/modules";
+import * as modules from "./modules";
+import * as components from "./components";
+import * as converters from "./converters";
+import * as registry from "./registry";
+import * as types from "./types";
+import * as syntax from "./syntax";
 
-/**
- * Created by nitzan on 29/03/2016.
- */
+export class ExecutionResult {
+	private asynced: boolean;
 
-namespace fugazi.components.commands {
-	export class ExecutionResult {
-		private asynced: boolean;
+	protected type: types.Type;
+	protected future: coreTypes.Future<any>;
 
-		protected type: types.Type;
-		protected future: fugazi.Future<any>;
-
-		constructor(type: types.Type, asynced: boolean) {
-			this.type = type;
-			this.asynced = asynced;
-			this.future = new fugazi.Future<any>();
-		}
-
-		public isAsync(): boolean {
-			return this.asynced;
-		}
-
-		public getType(): types.Type {
-			return this.type;
-		}
-
-		public then(successHandler: (value: any) => void): ExecutionResult {
-			this.future.then(successHandler);
-			return this;
-		}
-
-		/**
-		 * @override
-		 */
-		public catch(errorHandler: (error: fugazi.Exception) => void): ExecutionResult {
-			this.future.catch(errorHandler);
-			return this;
-		}
-
-		public resolve(value: any): void {
-			let str: string;
-			try {
-				str = JSON.stringify(value) || "undefined";
-			} catch (e) {
-				str = value.toString();
-			}
-			ga("send", "event", "Commands", "execution.result - resolved", str);
-			this.future.resolve(value);
-		}
-
-		public reject(error: fugazi.Exception): void {
-			ga("send", "event", "Commands", "execution.result - rejected", error.message);
-			this.future.reject(error);
-		}
+	constructor(type: types.Type, asynced: boolean) {
+		this.type = type;
+		this.asynced = asynced;
+		this.future = new coreTypes.Future<any>();
 	}
 
-	class ExecutionResultAny extends ExecutionResult {
-		public resolve(value: any): void {
-			this.setInferredType(value);
-			this.future.resolve(value);
-		}
-
-		private setInferredType(value: any): void {
-			this.type = registry.guessType(value);
-		}
+	public isAsync(): boolean {
+		return this.asynced;
 	}
 
-	export class ExecutionParameters {
-		private names: string[];
-		private values: collections.Map<any>;
-
-		public constructor() {
-			this.names = [];
-			this.values = collections.map<any>();
-		}
-
-		public add(name: string, value: any): void {
-			this.names.push(name);
-			this.values.set(name, value);
-		}
-
-		public has(name: string): boolean {
-			return this.values.has(name);
-		}
-
-		public get(name: string): any {
-			return this.values.get(name);
-		}
-
-		public asList(): any[] {
-			return this.names.map<any>(name => this.values.get(name));
-		}
-
-		public asStruct(): fugazi.PlainObject<any> {
-			return this.values.asObject();
-		}
-
-		public asMap(): collections.Map<any> {
-			return this.values.clone();
-		}
+	public getType(): types.Type {
+		return this.type;
 	}
 
-	export class Executer {
-		private fn: (params: ExecutionParameters) => void;
-		private executionResult: ExecutionResult;
-
-		public constructor(result: ExecutionResult, fn: (params: ExecutionParameters) => void) {
-			this.executionResult = result;
-			this.fn = fn;
-		}
-
-		get result(): ExecutionResult {
-			return this.executionResult;
-		}
-
-		public execute(params: ExecutionParameters): ExecutionResult {
-			this.fn(params);
-			return this.executionResult;
-		}
+	public then(successHandler: (value: any) => void): ExecutionResult {
+		this.future.then(successHandler);
+		return this;
 	}
 
-	function getHandlerErrorMessage(error: any): string {
-		if (typeof error === "string") {
-			return error;
-		}
-
-		// TODO: should be 'error instanceof Error' but it fails in runtime, for some reason Error is undefined
-		if (error instanceof window["Error"]) {
-			return error.message;
-		}
-
-		return error.toString();
+	public catch(errorHandler: (error: coreTypes.Exception) => void): ExecutionResult {
+		this.future.catch(errorHandler);
+		return this;
 	}
 
-	export abstract class Command extends Component {
-		protected asynced: boolean;
-		protected returnType: types.Type;
-		protected convert: {
-			from: types.Type;
-			converter: converters.Converter;
-		};
-		protected syntax: syntax.SyntaxRule[];
-
-		constructor() {
-			super(ComponentType.Command);
-			this.syntax = [];
+	public resolve(value: any): void {
+		let str: string;
+		try {
+			str = JSON.stringify(value) || "undefined";
+		} catch (e) {
+			str = value.toString();
 		}
+		ga("send", "event", "Commands", "execution.result - resolved", str);
+		this.future.resolve(value);
+	}
 
-		public isAsync(): boolean {
-			return this.asynced;
-		}
+	public reject(error: coreTypes.Exception): void {
+		ga("send", "event", "Commands", "execution.result - rejected", error.message);
+		this.future.reject(error);
+	}
+}
 
-		public getReturnType(): types.Type {
-			return this.returnType;
-		}
+class ExecutionResultAny extends ExecutionResult {
+	public resolve(value: any): void {
+		this.setInferredType(value);
+		this.future.resolve(value);
+	}
 
-		public getSyntax(): syntax.SyntaxRule[] {
-			return this.syntax.clone();
-		}
+	private setInferredType(value: any): void {
+		this.type = registry.guessType(value);
+	}
+}
 
-		public isRestricted(): boolean {
-			return true;
-		}
+export class ExecutionParameters {
+	private names: string[];
+	private values: collections.FugaziMap<any>;
 
-		public executeLater(context: app.modules.ModuleContext): Executer {
-			let executionResult = this.returnType.is("any") ? new ExecutionResultAny(this.returnType, this.asynced) : new ExecutionResult(this.returnType, this.asynced),
-				executer = new Executer(executionResult, params => {
-					this.invokeHandler(context, params).then(this.handleHandlerResult.bind(this, "then", executionResult), this.handleHandlerResult.bind(this, "catch", executionResult));
-				});
+	public constructor() {
+		this.names = [];
+		this.values = collections.map<any>();
+	}
 
-			return executer;
-		}
+	public add(name: string, value: any): void {
+		this.names.push(name);
+		this.values.set(name, value);
+	}
 
-		public executeNow(context: app.modules.ModuleContext, params: ExecutionParameters): ExecutionResult {
-			let executer = this.executeLater(context);
-			executer.execute(params);
-			return executer.result;
-		}
+	public has(name: string): boolean {
+		return this.values.has(name);
+	}
 
-		protected abstract invokeHandler(context: app.modules.ModuleContext, params: ExecutionParameters): Promise<handler.Result>;
+	public get(name: string): any {
+		return this.values.get(name);
+	}
 
-		protected handleHandlerResult(cbType: "then" | "catch", executionResult: ExecutionResult, result: handler.Result): void {
-			if (!handler.isHandlerResult(result)) {
-				result = cbType === "then" ? {
-						status: handler.ResultStatus.Success,
-						value: result
-					} : {
-						status: handler.ResultStatus.Failure,
-						error: getHandlerErrorMessage(result)
-					};
-			}
+	public asList(): any[] {
+		return this.names.map<any>(name => this.values.get(name));
+	}
 
-			if (result.status === handler.ResultStatus.Prompt) {
-				executionResult.resolve((result as handler.PromptResult).prompt);
-			} else if (result.status === handler.ResultStatus.Success) {
-				if (this.convert) {
-					try {
-						result.value = this.knownConvertResult(result.value);
-					} catch(e) {
-						executionResult.reject(e);
-						return;
-					}
-				}
-				try {
-					if (this.validateResultValue(result.value) || this.validateResultValue(this.unknownConvertResult(result.value))) {
-						executionResult.resolve(result.value);
-					} else {
-						executionResult.reject(new fugazi.Exception("execution result doesn't match the declared type"));
-					}
-				} catch(e) {
-					executionResult.reject(e);
-				}
-			} else {
-				executionResult.reject(new fugazi.Exception(result.error));
-			}
-		}
+	public asStruct(): coreTypes.PlainObject<any> {
+		return this.values.asObject();
+	}
 
-		protected validateResultValue(result: any): boolean {
-			return this.returnType.validate(handler.isHandlerResult(result) ? result.value : result);
-		}
+	public asMap(): collections.FugaziMap<any> {
+		return this.values.clone();
+	}
+}
 
-		private knownConvertResult(value: any): any {
-			if (this.convert.converter) {
-				return this.convert.converter.convert(value);
-			}
+export class Executer {
+	private fn: (params: ExecutionParameters) => void;
+	private executionResult: ExecutionResult;
 
-			if (registry.hasConverter(this.convert.from, this.returnType)) {
-				return registry.getConverter(this.convert.from, this.returnType).convert(value);
-			}
+	public constructor(result: ExecutionResult, fn: (params: ExecutionParameters) => void) {
+		this.executionResult = result;
+		this.fn = fn;
+	}
 
-			return value;
-		}
+	get result(): ExecutionResult {
+		return this.executionResult;
+	}
 
-		private unknownConvertResult(value: any): any {
-			if (typeof value === "string") {
-				const stringType = registry.getType("string");
+	public execute(params: ExecutionParameters): ExecutionResult {
+		this.fn(params);
+		return this.executionResult;
+	}
+}
 
-				if (this.returnType.is(stringType)) {
-					return registry.getConverter(stringType, this.returnType).convert(value);
-				}
-			}
+function getHandlerErrorMessage(error: any): string {
+	if (typeof error === "string") {
+		return error;
+	}
 
-			return value;
-		}
+	// TODO: should be 'error instanceof Error' but it fails in runtime, for some reason Error is undefined
+	if (error instanceof window["Error"]) {
+		return error.message;
+	}
 
-		protected defaultManual(): string {
-			const markdown = super.defaultManual(),
-				builder = Component.markdown().h4("Syntax:").newLine();
+	if (fugazi.isPlainObject(error)) {
+		return JSON.stringify(error);
+	}
 
-			this.syntax.forEach(rule => {
-				builder.li(rule.raw);
+	return error.toString();
+}
+
+export abstract class Command extends components.Component {
+	protected asynced: boolean;
+	protected returnType: types.Type;
+	protected convert: {
+		from: types.Type;
+		converter: converters.Converter;
+	};
+	protected syntax: syntax.SyntaxRule[];
+
+	constructor() {
+		super(components.ComponentType.Command);
+		this.syntax = [];
+	}
+
+	public isAsync(): boolean {
+		return this.asynced;
+	}
+
+	public getReturnType(): types.Type {
+		return this.returnType;
+	}
+
+	public getSyntax(): syntax.SyntaxRule[] {
+		return this.syntax.clone();
+	}
+
+	public isRestricted(): boolean {
+		return true;
+	}
+
+	public executeLater(context: appModules.ModuleContext): Executer {
+		let executionResult = this.returnType.is("any") ? new ExecutionResultAny(this.returnType, this.asynced) : new ExecutionResult(this.returnType, this.asynced),
+			executer = new Executer(executionResult, params => {
+				this.invokeHandler(context, params).then(this.handleHandlerResult.bind(this, "then", executionResult), this.handleHandlerResult.bind(this, "catch", executionResult));
 			});
 
-			return markdown + "\n" + builder.newLine().toString();
-		}
+		return executer;
 	}
 
-	export class LocalCommand extends Command {
-		protected parametersForm: handler.PassedParametersForm;
-		protected handler: handler.AsyncedHandler;
-
-		constructor() {
-			super();
-		}
-
-		protected invokeHandler(context: app.modules.ModuleContext, params: ExecutionParameters): Promise<handler.Result | any> {
-			switch (this.parametersForm) {
-				case handler.PassedParametersForm.Arguments:
-					return this.handler.apply(null, [context].concat(params.asList()));
-
-				case handler.PassedParametersForm.List:
-					return this.handler(context, params.asList());
-
-				case handler.PassedParametersForm.Map:
-					return this.handler(context, params.asMap());
-
-				case handler.PassedParametersForm.Struct:
-					return this.handler(context, params.asStruct());
-			}
-		}
+	public executeNow(context: appModules.ModuleContext, params: ExecutionParameters): ExecutionResult {
+		let executer = this.executeLater(context);
+		executer.execute(params);
+		return executer.result;
 	}
 
-	interface PreparedEndpointParams {
-		endpoint: string,
-		params: collections.Map<any>
-	}
+	protected abstract invokeHandler(context: appModules.ModuleContext, params: ExecutionParameters): Promise<handler.Result>;
 
-	const ENDPOINT_ARGUMENTS_REGEX = /(\{\s*([a-z0-9]+)\s*\})/gi;
-	enum EndpointParamReplacementPart {
-		ToReplace = 1,
-		ParamName = 2
-	}
-
-	class RemoteCommand extends Command {
-		protected endpoint: { raw: string, params: string[] };
-		protected method: net.HttpMethod;
-
-		constructor() {
-			super();
-
-			this.asynced = true;
+	protected handleHandlerResult(cbType: "then" | "catch", executionResult: ExecutionResult, result: handler.Result): void {
+		if (!handler.isHandlerResult(result)) {
+			result = cbType === "then" ? {
+				status: handler.ResultStatus.Success,
+				value: result
+			} : {
+				status: handler.ResultStatus.Failure,
+				error: getHandlerErrorMessage(result)
+			};
 		}
 
-		protected invokeHandler(context: app.modules.ModuleContext, params: ExecutionParameters): Promise<handler.Result> {
-			const future = new Future<handler.Result>();
-
-			if (!this.authenticator.authenticated()) {
-				future.reject(new Exception("not authenticated"));
-			}
-			else {
-				if ((this.parent as modules.Module).isRemote()) {
-					const remoteSourceId = context.getParent().getRemoteSource(this.parent.getPath());
-					const remote: modules.Remote = (this.parent as modules.Module).getRemote();
-
-					try {
-						const preparedEndpointParams = this.expandEndpointArguments(context, params);
-						this.executeVia(future, remote, remoteSourceId, preparedEndpointParams);
-					} catch (e) {
-						future.reject(e);
-					}
-				} else {
-					future.reject(new Exception(
-						`cannot execute remote command '${this.getName()}' without 
-					remote definition on its enclosing modules`));
+		if (result.status === handler.ResultStatus.Prompt) {
+			executionResult.resolve((result as handler.PromptResult).prompt);
+		} else if (result.status === handler.ResultStatus.Success) {
+			if (this.convert) {
+				try {
+					result.value = this.knownConvertResult(result.value);
+				} catch (e) {
+					executionResult.reject(e);
+					return;
 				}
 			}
-
-			return future.asPromise();
-		}
-
-		protected get authenticator(): fugazi.components.modules.Authenticator {
-			return (this.getParent() as modules.Module).getRemote().authenticator();
-		}
-
-		private executeVia(future: Future<handler.Result>, remote: modules.Remote, remoteSourceId: string, endpointParams: PreparedEndpointParams): void {
-			const data = endpointParams.params;
-			const props = {
-				cors: true,
-				method: this.method,
-				url: new net.Url(endpointParams.endpoint, remote.base(remoteSourceId))
-			} as net.RequestProperties;
-
-			if (isPlainObject(data) || is(data, collections.Map)) {
-				props.contentType = net.ContentTypes.Json;
+			try {
+				if (this.validateResultValue(result.value) || this.validateResultValue(this.unknownConvertResult(result.value))) {
+					executionResult.resolve(result.value);
+				} else {
+					executionResult.reject(new coreTypes.Exception("execution result doesn't match the declared type"));
+				}
+			} catch (e) {
+				executionResult.reject(e);
 			}
+		} else {
+			executionResult.reject(new coreTypes.Exception(result.error));
+		}
+	}
 
-			this.authenticator.interceptRequest(props, data);
+	protected validateResultValue(result: any): boolean {
+		return result === null || this.returnType.validate(handler.isHandlerResult(result) ? result.value : result);
+	}
 
-			if (remote.proxied()) {
-				remote.frame(remoteSourceId).execute(props, data)
-					.then(this.success.bind(this))
-					.catch(this.failure.bind(this));
+	private knownConvertResult(value: any): any {
+		if (this.convert.converter) {
+			return this.convert.converter.convert(value);
+		}
+
+		if (registry.hasConverter(this.convert.from, this.returnType)) {
+			return registry.getConverter(this.convert.from, this.returnType).convert(value);
+		}
+
+		return value;
+	}
+
+	private unknownConvertResult(value: any): any {
+		if (typeof value === "string") {
+			const stringType = registry.getType("string");
+
+			if (this.returnType.is(stringType)) {
+				return registry.getConverter(stringType, this.returnType).convert(value);
+			}
+		}
+
+		return value;
+	}
+
+	protected defaultManual(): string {
+		const markdown = super.defaultManual(),
+			builder = components.Component.markdown().h4("Syntax:").newLine();
+
+		this.syntax.forEach(rule => {
+			builder.li(rule.raw);
+		});
+
+		return markdown + "\n" + builder.newLine().toString();
+	}
+}
+
+export class LocalCommand extends Command {
+	protected parametersForm: handler.PassedParametersForm;
+	protected handler: handler.AsyncedHandler;
+
+	constructor() {
+		super();
+	}
+
+	protected invokeHandler(context: appModules.ModuleContext, params: ExecutionParameters): Promise<handler.Result | any> {
+		switch (this.parametersForm) {
+			case handler.PassedParametersForm.Arguments:
+				return this.handler.apply(null, [context].concat(params.asList()));
+
+			case handler.PassedParametersForm.List:
+				return this.handler(context, params.asList());
+
+			case handler.PassedParametersForm.Map:
+				return this.handler(context, params.asMap());
+
+			case handler.PassedParametersForm.Struct:
+				return this.handler(context, params.asStruct());
+		}
+	}
+}
+
+interface PreparedEndpointParams {
+	endpoint: string,
+	params: collections.FugaziMap<any>
+}
+
+export const ENDPOINT_ARGUMENTS_REGEX = /(\{\s*([a-z0-9]+)\s*\})/gi;
+export enum EndpointParamReplacementPart {
+	ToReplace = 1,
+	ParamName = 2
+}
+
+export class RemoteCommand extends Command {
+	protected endpoint: { raw: string, params: string[] };
+	protected method: net.HttpMethod;
+
+	constructor() {
+		super();
+
+		this.asynced = true;
+	}
+
+	protected invokeHandler(context: appModules.ModuleContext, params: ExecutionParameters): Promise<handler.Result> {
+		const future = new coreTypes.Future<handler.Result>();
+
+		if (!this.authenticator.authenticated()) {
+			future.reject(new coreTypes.Exception("not authenticated"));
+		}
+		else {
+			if ((this.parent as modules.Module).isRemote()) {
+				const remoteSourceId = context.getParent().getRemoteSource(this.parent.getPath());
+				const remote: modules.Remote = (this.parent as modules.Module).getRemote();
+
+				try {
+					const preparedEndpointParams = this.expandEndpointArguments(context, params);
+					this.executeVia(future, remote, remoteSourceId, preparedEndpointParams);
+				} catch (e) {
+					future.reject(e);
+				}
 			} else {
-				net.http(props)
-					.success(this.success.bind(this, future))
-					.fail(this.failure.bind(this, future))
-					.send(data);
+				future.reject(new coreTypes.Exception(
+					`cannot execute remote command '${this.getName()}' without 
+					remote definition on its enclosing modules`));
 			}
-		}
-
-		private expandEndpointArguments(context: app.modules.ModuleContext, params: ExecutionParameters): PreparedEndpointParams {
-			const prepared: PreparedEndpointParams = { endpoint: this.endpoint.raw, params: params.asMap() };
-			const searchOn = prepared.endpoint;
-
-			let match = ENDPOINT_ARGUMENTS_REGEX.exec(searchOn);
-			while (match != null) {
-				const toReplace: string = match[EndpointParamReplacementPart.ToReplace];
-				const replacementKey: string = match[EndpointParamReplacementPart.ParamName];
-
-				//let value = params.has(replacementKey) ? params.get(replacementKey).toString() : context.data.get(replacementKey);
-				let value: string;
-				if (params.has(replacementKey)) {
-					value = params.get(replacementKey).toString();
-				} else {
-					value = (this.getParent() as modules.Module).getParameter(replacementKey, context);
-				}
-
-				if (!value) {
-					throw new Exception(`can't not execute command, argument "${ replacementKey }" has no value`);
-				}
-
-				prepared.endpoint = prepared.endpoint.replace(toReplace, value);
-				prepared.params.remove(replacementKey);
-
-				match = ENDPOINT_ARGUMENTS_REGEX.exec(searchOn);
-			}
-
-			return prepared;
-		}
-
-		private success(future: Future<handler.Result>, response: net.HttpResponse): void {
-			this.authenticator.interceptResponse(response);
-			future.resolve(response.guessData());
-		}
-
-		private failure(future: Future<handler.Result>, response: net.HttpResponse): void {
-			this.authenticator.interceptResponse(response);
-			future.reject(response.guessData());
-		}
-	}
-
-	export namespace handler {
-		export function isHandlerResult(value: any): value is Result {
-			return fugazi.isPlainObject(value) && typeof ResultStatus[value.status] === "string";
-		}
-
-		export enum ResultStatus {
-			Success,
-			Failure,
-			Prompt
-		}
-
-		export interface Result {
-			status: ResultStatus;
-			value?: any;
-			error?: string;
-		}
-
-		export interface PromptData {
-			type: "password";
-			message: string;
-			handlePromptValue: (value: string) => void;
-		}
-
-		export interface PromptResult extends Result {
-			prompt: PromptData;
-		}
-
-		export function isPromptData(result: any): result is PromptData {
-			return result && (result as PromptData).type === "password" && typeof (result as PromptData).message === "string";
-		}
-
-		export enum PassedParametersForm {
-			List,
-			Arguments,
-			Struct,
-			Map
-		}
-
-		export interface Handler extends Function {}
-
-		export interface SyncedHandler extends Handler {
-			(context: app.modules.ModuleContext, ...params: any[]): Result | any;
-		}
-
-		export interface AsyncedHandler extends Handler {
-			(context: app.modules.ModuleContext, ...params: any[]): Promise<Result>;
-		}
-	}
-
-	function wrapSyncedHandler(syncedHandler: handler.SyncedHandler, ...args: any[]): Promise<handler.Result> {
-		var future = new Future<handler.Result>();
-
-		try {
-			future.resolve(syncedHandler.apply(null, args));
-		} catch (e) {
-			future.reject(e);
 		}
 
 		return future.asPromise();
 	}
 
-	export namespace descriptor {
-		export interface Descriptor extends components.descriptor.Descriptor {
-			returns: types.Definition;
-			convert?: {
-				from: string;
-				converter?: string;
-			}
-			syntax: string | string[];
-			async?: boolean;
+	protected get authenticator(): modules.Authenticator {
+		return (this.getParent() as modules.Module).getRemote().authenticator();
+	}
+
+	private executeVia(future: coreTypes.Future<handler.Result>, remote: modules.Remote, remoteSourceId: string, endpointParams: PreparedEndpointParams): void {
+		const data = endpointParams.params;
+		const props = {
+			cors: true,
+			method: this.method,
+			url: new net.Url(endpointParams.endpoint, remote.base(remoteSourceId))
+		} as net.RequestProperties;
+
+		if (coreTypes.isPlainObject(data) || coreTypes.is(data, collections.FugaziMap)) {
+			props.contentType = net.ContentTypes.Json;
 		}
 
-		export interface LocalCommandDescriptor extends Descriptor {
-			handler: handler.Handler;
-			parametersForm?: "list" | "arguments" | "map" | "struct";
-		}
+		this.authenticator.interceptRequest(props, data);
 
-		export interface RemoteHandlerDescriptor {
-			endpoint: string;
-			method?: string;
-		}
-
-		export interface RemoteCommandDescriptor extends Descriptor {
-			handler: RemoteHandlerDescriptor;
+		if (remote.proxied()) {
+			remote.frame(remoteSourceId).execute(props, data)
+				.then(this.success.bind(this))
+				.catch(this.failure.bind(this));
+		} else {
+			net.http(props)
+				.success(this.success.bind(this, future))
+				.fail(this.failure.bind(this, future))
+				.send(data);
 		}
 	}
 
-	export namespace builder {
-		export function create(commandDescriptor: descriptor.Descriptor, parent: components.builder.Builder<components.Component>): components.builder.Builder<Command>;
-		export function create<T extends LocalCommand>(commandDescriptor: descriptor.Descriptor, parent: components.builder.Builder<components.Component>, ctor: { new (): T }): components.builder.Builder<Command>;
-		export function create(commandDescriptor: descriptor.Descriptor, parent: components.builder.Builder<components.Component>, ctor?: any): components.builder.Builder<Command> {
-			let loader = new components.descriptor.ExistingLoader(<descriptor.LocalCommandDescriptor> commandDescriptor);
+	private expandEndpointArguments(context: appModules.ModuleContext, params: ExecutionParameters): PreparedEndpointParams {
+		const prepared: PreparedEndpointParams = {endpoint: this.endpoint.raw, params: params.asMap()};
+		const searchOn = prepared.endpoint;
 
-			if (fugazi.is((<descriptor.LocalCommandDescriptor> commandDescriptor).handler, Function)) {
-				return new LocalCommandBuilder(loader, parent);
+		let match = ENDPOINT_ARGUMENTS_REGEX.exec(searchOn);
+		while (match != null) {
+			const toReplace: string = match[EndpointParamReplacementPart.ToReplace];
+			const replacementKey: string = match[EndpointParamReplacementPart.ParamName];
+
+			//let value = params.has(replacementKey) ? params.get(replacementKey).toString() : context.data.get(replacementKey);
+			let value: string;
+			if (params.has(replacementKey)) {
+				value = params.get(replacementKey).toString();
+			} else {
+				value = (this.getParent() as modules.Module).getParameter(replacementKey, context);
 			}
 
-			if (fugazi.isPlainObject((<descriptor.RemoteCommandDescriptor> commandDescriptor).handler)) {
-				return new RemoteCommandBuilder(loader, parent);
+			if (!value) {
+				throw new coreTypes.Exception(`can't not execute command, argument "${ replacementKey }" has no value`);
 			}
 
-			throw new components.builder.Exception("invalid command descriptor");
+			prepared.endpoint = prepared.endpoint.replace(toReplace, value);
+			prepared.params.remove(replacementKey);
+
+			match = ENDPOINT_ARGUMENTS_REGEX.exec(searchOn);
 		}
 
-		class CommandBuilder<T extends Command> extends components.builder.BaseBuilder<T, descriptor.Descriptor> {
-			private returnType: types.TextualDefinition | components.builder.Builder<types.Type>;
-			private syntaxBuilders: components.builder.Builder<syntax.SyntaxRule>[];
-
-			protected onDescriptorReady(): void {
-				this.syntaxBuilders = [];
-
-				if (this.componentDescriptor.returns != null
-					&& (typeof this.componentDescriptor.returns === "string" && types.descriptor.isAnonymousDefinition(this.componentDescriptor.returns))
-						|| isPlainObject(this.componentDescriptor.returns)) {
-					this.returnType = types.builder.create(<string> this.componentDescriptor.returns, this);
-					this.innerBuilderCreated();
-				} else {
-					this.returnType = this.componentDescriptor.returns as string || "void";
-				}
-
-				if (typeof this.componentDescriptor.syntax === "string") {
-					this.componentDescriptor.syntax = [this.componentDescriptor.syntax];
-				}
-
-				this.componentDescriptor.syntax.forEach(syntaxString => {
-					this.innerBuilderCreated();
-					return this.syntaxBuilders.push(syntax.builder.create(syntaxString, this))
-				});
-			}
-
-			protected concreteBuild(): void {
-				let component: any = (<any> this.component);
-
-				component.asynced = this.componentDescriptor.async || false;
-				this.syntaxBuilders.forEach(syntaxBuilder => syntaxBuilder.build().then(this.innerBuilderCompleted.bind(this), this.future.reject));
-
-				if (fugazi.is(this.returnType, components.builder.BaseBuilder)) {
-					(<components.builder.Builder<types.Type>> this.returnType).build().then(this.innerBuilderCompleted.bind(this), this.future.reject);
-				}
-			}
-
-			protected concreteAssociate(): void {
-				var component: any = (<any> this.component);
-
-				if (fugazi.is(this.returnType, components.builder.BaseBuilder)) {
-					(<components.builder.Builder<types.Type>> this.returnType).associate();
-					component.returnType = (<components.builder.Builder<types.Type>> this.returnType).getComponent();
-				} else { // types.TextualDefinition AKA string
-					component.returnType = this.resolve<types.Type>(ComponentType.Type, <string> this.returnType);
-				}
-
-				if (this.componentDescriptor.convert) {
-					component.convert = {
-						from: this.resolve<types.Type>(ComponentType.Type, this.componentDescriptor.convert.from)
-					}
-
-					if (this.componentDescriptor.convert.converter) {
-						component.convert.converter = this.resolve<converters.Converter>(ComponentType.Converter, this.componentDescriptor.convert.converter);
-					}
-				}
-
-				this.syntaxBuilders.forEach(syntaxBuilder => {
-					syntaxBuilder.associate();
-					component.syntax.push(syntaxBuilder.getComponent());
-				});
-			}
-		}
-
-		function getPassedParametersForm(str: string): handler.PassedParametersForm {
-			if (str === "list") {
-				return handler.PassedParametersForm.List;
-			}
-
-			if (str === "struct") {
-				return handler.PassedParametersForm.Struct;
-			}
-
-			if (str === "map") {
-				return handler.PassedParametersForm.Map;
-			}
-
-			return handler.PassedParametersForm.Arguments;
-		}
-
-		class LocalCommandBuilder extends CommandBuilder<LocalCommand> {
-			constructor(loader: components.descriptor.Loader<descriptor.Descriptor>, parent?: components.builder.Builder<Component>, ctor?: { new (): LocalCommand }) {
-				super(ctor || LocalCommand, loader, parent);
-			}
-
-			protected concreteBuild(): void {
-				var component: any;
-
-				super.concreteBuild();
-
-				component = (<any> this.component);
-
-				if (component.async) {
-					component.handler = (<descriptor.LocalCommandDescriptor> this.componentDescriptor).handler;
-				} else {
-					component.handler = wrapSyncedHandler.bind(null, (<descriptor.LocalCommandDescriptor> this.componentDescriptor).handler);
-				}
-
-				component.parametersForm = getPassedParametersForm((<descriptor.LocalCommandDescriptor> this.componentDescriptor).parametersForm);
-			}
-		}
-
-		class RemoteCommandBuilder extends CommandBuilder<RemoteCommand> {
-			constructor(loader: components.descriptor.Loader<descriptor.Descriptor>, parent?: components.builder.Builder<Component>) {
-				super(RemoteCommand, loader, parent);
-			}
-
-			protected concreteAssociate(): void {
-				super.concreteAssociate();
-
-				const endpointParams = this.getRequiredEndpointParameters(EndpointParamReplacementPart.ParamName);
-
-				(this.component as any).method = net.stringToHttpMethod((<descriptor.RemoteCommandDescriptor> this.componentDescriptor).handler.method || "GET");
-				(this.component as any).endpoint = {
-					raw: (<descriptor.RemoteCommandDescriptor> this.componentDescriptor).handler.endpoint,
-					params: endpointParams
-				};
-
-				(this.component as any).syntax.forEach((rule: syntax.SyntaxRule) => {
-					const syntaxParams = rule.getTokens().filter(t => t.getTokenType() == syntax.TokenType.Parameter) as syntax.Parameter[];
-					const syntaxParamsNames = syntaxParams.map<string>(param => param.getName());
-					const existing = endpointParams.filter(name => !syntaxParamsNames.includes(name));
-
-					if (!existing.empty() && !existing.every(name => (this.component.getParent() as modules.Module).hasParameter(name))) {
-						throw new fugazi.Exception(
-							`Cannot build remote command ${ this.component.getPath().toString() }, ` +
-							`since syntax rule "${ rule.raw }" does not provide all the parameters ` +
-							`required by endpoint "${ (this.component as any).endpoint.raw }"`
-						);
-					}
-				});
-			}
-
-			private getRequiredEndpointParameters(part?: EndpointParamReplacementPart) {
-				let matches = [] as string[];
-				const endpoint = (this.componentDescriptor as descriptor.RemoteCommandDescriptor).handler.endpoint;
-				let match = ENDPOINT_ARGUMENTS_REGEX.exec(endpoint);
-
-				while (match != null) {
-					if (part) {
-						matches.push(match[part]);
-					} else {
-						matches = matches.concat(match);
-					}
-					match = ENDPOINT_ARGUMENTS_REGEX.exec(endpoint);
-				}
-
-				return matches;
-			}
-		}
+		return prepared;
 	}
+
+	private success(future: coreTypes.Future<handler.Result>, response: net.HttpResponse): void {
+		this.authenticator.interceptResponse(response);
+		future.resolve(response.guessData());
+	}
+
+	private failure(future: coreTypes.Future<handler.Result>, response: net.HttpResponse): void {
+		this.authenticator.interceptResponse(response);
+		future.reject(response.guessData());
+	}
+}
+
+export function wrapSyncedHandler(syncedHandler: handler.SyncedHandler, ...args: any[]): Promise<handler.Result> {
+	var future = new coreTypes.Future<handler.Result>();
+
+	try {
+		future.resolve(syncedHandler.apply(null, args));
+	} catch (e) {
+		future.reject(e);
+	}
+
+	return future.asPromise();
 }

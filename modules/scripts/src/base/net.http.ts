@@ -1,10 +1,4 @@
-/// <reference path="../../../../scripts/bin/core/net.d.ts" />
-
-/// <reference path="../../../../scripts/bin/components/components.d.ts" />
-
-/**
- * Created by nitzan on 05/05/2016.
- */
+import { Descriptor, HttpMethod, FugaziMap, ModuleContext, RequestProperties } from "../../../../scripts/bin/app/modules.api";
 
 (function(): void {
 	interface HttpResponse {
@@ -12,10 +6,10 @@
 		data: any;
 	}
 
-	function httpRequest(context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>): Promise<HttpResponse> {
+	function httpRequest(context: ModuleContext, params: FugaziMap<any>): Promise<HttpResponse> {
 		let future = new fugazi.Future<HttpResponse>(),
-			data: string | fugazi.collections.Map<any> = params.get("data"),
-			props: fugazi.net.RequestProperties = {
+			data: string | FugaziMap<any> = params.get("data"),
+			props: RequestProperties = {
 				cors: true,
 				url: params.get("url"),
 				method: fugazi.net.stringToHttpMethod(params.get("method")),
@@ -39,42 +33,42 @@
 		return future.asPromise();
 	}
 
-	function httpRequestByMethod(method: fugazi.net.HttpMethod, context: fugazi.app.modules.ModuleContext, params: fugazi.collections.Map<any>) {
+	function httpRequestByMethod(method: HttpMethod, context: ModuleContext, params: FugaziMap<any>) {
 		params.set("method", fugazi.net.httpMethodToString(method));
 		return httpRequest(context, params);
 	}
 
 	let httpRequestByMethodSyntax = (method: string) => {
 		return [
-				`${ method } (url url)`,
+			`${ method } (url url)`,
 
-				`${ method } (url url) (data string)`,
-				`${ method } (url url) (data map)`,
+			`${ method } (url url) (data string)`,
+			`${ method } (url url) (data map)`,
 
-				`${ method } (url url) (data string) (contentType contentType)`,
-				`${ method } (url url) (data map) (contentType contentType)`,
+			`${ method } (url url) (data string) (contentType contentType)`,
+			`${ method } (url url) (data map) (contentType contentType)`,
 
-				`${ method } (url url) (data string) (headers map)`,
-				`${ method } (url url) (data map) (headers map)`,
+			`${ method } (url url) (data string) (headers map)`,
+			`${ method } (url url) (data map) (headers map)`,
 
-				`${ method } (url url) (data string) (timeout number[numbers.integer])`,
-				`${ method } (url url) (data map) (timeout number[numbers.integer])`,
+			`${ method } (url url) (data string) (timeout number[numbers.integer])`,
+			`${ method } (url url) (data map) (timeout number[numbers.integer])`,
 
-				`${ method } (url url) (data string) (contentType contentType) (headers map)`,
-				`${ method } (url url) (data map) (contentType contentType) (headers map)`,
+			`${ method } (url url) (data string) (contentType contentType) (headers map)`,
+			`${ method } (url url) (data map) (contentType contentType) (headers map)`,
 
-				`${ method } (url url) (data string) (contentType contentType) (timeout number[numbers.integer])`,
-				`${ method } (url url) (data map) (contentType contentType) (timeout number[numbers.integer])`,
+			`${ method } (url url) (data string) (contentType contentType) (timeout number[numbers.integer])`,
+			`${ method } (url url) (data map) (contentType contentType) (timeout number[numbers.integer])`,
 
-				`${ method } (url url) (data string) (headers map) (timeout number[numbers.integer])`,
-				`${ method } (url url) (data map) (headers map) (timeout number[numbers.integer])`,
+			`${ method } (url url) (data string) (headers map) (timeout number[numbers.integer])`,
+			`${ method } (url url) (data map) (headers map) (timeout number[numbers.integer])`,
 
-				`${ method } (url url) (data string) (contentType contentType) (headers map) (timeout number[numbers.integer])`,
-				`${ method } (url url) (data map) (contentType contentType) (headers map) (timeout number[numbers.integer])`
-			];
-		};
+			`${ method } (url url) (data string) (contentType contentType) (headers map) (timeout number[numbers.integer])`,
+			`${ method } (url url) (data map) (contentType contentType) (headers map) (timeout number[numbers.integer])`
+		];
+	};
 
-	fugazi.components.modules.descriptor.loaded(<fugazi.components.modules.descriptor.Descriptor> {
+	fugazi.loaded(<Descriptor> {
 		name: "io.fugazi.net.http",
 		commands: {
 			http: {
