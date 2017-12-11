@@ -1,0 +1,6 @@
+.idea
+.vscode
+.settings
+.DS_Store
+node_modules
+npm-debug.log

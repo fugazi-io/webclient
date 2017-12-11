@@ -38,19 +38,14 @@ In addition to the `help` commands, another useful command (especially if this i
 command which is ran using `man COMMAND_NAME`.  
 Examples:
 ```fugazi-command
-// command
 man manual
 ```
 ```fugazi-command
-// command
 man http
 ```
 
 It can be used on other components other than commands by specifying the component path.  
 Examples:
 ```fugazi-command
-// command
 man "io.fugazi"
 ```
-
-For more information head to the [github repo page](https://github.com/fugazi-io/webclient "repo@GitHub")

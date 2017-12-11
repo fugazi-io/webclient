@@ -3,11 +3,11 @@ import { Component, Descriptor, FugaziMap, ModuleContext } from "../../../../scr
 
 (function(): void {
 	let echoExamples = "#### Examples:\n";
-	echoExamples += "```fugazi-command\n// command\necho hey\n//output\n\"hey\"\n```\n\n";
-	echoExamples += "```fugazi-command\n// command\necho [1, 2, hey]\n// output\nlist [\n\t1\n\t2\n\t\"hey\"\n]```\n\n";
+	echoExamples += "```fugazi-command\necho hey\n//output\n\"hey\"\n```\n\n";
+	echoExamples += "```fugazi-command\necho [1, 2, hey]\n// output\nlist [\n\t1\n\t2\n\t\"hey\"\n]```\n\n";
 
 	let manExamples = "#### Examples:\n";
-	manExamples += "```fugazi-commands\n// command\nman echo\n// command\nman http\n// command\nman \"io.fugazi.strings\"\n```\n\n";
+	manExamples += "```fugazi-commands\nman echo\nman http\nman \"io.fugazi.strings\"\n```\n\n";
 
 	function jsonToFugazi(value: any): any {
 		if (typeof value !== "object" || value === null || fugazi.is(value, Array)) {
