@@ -1,6 +1,10 @@
 import { loadScript } from "./utils";
 import * as constants from "../app/constants";
 import * as applicationBus from "../app/application.bus";
+//import * as bugsnag from "bugsnag-js";
+import bugsnag from 'bugsnag-js';
+
+const client = bugsnag("8dbc3432f95b3099a9faa79276686ebf");
 
 export interface Logger {
 	debug(...args: any[]): void;
