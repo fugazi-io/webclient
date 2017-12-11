@@ -1,6 +1,6 @@
 {
 	"name": "daedalus-fugazi-webclient",
-	"version": "1.1.21",
+	"version": "0.0.1",
 	"description": "web based terminal application for executing local and remote commands",
 	"dependencies": {
 		"lz-string": "1.4.4",
