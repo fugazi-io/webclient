@@ -2,13 +2,13 @@ import * as view from "./view";
 import * as renderers from "./renderers";
 import * as statements from "../app/statements";
 import * as constants from "../app/constants";
-import * as logger from "../core/logger";
 import * as coreTypes from "../core/types";
 import * as handler from "../components/commands.handler";
 import * as commands from "../components/commands";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as Ps from "perfect-scrollbar";
+import { snitchers } from "../core/snitch";
 
 let history: Array<OutputItemInfo> = [];
 
@@ -178,7 +178,7 @@ export class OutputView extends view.View<OutputProperties, OutputState> {
 					</li>);
 				}
 			} else {
-				logger.loggers.warn("unknown OutputItemInfo type: ", info);
+				snitchers.warn("unknown OutputItemInfo type: ", info);
 			}
 		});
 

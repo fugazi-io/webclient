@@ -2,13 +2,13 @@ import * as utils from "../core/utils";
 import * as collections from "../core/types.collections";
 import * as coreTypes from "../core/types";
 import * as net from "../core/net";
-import * as logger from "../core/logger";
 import * as dom from "../core/dom";
 import * as constraintsDescriptor from "./constraints.descriptor";
 import * as convertersDescriptor from "./converters.descriptor";
 import * as componentsDescriptor from "./components.descriptor";
 import * as commandsDescriptor from "./commands.descriptor";
 import * as typesDescriptor from "./types.descriptor";
+import { snitchers } from "../core/snitch";
 
 const loadingScriptModules: collections.FugaziMap<ScriptLoader> = collections.map<ScriptLoader>();
 
@@ -21,7 +21,7 @@ export function loaded(moduleDescriptor: Descriptor): void {
 		name: string = currentScript.id;
 
 	if (!loadingScriptModules.has(name)) {
-		logger.loggers.error("unexpected module loaded");
+		snitchers.error("unexpected module loaded");
 		dom.remove(currentScript);
 		return;
 	}

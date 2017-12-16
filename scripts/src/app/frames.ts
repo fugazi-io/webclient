@@ -8,7 +8,7 @@ import * as dom from "../core/dom";
 import * as collections from "../core/types.collections";
 import * as coreTypes from "../core/types";
 import * as net from "../core/net";
-import * as logger from "../core/logger";
+import { snitchers } from "../core/snitch";
 
 let remoteProxies = collections.map() as collections.FugaziMap<Frame>,
 	pendingLoaders = collections.map() as collections.FugaziMap<Loader>,
@@ -16,7 +16,7 @@ let remoteProxies = collections.map() as collections.FugaziMap<Frame>,
 	framesContainer: HTMLDivElement;
 
 window.addEventListener("message", envelope => {
-	logger.loggers.info("[app.frames] message received");
+	snitchers.info("[app.frames] message received");
 
 	let message;
 	try {
@@ -25,7 +25,7 @@ window.addEventListener("message", envelope => {
 		return;
 	}
 
-	logger.loggers.info("[app.frames] message data: ", message);
+	snitchers.info("[app.frames] message data: ", message);
 
 	switch (message.type) {
 		case proxyframeProtocol.MessageTypes.ProxyFrameHandshake:

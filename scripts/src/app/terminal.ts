@@ -14,6 +14,7 @@ import * as modulesBuilder from "../components/modules.builder";
 import * as types from "../components/types";
 import * as commands from "../components/commands";
 import * as handler from "../components/commands.handler";
+import { snitchers } from "../core/snitch";
 
 export interface Properties {
 	name: string;
@@ -198,6 +199,7 @@ export class Terminal {
 
 	private executeCommand(command: string): commands.ExecutionResult {
 		ga("send", "event", "Commands", "execution - start", command);
+		snitchers.info(`Executing Command '${ command }'`);
 		storage.local.store(this.properties.name, this.properties);
 
 		let result: commands.ExecutionResult = null;
@@ -209,11 +211,13 @@ export class Terminal {
 				result = executableStatement.execute();
 			} else {
 				ga("send", "event", "Commands", "execution - None of the statements are executable", command);
+				snitchers.error("None of the statements are executable");
 				throw new coreTypes.Exception("None of the statements are executable");
 			}
 		} catch (e) {
 			const error = typeof e === "string" ? e : (e.message ? e.message : e.toString());
 			ga("send", "event", "Commands", "execution - error: " + error, command);
+			snitchers.error(`Execution failed with error '${ error }'`);
 			result = new commands.ExecutionResult(registry.getType("any"), false);
 			result.reject(e);
 		}

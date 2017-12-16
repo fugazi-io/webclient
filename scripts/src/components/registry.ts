@@ -10,10 +10,7 @@ import * as constraints from "./constraints";
 import * as types from "./types";
 import * as coreTypes from "../core/types";
 import * as net from "../core/net";
-import * as logger from "../core/logger";
 import * as collections from "../core/types.collections";
-
-logger.init();
 
 const index = collections.map<modules.Module>(),
 	defaultConverters = collections.map<converters.Converter>();

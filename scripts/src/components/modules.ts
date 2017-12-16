@@ -1,7 +1,6 @@
 import * as collections from "../core/types.collections";
 import * as coreTypes from "../core/types";
 import * as net from "../core/net";
-import * as logger from "../core/logger";
 import * as components from "./components";
 import * as commandsDescriptor from "./commands.descriptor";
 import * as types from "./types";
@@ -13,6 +12,7 @@ import * as descriptor from "./modules.descriptor";
 import * as appFrames from "../app/frames";
 import * as appModules from "../app/modules";
 import * as app from "../app/application";
+import { snitchers } from "../core/snitch";
 
 export type LookupType = "module-context";
 
@@ -514,7 +514,7 @@ export class RemoteSource implements Remote {
 			check();
 		};
 		const rejected = (name: string, url: net.Url) => {
-			logger.loggers.error("failed to load frame");
+			snitchers.error("failed to load frame");
 			failed.push({name, url});
 			check();
 		};
