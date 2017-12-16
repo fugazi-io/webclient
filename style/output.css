@@ -70,7 +70,6 @@ main#ui article.terminal section.output > .items > .execution .command .fa {
 main#ui article.terminal section.output > .items > .execution .result {
 	padding-top: 2px;
 	max-height: 500px;
-	/* max-height: 150px; */
 	overflow: hidden;
 	position: relative;
 }
