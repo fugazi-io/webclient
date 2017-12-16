@@ -3,8 +3,4 @@
 .settings
 .DS_Store
 node_modules
-**/scripts/bin
 npm-debug.log
-index.html
-*.bundle.js
-*.iml

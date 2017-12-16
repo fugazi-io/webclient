@@ -47,12 +47,10 @@ export class ExecutionResult {
 		} catch (e) {
 			str = value.toString();
 		}
-		ga("send", "event", "Commands", "execution.result - resolved", str);
 		this.future.resolve(value);
 	}
 
 	public reject(error: coreTypes.Exception): void {
-		ga("send", "event", "Commands", "execution.result - rejected", error.message);
 		this.future.reject(error);
 	}
 }

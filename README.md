@@ -1,4 +1,4 @@
-# fugazi.io 
+# customized fork of fugazi.io 
 
 A web based terminal application for executing local and remote commands.  
 The latest version of the terminal can be found here: http://fugazi.io.  

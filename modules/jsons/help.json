@@ -21,22 +21,6 @@
 				"endpoint": "commands.md"
 			}
 		},
-		"constraints": {
-			"title": "Type constraints help",
-			"syntax": "help constraints",
-			"returns": "ui.markdown",
-			"handler": {
-				"endpoint": "constraints.md"
-			}
-		},
-		"converters": {
-			"title": "Type converters help",
-			"syntax": "help converters",
-			"returns": "ui.markdown",
-			"handler": {
-				"endpoint": "converters.md"
-			}
-		},
 		"history": {
 			"title": "Commands history help",
 			"syntax": "help history",
@@ -67,22 +51,6 @@
 			"returns": "ui.markdown",
 			"handler": {
 				"endpoint": "syntax.md"
-			}
-		},
-		"types": {
-			"title": "Types help",
-			"syntax": "help types",
-			"returns": "ui.markdown",
-			"handler": {
-				"endpoint": "types.md"
-			}
-		},
-		"vars": {
-			"title": "Variables help",
-			"syntax": "help vars",
-			"returns": "ui.markdown",
-			"handler": {
-				"endpoint": "vars.md"
 			}
 		}
 	}

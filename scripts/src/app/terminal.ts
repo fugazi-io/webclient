@@ -197,7 +197,6 @@ export class Terminal {
 	}
 
 	private executeCommand(command: string): commands.ExecutionResult {
-		ga("send", "event", "Commands", "execution - start", command);
 		storage.local.store(this.properties.name, this.properties);
 
 		let result: commands.ExecutionResult = null;
@@ -208,12 +207,10 @@ export class Terminal {
 			if (!coreTypes.isNull(executableStatement)) {
 				result = executableStatement.execute();
 			} else {
-				ga("send", "event", "Commands", "execution - None of the statements are executable", command);
 				throw new coreTypes.Exception("None of the statements are executable");
 			}
 		} catch (e) {
 			const error = typeof e === "string" ? e : (e.message ? e.message : e.toString());
-			ga("send", "event", "Commands", "execution - error: " + error, command);
 			result = new commands.ExecutionResult(registry.getType("any"), false);
 			result.reject(e);
 		}
