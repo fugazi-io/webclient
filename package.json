@@ -1,6 +1,6 @@
 {
 	"name": "daedalus-fugazi-webclient",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "web based terminal application for executing local and remote commands",
 	"dependencies": {
 		"lz-string": "1.4.4",
@@ -37,7 +37,8 @@
 		"serve-public": "webpack-dev-server --no-info --colors --port 3330 --host 0.0.0.0",
 		"dev": "npm-run-all transpile -p transpile-watch serve",
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"bundle": "webpack --env.prod --progress --colors",
+		"bundle": "webpack --config webpack.config.js --env.prod --progress --colors",
+		"bundle-watch": "webpack --config webpack.config.js --env.prod --progress --colors --watch",
 		"build": "run-s transpile bundle"
 	},
 	"repository": {
