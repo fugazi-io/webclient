@@ -460,7 +460,7 @@ class HttpRequestObject extends HttpObject implements HttpRequest {
 			data = collections.map<any>(<types.PlainObject<any>> data);
 		}
 
-		this.open();
+		this.open(data);
 		this.processHeaders();
 		this.xhr.onreadystatechange = this.handler.bind(this);
 		this.processDataAndSend(<string | collections.FugaziMap<any>> data);
@@ -491,7 +491,7 @@ class HttpRequestObject extends HttpObject implements HttpRequest {
 		return this;
 	}
 
-	protected open(): void {
+	protected open(data?: string | types.PlainObject<any> | collections.FugaziMap<any>): void {
 		this.xhr.open(httpMethodToString(this.method), this.url.toString(), true);
 	}
 
