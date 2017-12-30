@@ -2,6 +2,7 @@ import * as handler from "./commands.handler";
 import * as collections from "../core/types.collections";
 import * as coreTypes from "../core/types";
 import * as net from "../core/net";
+import { snitchers } from "../core/snitch";
 import * as appModules from "../app/modules";
 import * as modules from "./modules";
 import * as components from "./components";
@@ -47,12 +48,14 @@ export class ExecutionResult {
 		} catch (e) {
 			str = value.toString();
 		}
-		ga("send", "event", "Commands", "execution.result - resolved", str);
+		snitchers.notify({ type: "Commands", data: "Result: Resolved"});
+		snitchers.info(`Result resolved to ${ value }`);
 		this.future.resolve(value);
 	}
 
 	public reject(error: coreTypes.Exception): void {
-		ga("send", "event", "Commands", "execution.result - rejected", error.message);
+		snitchers.notify({ type: "Commands", data: "Result: Rejected"});
+		snitchers.info(`Result rejected for ${ error.message }`);
 		this.future.reject(error);
 	}
 }

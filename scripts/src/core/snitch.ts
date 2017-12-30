@@ -1,19 +1,21 @@
 import { loadScript } from "./utils";
 import * as constants from "../app/constants";
 import * as applicationBus from "../app/application.bus";
+
 import bugsnag from 'bugsnag-js';
+import * as ReactGA from 'react-ga';
 
 const client = bugsnag("T O K E N");
 
 
 export interface Metric {
-	timestamp: Date,
+	timestamp?: Date,
 	key: string,
 	value: number
 }
 
 export interface Event {
-	timestamp: Date,
+	timestamp?: Date,
 	type: string,
 	data: any
 }
@@ -131,13 +133,45 @@ class LogglySnitcher implements Snitcher {
     }
 
 	trace(metric: Metric): void {
-		const metricMessage = `Metric ${metric.key}: ${metric.value} recorded at ${metric.timestamp}`;
-		window._LTracker.push(metricMessage);
+		// unsupported
 	}
 
 	notify(event: Event): void {
-		const eventMessage = `Event ${event.type}: ${event.data} recorded at ${event.timestamp}`;
-		throw new Error(eventMessage);
+		// unsupported
+	}
+}
+
+class GoogleAnalyticsSnitcher implements Snitcher {
+	constructor() {
+		ReactGA.initialize('UA-91051756-1');
+		ReactGA.pageview(window.location.pathname + window.location.search);
+	}
+
+	debug(...args: any[]): void {
+		// unsupported
+	}
+
+	info(...args: any[]): void {
+		// unsupported
+	}
+
+	warn(...args: any[]): void {
+		// unsupported
+	}
+
+	error(...args: any[]): void {
+		// unsupported
+	}
+
+	trace(metric: Metric): void {
+		// unsupported
+	}
+
+	notify(event: Event): void {
+		ReactGA.event({
+			category: event.type,
+			action: event.data.toString()
+		});
 	}
 }
 
@@ -146,6 +180,7 @@ export const snitchers: Snitcher = new Snitchers();
 applicationBus.register(constants.Events.Loaded, function () {
 	(snitchers as Snitchers).add(new LogglySnitcher());
 	(snitchers as Snitchers).add(new ConsoleSnitcher());
+	(snitchers as Snitchers).add(new GoogleAnalyticsSnitcher());
 
 	console.log("Loggers loaded");
 
