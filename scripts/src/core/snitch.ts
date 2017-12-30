@@ -1,6 +1,10 @@
 import { loadScript } from "./utils";
 import * as constants from "../app/constants";
 import * as applicationBus from "../app/application.bus";
+import bugsnag from 'bugsnag-js';
+
+const client = bugsnag("T O K E N");
+
 
 export interface Metric {
 	timestamp: Date,

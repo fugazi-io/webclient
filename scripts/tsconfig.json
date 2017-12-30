@@ -6,6 +6,7 @@
 		"rootDir": "src",
 		"declaration": true,
 		"skipLibCheck": true,
-		"skipDefaultLibCheck": true
+		"skipDefaultLibCheck": true,
+		"moduleResolution": "node"
 	}
 }
