@@ -105,7 +105,7 @@ class LogglySnitcher implements Snitcher {
 	constructor() {
 		window._LTracker = window._LTracker || [];
 		window._LTracker.push({
-			"logglyKey": "T O K E N",
+			"logglyKey": "f9b61795-ceaf-4dfe-956e-9a4f02e51150",
 			"sendConsoleErrors" : true,
 			"tag" : "webclient"
 		});
