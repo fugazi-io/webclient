@@ -4,10 +4,10 @@
 	"description": "web based terminal application for executing local and remote commands",
 	"dependencies": {
 		"lz-string": "1.4.4",
-		"react": "15.6.1",
-		"react-dom": "15.6.1",
+		"marked": "^0.3.9",
 		"perfect-scrollbar": "0.7.1",
-		"marked": "0.3.6"
+		"react": "15.6.1",
+		"react-dom": "15.6.1"
 	},
 	"devDependencies": {
 		"@types/google.analytics": "0.0.34",
